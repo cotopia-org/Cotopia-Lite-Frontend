@@ -1,7 +1,9 @@
 import { Eclipse } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
+export const metadata = {
+  title: "Select Room",
+};
 export default function SelectRoomPage() {
   return (
     <div className='w-screen h-screen flex flex-col items-center justify-center'>
