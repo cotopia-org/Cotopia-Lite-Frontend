@@ -1,14 +1,14 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
-import { Grid2X2 } from "lucide-react";
+import { UserRoundPlus } from "lucide-react";
 import React from "react";
 
-export default function MenuButton() {
+export default function InviteButtonTool() {
   return (
     <CotopiaButton
-      startIcon={<Grid2X2 />}
+      startIcon={<UserRoundPlus />}
       className='bg-white hover:bg-white text-black rounded-xl'
     >
-      MenuButton
+      Invite
     </CotopiaButton>
   );
 }

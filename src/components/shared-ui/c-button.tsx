@@ -17,7 +17,7 @@ export default function CotopiaButton({
 }: Props) {
   const isDisabled = rest?.disabled ?? loading ?? false;
   let clss = rest?.className ?? "";
-  clss += ` gap-x-2 px-2 rounded-xl`;
+  clss += ` gap-x-2 px-2`;
 
   return (
     <Button {...rest} className={clss} disabled={isDisabled}>
