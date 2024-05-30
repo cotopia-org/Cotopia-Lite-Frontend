@@ -17,14 +17,7 @@ export default function UserSession({ participant }: Props) {
     <DraggableComponent>
       <div className='relative rounded-full bg-primary w-[96px] h-[96px] flex flex-col items-center justify-center'>
         <div className='w-[86px] h-[86px] bg-white rounded-full flex flex-col items-center justify-center'>
-          <div className='w-[82px] h-[82px] rounded-full bg-black'>
-            <video
-              ref={participant.videoTrackPublications.values().next()}
-              autoPlay
-              muted
-              playsInline
-            />
-          </div>
+          <div className='w-[82px] h-[82px] rounded-full bg-black'></div>
         </div>
         <ActionsRight>
           <MicButton />
