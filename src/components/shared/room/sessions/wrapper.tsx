@@ -1,10 +1,11 @@
-import { isScreenShareExist, useExcludeShareScreenTrack } from "@/lib/utils";
+import { isScreenShareExist } from "@/lib/utils";
 import getTrackRefId from "@/types/get-track-ref-id";
 import { getTrackReferenceId } from "@livekit/components-core";
 import {
   TrackRefContext,
   TrackReferenceOrPlaceholder,
 } from "@livekit/components-react";
+import { Track } from "livekit-client";
 import { Children, ReactNode, cloneElement, isValidElement, memo } from "react";
 
 type Props = {
@@ -22,6 +23,16 @@ export const cloneSingleChild = (
       return cloneElement(child, { ...props, key });
     }
   });
+};
+
+const useExcludeShareScreenTrack = (tracks: TrackReferenceOrPlaceholder[]) => {
+  let finalTracks = [];
+  for (let item of tracks) {
+    if (item.source !== Track.Source.ScreenShare) {
+      finalTracks.push(item);
+    }
+  }
+  return finalTracks;
 };
 
 const CustomGridLayout = ({ tracks, children }: Props) => {

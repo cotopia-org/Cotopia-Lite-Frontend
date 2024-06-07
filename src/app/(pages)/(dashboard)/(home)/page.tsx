@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { __VARS } from "../../const/vars";
+import { __VARS } from "../../../const/vars";
 import GetRoomToken from "./components/get-room-token";
 import { redirect } from "next/navigation";
 

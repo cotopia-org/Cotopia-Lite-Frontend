@@ -20,7 +20,7 @@ export default function CotopiaButton({
   clss += ` gap-x-2 px-2`;
 
   return (
-    <Button {...rest} className={clss} disabled={isDisabled}>
+    <Button type='button' {...rest} className={clss} disabled={isDisabled}>
       {loading ? (
         <Loader className='animate-spin' />
       ) : (

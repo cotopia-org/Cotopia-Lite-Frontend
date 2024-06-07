@@ -1,17 +1,24 @@
-import {
-  getTrackReferenceId,
-  isScreenShareExist,
-  useExcludeShareScreenTrack,
-} from "@/lib/utils";
+import { isScreenShareExist } from "@/lib/utils";
 import {
   TrackRefContext,
   TrackReferenceOrPlaceholder,
 } from "@livekit/components-react";
+import { Track } from "livekit-client";
 import { Children, ReactNode, cloneElement, isValidElement } from "react";
 
 type Props = {
   tracks: TrackReferenceOrPlaceholder[];
   children: ReactNode;
+};
+
+const useExcludeShareScreenTrack = (tracks: TrackReferenceOrPlaceholder[]) => {
+  let finalTracks = [];
+  for (let item of tracks) {
+    if (item.source !== Track.Source.ScreenShare) {
+      finalTracks.push(item);
+    }
+  }
+  return finalTracks;
 };
 
 export const cloneSingleChild = (
@@ -62,7 +69,8 @@ const SpcialLayout = ({ tracks, children }: Props) => {
             className={
               "w-[400px] h-[300px] [&_.rounded-full]:!w-full [&_.rounded-full]:!h-full [&_.rounded-full]:!rounded-md"
             }
-            key={getTrackReferenceId(shareScreenTrack)}
+            // key={getTrackReferenceId(shareScreenTrack) ?? "-"}
+            // key={}
           >
             <TrackRefContext.Provider value={shareScreenTrack}>
               {cloneSingleChild(children)}
