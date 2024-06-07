@@ -10,7 +10,6 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  transformIgnorePatterns: ['/node_modules/']
 };
 
 module.exports = createJestConfig(customJestConfig);

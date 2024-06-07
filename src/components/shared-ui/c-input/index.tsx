@@ -1,4 +1,4 @@
-import { Input, InputProps } from "../ui/input";
+import { Input, InputProps } from "../../ui/input";
 
 type Props = InputProps & {
   label?: string;
@@ -28,7 +28,11 @@ export default function CotopiaInput({
         </strong>
       )}
       <Input {...rest} className={inputClasss} />
-      {helperText && <span className={helperTextClss}>{helperText}</span>}
+      {helperText && (
+        <span data-testid='hint-text' className={helperTextClss}>
+          {helperText}
+        </span>
+      )}
     </div>
   );
 }

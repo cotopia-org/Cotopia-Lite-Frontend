@@ -40,7 +40,7 @@ export default function CotopiaPasswordInput({
           className={inputClasss}
         />
         <CotopiaIconButton
-          className='absolute top-[50%] translate-y-[-50%] right-2 !bg-transparent'
+          className='absolute top-[50%] translate-y-[-50%] right-0 !bg-transparent'
           variant={"ghost"}
           onClick={handleToggleShowPassword}
         >

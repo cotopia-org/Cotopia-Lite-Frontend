@@ -18,6 +18,7 @@ export default function GetRoomToken({ onSetToken }: Props) {
       token: Yup.string().required("Token is required"),
     }),
     onSubmit: (values, actions) => {
+      console.log("values, ", values.token);
       onSetToken(values.token);
     },
   });
@@ -38,7 +39,9 @@ export default function GetRoomToken({ onSetToken }: Props) {
         hasError={!!touched.token && !!errors.token}
         helperText={!!touched.token && !!errors.token && errors.token}
       />
-      <CotopiaButton disabled={!values.token}>Enter</CotopiaButton>
+      <CotopiaButton type='submit' disabled={!values.token}>
+        Enter
+      </CotopiaButton>
     </form>
   );
 }
