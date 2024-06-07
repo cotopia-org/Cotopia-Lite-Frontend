@@ -5,26 +5,48 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import CotopiaInput from "@/components/shared-ui/c-input";
 import CotopiaPasswordInput from "@/components/shared-ui/c-password-input";
 import { buttonVariants } from "@/components/ui/button";
+import axiosInstance from "@/lib/axios";
+import { AuthenticateType } from "@/types/authenticate";
 import { useFormik } from "formik";
 import { MoveRight } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
 //Login form wrapper
-export default function SignInForm() {
-  const { values, touched, errors, getFieldProps, handleSubmit } = useFormik({
-    initialValues: {
-      username: "",
-      password: "",
-    },
-    validationSchema: Yup.object().shape({
-      username: Yup.string().required("Username is required"),
-      password: Yup.string().required("Password is required"),
-    }),
-    onSubmit: (values, actions) => {
-      console.log("values", values);
-    },
-  });
+type Props = {
+  onLoggedIn?: (res: AuthenticateType) => void;
+};
+export default function SignInForm({ onLoggedIn }: Props) {
+  const { values, touched, errors, isSubmitting, getFieldProps, handleSubmit } =
+    useFormik({
+      initialValues: {
+        username: "",
+        password: "",
+      },
+      validationSchema: Yup.object().shape({
+        username: Yup.string().required("Username is required"),
+        password: Yup.string().required("Password is required"),
+      }),
+      onSubmit: async (values, actions) => {
+        //Register user here
+        actions.setSubmitting(true);
+        try {
+          const res = await axiosInstance.post<AuthenticateType>(
+            `/auth/login`,
+            {
+              username: values.username,
+              password: values.password,
+            }
+          );
+          actions.setSubmitting(false);
+          toast.success("You logged in successfully.");
+          if (onLoggedIn) onLoggedIn(res.data);
+        } catch (e) {
+          actions.setSubmitting(false);
+        }
+      },
+    });
 
   return (
     <div className='flex flex-col gap-y-8 items-start px-6 md:px-0'>
@@ -57,6 +79,7 @@ export default function SignInForm() {
         <CotopiaButton
           type='submit'
           disabled={!values.username || !values.password}
+          loading={isSubmitting}
         >
           Login
         </CotopiaButton>

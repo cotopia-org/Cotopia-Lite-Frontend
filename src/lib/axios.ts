@@ -9,6 +9,9 @@ type ErrorResponseObjectType = {
 // Create a new Axios instance
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    ["Content-Type"]: "application/json",
+  },
 });
 
 // Add a request interceptor to add authorization headers
@@ -59,25 +62,11 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    //Toasting error
-    const errorData:
-      | ErrorResponseObjectType[]
-      | {
-          code: number;
-          message: string;
-          name: string;
-          status: number;
-        } = error?.response?.data;
+    const errorData = error.response.data;
 
-    if (errorData) {
-      if (Array.isArray(errorData)) {
-        if (errorData.length > 0)
-          for (let item of errorData) {
-            toast.error(item.message);
-          }
-      } else {
-        if (errorData?.message) toast.error(errorData?.message);
-      }
+    if (errorData?.["detail"] && typeof errorData["detail"] === "string") {
+      //Means we have error string as detail
+      toast.error(errorData.detail);
     }
 
     return Promise.reject(error);

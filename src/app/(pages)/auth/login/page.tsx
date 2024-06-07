@@ -1,13 +1,22 @@
+import { AuthenticateType } from "@/types/authenticate";
 import SignInForm from "./sign-in-form";
+import { cookies } from "next/headers";
+import { __VARS } from "@/app/const/vars";
 
 export const metadata = {
   title: "Login to your account",
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  async function onLoggedIn(res: AuthenticateType) {
+    "use server";
+
+    cookies().set(__VARS.tokenCookieKey, res.access_token);
+  }
+
   return (
     <main className='w-screen h-screen flex flex-col items-center justify-center '>
-      <SignInForm />
+      <SignInForm onLoggedIn={onLoggedIn} />
     </main>
   );
 }
