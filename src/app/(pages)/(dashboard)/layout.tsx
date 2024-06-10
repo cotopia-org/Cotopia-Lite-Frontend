@@ -6,6 +6,7 @@ import Header from "./components/header";
 import Dashboard from "./dashboard";
 import DashboardMenus, { DashboardMenuItemType } from "./components/menus";
 import { Clock, Star } from "lucide-react";
+import DashboardLayoutMaker from "@/components/shared/layouts/dashboard";
 
 type Props = {
   children: ReactNode;
@@ -42,20 +43,12 @@ export default async function layout({ children }: Props) {
 
   return (
     <Dashboard user={data?.user} accessToken={data?.accessToken as string}>
-      <main className='w-screen min-h-screen flex flex-col'>
-        <Header />
-        <div className='grid grid-cols-12 gap-x-32 w-full p-4'>
-          <div className='col-span-3'>
-            <div className='w-[240px] max-w-full'>
-              <DashboardMenus items={ITEMS} className='gap-y-2' />
-            </div>
-          </div>
-          <div className='col-span-7'>
-            <div className='w-[666px] mx-auto max-w-full'>{children}</div>
-          </div>
-          <div className='col-span-2 bg-black/10'>Right</div>
-        </div>
-      </main>
+      <DashboardLayoutMaker
+        header={<Header />}
+        leftSidebar={<DashboardMenus items={ITEMS} className='gap-y-2' />}
+      >
+        {children}
+      </DashboardLayoutMaker>
     </Dashboard>
   );
 }
