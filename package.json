@@ -19,11 +19,13 @@
     "formik": "^2.4.6",
     "livekit-client": "^2.1.5",
     "lucide-react": "^0.379.0",
+    "moment": "^2.30.1",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
     "react-draggable": "^4.4.6",
     "sonner": "^1.4.41",
+    "swr": "^2.2.5",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "yup": "^1.4.0"

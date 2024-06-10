@@ -25,8 +25,10 @@ export default function CotopiaButton({
         <Loader className='animate-spin' />
       ) : (
         <>
-          {!!startIcon && startIcon}
-          {rest?.children}
+          <div className='flex flex-row items-center gap-x-1'>
+            {!!startIcon && startIcon}
+            {rest?.children}
+          </div>
           {!!endIcon && endIcon}
         </>
       )}

@@ -1,3 +1,4 @@
+import { __VARS } from "@/app/const/vars";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { toast } from "sonner";
 
@@ -46,19 +47,24 @@ axiosInstance.interceptors.response.use(
 
     // If error response status is 401 and the request was not already retried
     if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+      // originalRequest._retry = true;
+      // // Perform token refresh logic here
+      // try {
+      //   const newAccessToken = await refreshAccessToken(); // Implement your refresh token logic
+      //   if (newAccessToken) {
+      //     // Retry the original request with the new access token
+      //     originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+      //     return axiosInstance(originalRequest);
+      //   }
+      // } catch (refreshError) {
+      //   //Signing out the user here
+      //   //TODO - Add logic here
+      // }
 
-      // Perform token refresh logic here
-      try {
-        const newAccessToken = await refreshAccessToken(); // Implement your refresh token logic
-        if (newAccessToken) {
-          // Retry the original request with the new access token
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return axiosInstance(originalRequest);
-        }
-      } catch (refreshError) {
-        //Signing out the user here
-        //TODO - Add logic here
+      //Means we are in client mode
+      if (typeof window !== "undefined") {
+        toast.loading("You are going to logout!");
+        // window.location.href = __VARS.signOutApiPage;
       }
     }
 
