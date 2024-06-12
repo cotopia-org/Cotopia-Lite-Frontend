@@ -7,6 +7,7 @@ import {
 } from "livekit-client";
 import SpcialLayout from "./special-layout";
 import {
+  RoomAudioRenderer,
   useParticipants,
   useRoomContext,
   useTracks,
@@ -21,10 +22,18 @@ export default function UserSessions() {
       { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    {
+      updateOnlyOn: [
+        RoomEvent.ActiveSpeakersChanged,
+        RoomEvent.Reconnected,
+        RoomEvent.Reconnecting,
+        RoomEvent.MediaDevicesChanged,
+        RoomEvent.LocalTrackPublished,
+        RoomEvent.TrackUnsubscribed,
+      ],
+      onlySubscribed: true,
+    }
   );
-
-  const participants = useParticipants();
 
   if (state !== "connected") return <FullLoading />;
 
@@ -32,6 +41,7 @@ export default function UserSessions() {
     <SpcialLayout tracks={tracks}>
       <>
         <UserSession />
+        <RoomAudioRenderer />
       </>
     </SpcialLayout>
   );
