@@ -9,7 +9,6 @@ import BottomMiddleTools from "./tools/bottom-middle";
 import BottomRightTools from "./tools/bottom-right";
 import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
-import dynamic from "next/dynamic";
 import UserSessions from "./sessions";
 
 type Props = {

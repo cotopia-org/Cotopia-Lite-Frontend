@@ -63,7 +63,7 @@ axiosInstance.interceptors.response.use(
 
       //Means we are in client mode
       if (typeof window !== "undefined") {
-        toast.loading("You are going to logout!");
+        // toast.loading("You are going to logout!");
         // window.location.href = __VARS.signOutApiPage;
       }
     }

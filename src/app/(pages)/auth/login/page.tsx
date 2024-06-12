@@ -8,6 +8,7 @@ export const metadata = {
 };
 
 export default async function LoginPage() {
+  //Server action
   async function onLoggedIn(res: AuthenticateType) {
     "use server";
 

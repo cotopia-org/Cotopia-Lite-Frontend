@@ -159,13 +159,13 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
                           />
                         )
                       )}
-                      <TrackMutedIndicator
+                      {/* <TrackMutedIndicator
                         trackRef={{
                           participant: trackReference.participant,
                           source: Track.Source.Microphone,
                         }}
                         show={"muted"}
-                      ></TrackMutedIndicator>
+                      ></TrackMutedIndicator> */}
                       {/* <div className='lk-participant-placeholder'>
                   <ParticipantPlaceholder />
                 </div>
