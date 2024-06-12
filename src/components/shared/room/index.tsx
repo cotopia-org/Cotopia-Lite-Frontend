@@ -77,6 +77,7 @@ export default function RoomHolder({ token }: Props) {
           deviceId: "",
           echoCancellation: true,
           noiseSuppression: true,
+          sampleRate: 100,
         },
       }}
     >

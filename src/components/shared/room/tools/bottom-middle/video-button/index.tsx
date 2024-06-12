@@ -1,4 +1,5 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
+import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Video, VideoOff } from "lucide-react";
@@ -24,9 +25,15 @@ export default function VideoButtonTool() {
     }
   };
 
+  let title = "Video Off";
+
+  if (track?.isMuted) title = "Video on";
+
   return (
-    <CotopiaIconButton className='text-black' onClick={toggleUpstream}>
-      {isUpstreamPaused ? <VideoOff size={20} /> : <Video size={20} />}
-    </CotopiaIconButton>
+    <CotopiaTooltip title={title}>
+      <CotopiaIconButton className='text-black' onClick={toggleUpstream}>
+        {isUpstreamPaused ? <VideoOff size={20} /> : <Video size={20} />}
+      </CotopiaIconButton>
+    </CotopiaTooltip>
   );
 }

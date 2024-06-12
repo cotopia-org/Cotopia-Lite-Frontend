@@ -4,7 +4,6 @@ import {
   useTrackMutedIndicator,
 } from "@livekit/components-react";
 import { Mic, MicOff } from "lucide-react";
-import { useState } from "react";
 
 type Props = {
   trackRef: TrackMutedIndicatorProps["trackRef"];

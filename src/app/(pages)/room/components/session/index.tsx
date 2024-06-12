@@ -1,26 +1,16 @@
 "use client";
 
-import DraggableComponent from "@/components/shared/draggable";
-import ActionsRight from "./actions-right";
-import ActionsLeft from "./actions-left";
-import MicButton from "./actions-right/mic";
-import UserButton from "./actions-left/user";
 import {
-  isTrackReference,
   ParticipantContext,
   ParticipantTileProps,
   TrackRefContext,
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
-  useParticipants,
 } from "@livekit/components-react";
-import { useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { TrackReferenceType } from "@/types/track-reference";
-import isMyParticipant from "@/hooks/livekit/is-my-participant";
 import { Participant, Track } from "livekit-client";
-import { Mic, MicOff } from "lucide-react";
 import DraggableCircle from "./draggable-circle";
-import SessionWrapper from "./wrapper";
 
 function SpacialParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -37,6 +27,12 @@ function SpacialParticipantContextIfNeeded(
     <>{props.children}</>
   );
 }
+
+const SessionContext = createContext<{ track?: TrackReferenceType }>({
+  track: undefined,
+});
+
+export const useUserTile = () => useContext(SessionContext);
 
 function TrackRefContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -72,7 +68,9 @@ export default function UserSession({ trackRef }: Props) {
       <SpacialParticipantContextIfNeeded
         participant={trackReference.participant}
       >
-        <DraggableCircle />
+        <SessionContext.Provider value={{ track: trackReference }}>
+          <DraggableCircle />
+        </SessionContext.Provider>
       </SpacialParticipantContextIfNeeded>
     </TrackRefContextIfNeeded>
   );

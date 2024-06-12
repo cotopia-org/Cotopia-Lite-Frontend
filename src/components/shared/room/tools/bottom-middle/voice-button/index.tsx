@@ -1,4 +1,5 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
+import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { useLocalParticipant, useTracks } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Mic, MicOff } from "lucide-react";
@@ -11,7 +12,6 @@ export default function VoiceButtonTool() {
     ],
     { onlySubscribed: false }
   );
-  console.log("tracks", tracks);
 
   const { localParticipant } = useLocalParticipant();
 
@@ -35,9 +35,15 @@ export default function VoiceButtonTool() {
     }
   };
 
+  let title = "Mic Off";
+
+  if (track?.isMuted) title = "Mic on";
+
   return (
-    <CotopiaIconButton className='text-black' onClick={toggleMute}>
-      {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
-    </CotopiaIconButton>
+    <CotopiaTooltip title={title}>
+      <CotopiaIconButton className='text-black' onClick={toggleMute}>
+        {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+      </CotopiaIconButton>
+    </CotopiaTooltip>
   );
 }

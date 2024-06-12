@@ -1,17 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Ping from "./ping";
-import { useTracks } from "@livekit/components-react";
-import { Track } from "livekit-client";
+
+import { useUserTile } from "../..";
+
+const getNumberRandom = () => {
+  return Math.random() * 10000000;
+};
 
 export default function VoiceEffects() {
-  const tracks = useTracks(
-    [{ source: Track.Source.Microphone, withPlaceholder: true }],
-    { onlySubscribed: false }
-  );
+  const { track } = useUserTile();
+
+  const [pings, setPings] = useState<number[]>([]);
+
+  if (track === undefined) return;
+
+  useEffect(() => {
+    if (track === undefined) return;
+
+    const id = getNumberRandom();
+
+    setPings((prev) => [...prev, id]);
+
+    setTimeout(() => {
+      setPings((prev) => prev.filter((x) => x !== id));
+    }, 600);
+
+    return () => {
+      setPings([]);
+    };
+  }, [track?.participant?.audioLevel, track?.participant?.isSpeaking]);
 
   return (
     <>
-      <Ping />
+      {pings.map((_, key) => (
+        <Ping key={key} />
+      ))}
     </>
   );
 }
