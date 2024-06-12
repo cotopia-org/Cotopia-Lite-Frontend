@@ -20,6 +20,7 @@ import isMyParticipant from "@/hooks/livekit/is-my-participant";
 import { Participant, Track } from "livekit-client";
 import { Mic, MicOff } from "lucide-react";
 import DraggableCircle from "./draggable-circle";
+import SessionWrapper from "./wrapper";
 
 function SpacialParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -54,8 +55,6 @@ function TrackRefContextIfNeeded(
 
 type Props = ParticipantTileProps;
 export default function UserSession({ trackRef }: Props) {
-  const participants = useParticipants();
-
   const maybeTrackRef = useMaybeTrackRefContext();
 
   const trackReference: TrackReferenceType = useMemo(() => {
@@ -67,29 +66,6 @@ export default function UserSession({ trackRef }: Props) {
 
     return latestTrack;
   }, [maybeTrackRef, trackRef]);
-
-  const { isLocal, localPart } = isMyParticipant(
-    participants,
-    trackReference.participant
-  );
-
-  // let hasVideo =
-  //   (isTrackReference(trackReference) &&
-  //     trackReference.publication?.kind === "video") ||
-  //   trackReference.source === Track.Source.Camera ||
-  //   trackReference.source === Track.Source.ScreenShare;
-
-  // const isScreenShare = trackReference.source === "screen_share";
-
-  let micStatusIcon = <MicOff className='text-white' />;
-  if (isLocal && localPart.isMicrophoneEnabled) {
-    micStatusIcon = <Mic className='text-white' />;
-  }
-
-  let showCamera = localPart?.isCameraEnabled || false;
-  if (trackReference.source === "screen_share") {
-    showCamera = true;
-  }
 
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>

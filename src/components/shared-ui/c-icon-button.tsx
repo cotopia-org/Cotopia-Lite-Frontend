@@ -1,6 +1,4 @@
-import { Loader } from "lucide-react";
-import { Button, ButtonProps } from "../ui/button";
-import { Input, InputProps } from "../ui/input";
+import { ButtonProps } from "../ui/button";
 import CotopiaButton from "./c-button";
 
 type Props = ButtonProps & {
@@ -9,7 +7,7 @@ type Props = ButtonProps & {
 
 export default function CotopiaIconButton({ loading, ...rest }: Props) {
   let clssName = rest?.className ?? "";
-  clssName += ` bg-white rounded-full`;
+  clssName += ` bg-white rounded-full hover:bg-gray-100`;
 
   return (
     <CotopiaButton

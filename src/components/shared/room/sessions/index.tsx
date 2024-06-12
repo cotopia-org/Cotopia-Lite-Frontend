@@ -31,9 +31,7 @@ export default function UserSessions() {
   return (
     <SpcialLayout tracks={tracks}>
       <>
-        {participants.map((pt, index) => (
-          <UserSession key={pt.identity} />
-        ))}
+        <UserSession />
       </>
     </SpcialLayout>
   );

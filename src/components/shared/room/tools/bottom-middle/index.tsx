@@ -10,7 +10,7 @@ import GridViewButtonTool from "./gridview-button";
 
 export default function BottomMiddleTools() {
   return (
-    <div className='flex flex-row items-center bg-white rounded-xl px-2'>
+    <div className='flex flex-row items-center bg-white rounded-xl p-2'>
       <AddButtonTool />
       <EditButtonTool />
       <ShareScreenButtonTool />

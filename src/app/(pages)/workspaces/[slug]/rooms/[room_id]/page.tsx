@@ -6,6 +6,11 @@ type Props = {
     token: string;
   };
 };
+
+export const metadata = {
+  title: "Room",
+};
+
 export default function RoomPage({ searchParams: { token } }: Props) {
   if (!token) {
     return notFound();
