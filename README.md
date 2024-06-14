@@ -10,10 +10,21 @@ npm install
 yarn
 ```
 
-Create .env.development or .env.production according to .env.example, after that you can run you server by:
+
+For testing, please create .env.test, after that run test script, 
+
+```bash
+npm run test
+# or
+yarn test
+```
+
+For run the development area, create .env.development or for production mode, create .env.production according to .env.example, after that you can run the server by:
 
 ```bash
 npm run dev
 # or
 yarn dev
 ```
+
+
