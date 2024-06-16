@@ -1,5 +1,6 @@
 "use client";
 
+import { DashboardWrapper } from "@/context";
 import axiosInstance from "@/lib/axios";
 import { UserType } from "@/types/user";
 import {
@@ -36,12 +37,10 @@ export default function Dashboard({ user, children, accessToken }: Props) {
   if (!tokenSet) return;
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={{user,}}>
+      <DashboardWrapper>
+        {children}
+      </DashboardWrapper>
     </AuthContext.Provider>
   );
 }

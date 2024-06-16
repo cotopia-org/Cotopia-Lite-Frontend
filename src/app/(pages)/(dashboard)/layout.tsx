@@ -7,7 +7,6 @@ import Dashboard from "./dashboard";
 import DashboardMenus, { DashboardMenuItemType } from "./components/menus";
 import { Clock, Star } from "lucide-react";
 import DashboardLayoutMaker from "@/components/shared/layouts/dashboard";
-import { DashboardWrapper } from "@/context";
 
 type Props = {
   children: ReactNode;
@@ -43,7 +42,6 @@ export default async function layout({ children }: Props) {
   if (!isAuthenticated) return redirect(__VARS.loginPage);
 
   return (
-    <DashboardWrapper>
       <Dashboard user={data?.user} accessToken={data?.accessToken as string}>
         <DashboardLayoutMaker
           header={<Header />}
@@ -52,6 +50,5 @@ export default async function layout({ children }: Props) {
           {children}
         </DashboardLayoutMaker>
       </Dashboard>
-    </DashboardWrapper>
   );
 }
