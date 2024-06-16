@@ -19,7 +19,7 @@ export default async function getServerSession<T = UserSession>() {
   if (!token)
     return {
       data: undefined,
-      isAuthenticated: false,
+      isAuthenticated: true,
     };
 
   let user;

@@ -16,7 +16,7 @@ export default function DashboardLayoutMaker({
   header,
 }: Props) {
   const { windowSize } = useWindowSize();
-  const { isOpen } = useAppContext();
+  const { sideBarOpen } = useAppContext();
 
   return (
     <main className='w-screen min-h-screen flex flex-col'>
@@ -33,7 +33,7 @@ export default function DashboardLayoutMaker({
           </div>
 
           // In Dispaly Smaller than or = 1020
-        ) : windowSize.windowWidth <= 1020 && isOpen && (
+        ) : windowSize.windowWidth <= 1020 && sideBarOpen && (
           <div className="col-span-7">
             {/* w-15 => 15 rem = 240px */}
             <div className='w-15 max-w-full'>

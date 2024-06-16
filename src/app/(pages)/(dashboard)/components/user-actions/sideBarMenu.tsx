@@ -8,10 +8,10 @@ import { useAppContext } from "@/context";
 
 export default function UserActionsMenuButton() {
   const { windowSize } = useWindowSize();
-  const { isOpen, setIsOpen } = useAppContext();
+  const { sideBarOpen, setSideBarOpen } = useAppContext();
 
   function handlerClick() {
-    setIsOpen(!isOpen);
+    setSideBarOpen(!sideBarOpen);
   }
 
   return (
