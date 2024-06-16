@@ -1,7 +1,7 @@
 'use client';
 import React, { ReactNode } from "react";
 import useWindowSize from "@/hooks/use-window-size";
-import { useAppContext } from "@/context";
+import { useDashboardContext } from "@/context";
 
 type Props = {
   leftSidebar?: ReactNode;
@@ -16,7 +16,7 @@ export default function DashboardLayoutMaker({
   header,
 }: Props) {
   const { windowSize } = useWindowSize();
-  const { sideBarOpen } = useAppContext();
+  const { sideBarOpen } = useDashboardContext();
 
   return (
     <main className='w-screen min-h-screen flex flex-col'>

@@ -2,29 +2,29 @@
 
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
 
-interface AppContextValue {
+interface DashboardContextValue {
   sideBarOpen: boolean;
   setSideBarOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const AppContext = createContext<AppContextValue | undefined>(undefined);
+const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
-interface AppWrapperProps {
+interface DashboardWrapperProps {
   children: ReactNode;
 }
 
-export function AppWrapper({ children }: AppWrapperProps) {
+export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const [sideBarOpen, setSideBarOpen] = useState(false);
 
   return (
-    <AppContext.Provider value={{ sideBarOpen, setSideBarOpen }}>
+    <DashboardContext.Provider value={{ sideBarOpen, setSideBarOpen }}>
       {children}
-    </AppContext.Provider>
+    </DashboardContext.Provider>
   );
 }
 
-export function useAppContext() {
-  const context = useContext(AppContext);
+export function useDashboardContext() {
+  const context = useContext(DashboardContext);
 
   if (!context) {
     throw new Error("useAppContext must be used within an AppWrapper");

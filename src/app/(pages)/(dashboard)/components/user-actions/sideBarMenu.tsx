@@ -4,11 +4,11 @@ import React from "react";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import useWindowSize from "@/hooks/use-window-size";
 import { AlignJustify } from "lucide-react";
-import { useAppContext } from "@/context";
+import { useDashboardContext } from "@/context";
 
 export default function UserActionsMenuButton() {
   const { windowSize } = useWindowSize();
-  const { sideBarOpen, setSideBarOpen } = useAppContext();
+  const { sideBarOpen, setSideBarOpen } = useDashboardContext();
 
   function handlerClick() {
     setSideBarOpen(!sideBarOpen);
