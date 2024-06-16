@@ -14,22 +14,23 @@ export default function JoinWorkspaceWithLink() {
       validationSchema: Yup.object().shape({
         link: Yup.string().required("Link is required"),
       }),
-      onSubmit: async (values, actions) => {},
+      onSubmit: async (values, actions) => { },
     });
-
   const submitDisabled = !values.link;
 
   return (
-    <div className='flex flex-row items-start gap-x-4 w-full'>
+    <div className='flex flex-col gap-y-2 md:flex-row items-start gap-x-4 w-full'>
       <CotopiaInput
         {...getFieldProps("link")}
         hasError={!!touched.link && !!errors.link}
         helperText={!!touched.link && !!errors.link && errors.link}
         placeholder='Enter link'
-        className='flex-1 py-4 px-4'
+        className="flex-1 py-4 px-4 2xs:w-auto xs:w-full"
       />
+
+      {/* h-3.2 => 3.125rem = 50px , w-10.4 => 10.25rem => 164px */}
       <CotopiaButton
-        className='w-[164px] h-[50px] max-w-full'
+        className="h-3.25 md:w-10.5 w-full"
         disabled={submitDisabled}
         variant={submitDisabled ? "outline" : "default"}
         size={"sm"}
