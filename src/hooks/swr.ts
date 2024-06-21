@@ -7,3 +7,14 @@ export const useApi = <T = any, X = any>(url: string): SWRResponse<T, X> => {
     return res.data;
   });
 };
+
+export const useNextApi = <T = any, X = any>(
+  url: string
+): SWRResponse<T, X> => {
+  return useSWR(url, async () => {
+    const res = await axiosInstance.get(url, {
+      baseURL: "",
+    });
+    return res.data;
+  });
+};

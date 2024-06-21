@@ -23,11 +23,10 @@ export default function HomePage() {
   // }
 
   return (
-    <div className='w-full'>
-      <div className='flex flex-col gap-y-4 2xs:items-left md:items-center w-full'>
-
-        <div className="2xs:w-auto xs:w-3/4 sm:w-nearly-full md:w-full">
-          <h1 className='2xs:font-semibold md:font-medium text-black 2xs:text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center'>
+    <div className='max-w-full w-[500px] mx-auto px-4 md:px-0'>
+      <div className='flex flex-col gap-y-4 w-full'>
+        <div className='w-full'>
+          <h1 className='md:font-medium text-black 2xs:text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center'>
             Welcome to CotopiaLite
           </h1>
           <p className='font-normal xs:text-small sm:text-base md:text-lg text-gray-700 text-center'>

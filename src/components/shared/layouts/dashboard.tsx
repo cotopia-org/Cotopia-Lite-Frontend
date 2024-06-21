@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { ReactNode } from "react";
 import useWindowSize from "@/hooks/use-window-size";
 import { useDashboardContext } from "@/context";
@@ -21,32 +21,32 @@ export default function DashboardLayoutMaker({
   return (
     <main className='w-screen min-h-screen flex flex-col'>
       {!!header && header}
-      <div className='grid lg:grid-cols-12 gap-4 w-full p-4'>
-
+      <div className='grid lg:grid-cols-12 gap-4 w-full md:p-4'>
         {/* In Display Biger than or = 1020 */}
         {windowSize.windowWidth >= 1020 ? (
-          <div className="col-span-3">
+          <div className='col-span-3'>
             {/* w-15 => 15 rem = 240px */}
-            <div className='w-15 max-w-full'>
+            <div className='w-15 max-w-full px-4 md:px-0'>
               {!!leftSidebar && leftSidebar}
             </div>
           </div>
-
+        ) : (
           // In Dispaly Smaller than or = 1020
-        ) : windowSize.windowWidth <= 1020 && sideBarOpen && (
-          <div className="col-span-7">
-            {/* w-15 => 15 rem = 240px */}
-            <div className='w-15 max-w-full'>
-              {!!leftSidebar && leftSidebar}
+          windowSize.windowWidth <= 1020 &&
+          sideBarOpen && (
+            <div className='col-span-7'>
+              {/* w-15 => 15 rem = 240px */}
+              <div className='w-15 max-w-full px-4 md:px-0'>
+                {!!leftSidebar && leftSidebar}
+              </div>
             </div>
-          </div>
+          )
         )}
 
         <div className='col-span-7'>
-          <div className='md:m-wide mx-auto max-w-full'>
+          <div className='w-[500px] max-w-full mx-auto px-4 md:px-0'>
             {!!children && children}
           </div>
-
         </div>
 
         {windowSize.windowWidth >= 1020 && (
@@ -55,7 +55,6 @@ export default function DashboardLayoutMaker({
           </div>
         )}
       </div>
-
     </main>
   );
 }

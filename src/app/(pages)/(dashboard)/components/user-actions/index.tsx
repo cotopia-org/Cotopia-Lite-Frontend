@@ -1,6 +1,6 @@
 import UserActionsAvatarButton from "./avatar";
 import UserActionsMessageButton from "./message";
-import UserActionsMenuButton from "./sideBarMenu";
+import UserActionsMenuButton from "./sidebar-menu";
 
 export default function UserActions() {
   return (
