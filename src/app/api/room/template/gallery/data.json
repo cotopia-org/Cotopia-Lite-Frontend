@@ -1,0 +1,42 @@
+[
+    {
+        "id": "421482149219842198421",
+        "title":"Spring 1",
+        "source": "/assets/mock/gallery/template/spring-1.jpg"
+    },
+    {
+        "id": "89421974792147921412",
+        "title":"Spring 2",
+        "source": "/assets/mock/gallery/template/spring-2.jpg"
+    },
+    {
+        "id": "79842714921749127498",
+        "title":"Spring 3",
+        "source": "/assets/mock/gallery/template/spring-3.jpg"
+    },
+    {
+        "id": "98472149271957129841",
+        "title":"Spring 4",
+        "source": "/assets/mock/gallery/template/spring-4.jpg"
+    },
+    {
+        "id": "98472149271957129841",
+        "title":"Wall",
+        "source": "/assets/mock/gallery/template/wall-1.jpg"
+    },
+    {
+        "id": "51351251251252412421",
+        "title":"Sky",
+        "source": "/assets/mock/gallery/template/sky-1.jpg"
+    },
+    {
+        "id": "40921840921840921842",
+        "title":"Sky Clouds",
+        "source": "/assets/mock/gallery/template/sky-2.jpg"
+    },
+    {
+        "id": "904812904821094821",
+        "title":"Space",
+        "source": "/assets/mock/gallery/template/space-1.jpg"
+    }
+]
