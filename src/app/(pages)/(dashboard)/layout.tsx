@@ -42,13 +42,13 @@ export default async function layout({ children }: Props) {
   if (!isAuthenticated) return redirect(__VARS.loginPage);
 
   return (
-      <Dashboard user={data?.user} accessToken={data?.accessToken as string}>
-        <DashboardLayoutMaker
-          header={<Header />}
-          leftSidebar={<DashboardMenus items={ITEMS} className='gap-y-2' />}
-        >
-          {children}
-        </DashboardLayoutMaker>
-      </Dashboard>
+    <Dashboard user={data?.user} accessToken={data?.accessToken as string}>
+      <DashboardLayoutMaker
+        header={<Header />}
+        leftSidebar={<DashboardMenus items={ITEMS} className='gap-y-2' />}
+      >
+        {children}
+      </DashboardLayoutMaker>
+    </Dashboard>
   );
 }

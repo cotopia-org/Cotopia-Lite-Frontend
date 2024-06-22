@@ -12,7 +12,7 @@ export default async function LoginPage() {
   async function onLoggedIn(res: AuthenticateType) {
     "use server";
 
-    cookies().set(__VARS.tokenCookieKey, res.access_token);
+    cookies().set(__VARS.tokenCookieKey, res.token);
   }
 
   return (

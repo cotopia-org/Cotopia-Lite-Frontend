@@ -1,16 +1,9 @@
 "use client";
 
-import Background from "./backgrounds/background";
-import MenuButton from "./components/menu";
-import Toolbar from "./toolbar";
-import TopRightTools from "./tools/top-right";
-import BottomLeftTools from "./tools/bottom-left";
-import BottomMiddleTools from "./tools/bottom-middle";
-import BottomRightTools from "./tools/bottom-right";
-import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
-import UserSessions from "./sessions";
 import RoomContext from "./room-context";
+import RoomInner from "./room-inner";
 
 type Props = {
   token: string;
@@ -85,17 +78,7 @@ export default function RoomHolder({ token, workspace_id, room_id }: Props) {
           },
         }}
       >
-        <div className='w-screen h-screen relative flex items-center justify-center'>
-          <Background />
-          <Toolbar
-            topLeft={<MenuButton />}
-            topRight={<TopRightTools />}
-            bottomLeft={<BottomLeftTools />}
-            bottomMiddle={<BottomMiddleTools />}
-            bottomRight={<BottomRightTools />}
-          />
-          <UserSessions />
-        </div>
+        <RoomInner />
       </LiveKitRoom>
     </RoomContext>
   );

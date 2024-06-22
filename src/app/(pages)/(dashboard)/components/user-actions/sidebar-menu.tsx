@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import React from "react";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import useWindowSize from "@/hooks/use-window-size";
 import { AlignJustify } from "lucide-react";
-import { useDashboardContext } from "@/context";
+import { useDashboardContext } from "../../dashboard-wrapper";
 
 export default function UserActionsMenuButton() {
   const { windowSize } = useWindowSize();

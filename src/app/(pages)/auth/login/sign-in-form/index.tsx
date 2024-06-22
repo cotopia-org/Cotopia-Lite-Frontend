@@ -5,7 +5,7 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import CotopiaInput from "@/components/shared-ui/c-input";
 import CotopiaPasswordInput from "@/components/shared-ui/c-password-input";
 import { buttonVariants } from "@/components/ui/button";
-import axiosInstance from "@/lib/axios";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { AuthenticateType } from "@/types/authenticate";
 import { useFormik } from "formik";
 import { MoveRight } from "lucide-react";
@@ -32,7 +32,7 @@ export default function SignInForm({ onLoggedIn }: Props) {
         //Register user here
         actions.setSubmitting(true);
         try {
-          const res = await axiosInstance.post<AuthenticateType>(
+          const res = await axiosInstance.post<FetchDataType<AuthenticateType>>(
             `/auth/login`,
             {
               username: values.username,
@@ -41,7 +41,7 @@ export default function SignInForm({ onLoggedIn }: Props) {
           );
           actions.setSubmitting(false);
           toast.success("You logged in successfully.");
-          if (onLoggedIn) onLoggedIn(res.data);
+          if (onLoggedIn) onLoggedIn(res.data.data);
         } catch (e) {
           actions.setSubmitting(false);
         }

@@ -1,4 +1,3 @@
-export type AuthenticateType = {
-  access_token: string;
-  token_type: string; //Bearer or ...
-};
+import { UserType } from "./user";
+
+export type AuthenticateType = UserType & { token: string };

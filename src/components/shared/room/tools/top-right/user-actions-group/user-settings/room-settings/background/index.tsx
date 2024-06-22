@@ -26,8 +26,8 @@ export default function BackgroundSetting() {
           content: <Gallery room_id={room_id} workspace_id={workspace_id} />,
         },
         {
-          title: "Room Settings",
-          value: "room-settings",
+          title: "Upload",
+          value: "upload",
           content: <>This feature will be ready in the soon future.</>,
         },
       ]}

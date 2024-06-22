@@ -2,9 +2,13 @@ import { __VARS } from "@/app/const/vars";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { toast } from "sonner";
 
-type ErrorResponseObjectType = {
-  field: string;
-  message: string;
+export type FetchDataType<T> = {
+  meta: {
+    code: number;
+    message: string;
+  };
+  status: string;
+  data: T;
 };
 
 // Create a new Axios instance
@@ -23,11 +27,6 @@ axiosInstance.interceptors.request.use(
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken && config?.headers) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
-    const currencyCode = localStorage.getItem("x-currency");
-    if (currencyCode && config?.headers) {
-      config.headers["x-currency"] = currencyCode;
     }
 
     return config;
@@ -70,9 +69,12 @@ axiosInstance.interceptors.response.use(
 
     const errorData = error.response.data;
 
-    if (errorData?.["detail"] && typeof errorData["detail"] === "string") {
+    if (
+      errorData?.["meta"] &&
+      typeof errorData["meta"]?.["message"] === "string"
+    ) {
       //Means we have error string as detail
-      toast.error(errorData.detail);
+      toast.error(errorData?.meta?.message);
     }
 
     return Promise.reject(error);

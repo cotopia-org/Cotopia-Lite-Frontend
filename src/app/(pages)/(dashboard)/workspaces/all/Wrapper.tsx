@@ -6,10 +6,11 @@ import { Workspace } from "@/types/workspace";
 import FilterButton from "../components/filter";
 import Workspaces from "@/components/shared/workspaces/workspaces";
 import FullLoading from "@/components/shared/full-loading";
+import { FetchDataType } from "@/lib/axios";
 
 export default function Wrapper() {
-  const { data, isLoading } = useApi(`/users/workspaces`);
-  const items: Workspace[] = !!data ? data : [];
+  const { data, isLoading } = useApi<FetchDataType<Workspace[]>>(`/workspaces`);
+  const items: Workspace[] = !!data ? data?.data : [];
 
   let content = <Workspaces items={items} />;
 
