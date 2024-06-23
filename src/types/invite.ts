@@ -1,6 +1,5 @@
 import { AttachmentFileType } from "./file";
 import { WorkspaceRoomType } from "./room";
-import { UserType } from "./user";
 import { WorkspaceType } from "./workspace";
 
 export type InviteType = {

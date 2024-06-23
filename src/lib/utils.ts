@@ -1,8 +1,3 @@
-import { UserType } from "@/types/user";
-import {
-  isTrackReference,
-  isTrackReferencePlaceholder,
-} from "@livekit/components-core";
 import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import { type ClassValue, clsx } from "clsx";
 import { Track } from "livekit-client";
@@ -28,10 +23,10 @@ export const isScreenShareExist = (tracks: TrackReferenceOrPlaceholder[]) => {
   };
 };
 
-export const getUserFullname = (user: UserType) => {
-  let fullName = user.username;
+export const getUserFullname = (user: any) => {
+  let fullName = user?.username;
 
-  if (user?.name) fullName = user.name;
+  if (user?.name) fullName = user?.name;
 
   return fullName;
 };

@@ -4,9 +4,13 @@ import { toast } from "sonner";
 class SocketService {
   public socket: Socket | null = null;
 
-  public connect(url: string): void {
+  public connect(url: string, userToken: string): void {
     if (!this.socket) {
-      this.socket = io(url);
+      this.socket = io(url, {
+        query: {
+          userToken,
+        },
+      });
       this.setupListeners();
     }
   }

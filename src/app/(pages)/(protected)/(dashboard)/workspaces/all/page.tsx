@@ -1,4 +1,3 @@
-import React from "react";
 import Wrapper from "./Wrapper";
 
 export const metadata = {
@@ -6,9 +5,5 @@ export const metadata = {
 };
 
 export default function AllWorkspacesPage() {
-  return (
-    <>
-      <Wrapper />
-    </>
-  );
+  return <Wrapper />;
 }

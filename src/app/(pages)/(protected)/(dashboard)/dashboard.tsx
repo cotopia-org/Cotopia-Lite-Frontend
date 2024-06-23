@@ -1,12 +1,20 @@
 "use client";
 
+import axiosInstance from "@/lib/axios";
 import { UserType } from "@/types/user";
-import { createContext, ReactNode, useContext } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { DashboardWrapper } from "./dashboard-wrapper";
 
 type Props = {
   user?: UserType;
   children: ReactNode;
+  accessToken: string;
 };
 
 const AuthContext = createContext<{ user?: UserType }>({
@@ -15,10 +23,10 @@ const AuthContext = createContext<{ user?: UserType }>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export default function Dashboard({ user, children }: Props) {
+export default function Dashboard({ user, children, accessToken }: Props) {
   return (
     <AuthContext.Provider value={{ user }}>
-      <DashboardWrapper>{children}</DashboardWrapper>
+      <DashboardWrapper userToken={accessToken}>{children}</DashboardWrapper>
     </AuthContext.Provider>
   );
 }

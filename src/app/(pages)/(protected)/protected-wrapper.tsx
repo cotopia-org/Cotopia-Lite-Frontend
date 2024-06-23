@@ -1,5 +1,6 @@
 "use client";
 
+import { __VARS } from "@/app/const/vars";
 import axiosInstance from "@/lib/axios";
 import { ReactNode, useEffect, useState } from "react";
 

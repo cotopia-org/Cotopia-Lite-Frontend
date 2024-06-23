@@ -12,10 +12,12 @@ import React, {
   SetStateAction,
   useEffect,
 } from "react";
+import { UserType } from "@/types/user";
 
 interface DashboardContextValue {
   sideBarOpen: boolean;
   setSideBarOpen: Dispatch<SetStateAction<boolean>>;
+  socketState?: Socket;
 }
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(
@@ -24,13 +26,22 @@ const DashboardContext = createContext<DashboardContextValue | undefined>(
 
 interface DashboardWrapperProps {
   children: ReactNode;
+  userToken: string;
 }
 
-export function DashboardWrapper({ children }: DashboardWrapperProps) {
+export function DashboardWrapper({
+  children,
+  userToken,
+}: DashboardWrapperProps) {
   const [sideBarOpen, setSideBarOpen] = useState(false);
 
+  const [socketState, setSocketState] = useState<Socket>();
   useEffect(() => {
-    socket.connect(__VARS.socketUrl);
+    socket.connect(__VARS.socketUrl, userToken);
+
+    const instance = socket.getInstance();
+
+    if (instance) setSocketState(instance);
 
     return () => {
       socket.disconnect();
@@ -38,7 +49,9 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
   }, []);
 
   return (
-    <DashboardContext.Provider value={{ sideBarOpen, setSideBarOpen }}>
+    <DashboardContext.Provider
+      value={{ sideBarOpen, setSideBarOpen, socketState }}
+    >
       {children}
     </DashboardContext.Provider>
   );
@@ -53,3 +66,16 @@ export function useDashboardContext() {
 
   return context;
 }
+
+export const useSocket = (event: string, callbackFn: (data: any) => void) => {
+  const { socketState } = useDashboardContext();
+  useEffect(() => {
+    if (!socketState) return;
+    socketState.on(event, callbackFn);
+    return () => {
+      socketState.off(event, callbackFn);
+    };
+  }, [socketState, event, callbackFn]);
+
+  return socketState as Socket;
+};
