@@ -13,6 +13,14 @@ export type UserSession = {
   };
 };
 
+export async function getServerToken() {
+  const token = cookies().get(__VARS.tokenCookieKey)?.value || "";
+  return {
+    token,
+    isAuthenticated: !!token,
+  };
+}
+
 export default async function getServerSession<T = UserSession>() {
   const token = cookies().get(__VARS.tokenCookieKey)?.value || "";
 

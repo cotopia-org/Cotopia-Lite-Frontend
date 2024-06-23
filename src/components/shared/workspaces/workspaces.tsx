@@ -1,10 +1,10 @@
-import { Workspace } from "@/types/workspace";
+import { WorkspaceType } from "@/types/workspace";
 import WorkspaceItem from "./workpsace/workspace";
 import NotFound from "../layouts/not-found";
 import { Route } from "lucide-react";
 
 type Props = {
-  items: Workspace[];
+  items: WorkspaceType[];
 };
 export default function Workspaces({ items }: Props) {
   //Return nothing when items is empty

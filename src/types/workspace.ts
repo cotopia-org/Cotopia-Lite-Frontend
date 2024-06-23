@@ -1,12 +1,9 @@
-export type Workspace = {
-  avatar: null | string;
-  banner: null | string;
-  created_at: string;
-  description: string;
+export type WorkspaceType = {
+  active: number;
+  created_at: null | string;
+  description: null | string;
   id: number;
-  is_active: boolean;
-  is_private: boolean;
-  name: string;
+  is_private: 0 | 1;
+  title: string;
   updated_at: null | string;
-  user_id: number;
 };

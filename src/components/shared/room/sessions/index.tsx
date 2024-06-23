@@ -1,4 +1,4 @@
-import UserSession from "@/app/(pages)/room/components/session";
+import UserSession from "@/app/(pages)/(protected)/session";
 import {
   LocalParticipant,
   RemoteParticipant,

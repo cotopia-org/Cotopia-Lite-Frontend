@@ -1,3 +1,4 @@
+import { UserType } from "@/types/user";
 import {
   isTrackReference,
   isTrackReferencePlaceholder,
@@ -25,4 +26,12 @@ export const isScreenShareExist = (tracks: TrackReferenceOrPlaceholder[]) => {
     hasShareScreen,
     shareScreenTrack: shareScreenTrack?.[0] || null,
   };
+};
+
+export const getUserFullname = (user: UserType) => {
+  let fullName = user.username;
+
+  if (user?.name) fullName = user.name;
+
+  return fullName;
 };

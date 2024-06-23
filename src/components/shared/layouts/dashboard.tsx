@@ -1,7 +1,7 @@
 "use client";
 import React, { ReactNode } from "react";
 import useWindowSize from "@/hooks/use-window-size";
-import { useDashboardContext } from "@/app/(pages)/(dashboard)/dashboard-wrapper";
+import { useDashboardContext } from "@/app/(pages)/(protected)/(dashboard)/dashboard-wrapper";
 
 type Props = {
   leftSidebar?: ReactNode;

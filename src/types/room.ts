@@ -1,18 +1,17 @@
+import { RoomJoinType } from "./room-join";
+
 export type WorkspaceRoomType = {
-  avatar: null | string;
-  background_image: null | string;
-  created_at: string;
+  active: 1 | 0;
+  created_at: null | string;
   id: number;
-  is_active: boolean;
-  is_locked: boolean;
-  landing_spot: string;
-  passcode: null | string;
-  status: any;
+  is_private: 0 | 1;
+  landing_spot: null | string;
+  password: null | string;
+  status: null | string;
   title: string;
   updated_at: null | string;
+  user_id: number;
   workspace_id: number;
 };
 
-export type WorkspaceRoomJoinType = WorkspaceRoomType & {
-  token: string;
-};
+export type WorkspaceRoomJoinType = RoomJoinType;

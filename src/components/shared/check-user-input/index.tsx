@@ -23,13 +23,13 @@ export default function CheckUserInput({
 }: Props) {
   const value = rest?.value;
 
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const { startLoading, stopLoading, isLoading } = useLoading();
 
   useEffect(() => {
-    clearTimeout(timeout);
-
     if (!value) return;
+
+    clearTimeout(timeout);
 
     startLoading();
 

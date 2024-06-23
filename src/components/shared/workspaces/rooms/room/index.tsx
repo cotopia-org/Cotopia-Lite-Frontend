@@ -1,6 +1,6 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
 import useLoading from "@/hooks/use-loading";
-import axiosInstance from "@/lib/axios";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,11 +18,11 @@ export default function WorkspaceRoom({ room }: Props) {
   const joinRoomHandler = async () => {
     startLoading();
     try {
-      const res = await axiosInstance.get<WorkspaceRoomJoinType>(
+      const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
         `/rooms/${room.id}/join`
       );
 
-      const livekitToken = res.data.token; //Getting livekit token from joinObject
+      const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
       if (livekitToken) {
         router.push(
