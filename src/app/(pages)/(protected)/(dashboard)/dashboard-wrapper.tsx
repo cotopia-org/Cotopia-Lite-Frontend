@@ -12,7 +12,6 @@ import React, {
   SetStateAction,
   useEffect,
 } from "react";
-import { UserType } from "@/types/user";
 
 interface DashboardContextValue {
   sideBarOpen: boolean;
