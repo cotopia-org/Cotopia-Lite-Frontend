@@ -4,6 +4,7 @@ import { __VARS } from "@/app/const/vars";
 import { UserType } from "@/types/user";
 import { cookies } from "next/headers";
 import axiosInstance from "./axios";
+import { redirect } from "next/navigation";
 
 export type UserSession = {
   isAuthenticated: boolean;
@@ -38,7 +39,15 @@ export default async function getServerSession<T = UserSession>() {
       },
     });
     user = res.data;
-  } catch (e) {}
+  } catch (e: any) {
+    console.log("e?.response?.status", e);
+    if (
+      e?.response?.status == 401 ||
+      e?.response?.data?.meta?.message === "Unauthenticated."
+    ) {
+      return redirect(__VARS.signOutApiPage);
+    }
+  }
 
   const isAuthenticated = !!token;
 

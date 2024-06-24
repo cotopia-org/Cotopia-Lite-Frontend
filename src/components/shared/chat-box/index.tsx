@@ -1,6 +1,7 @@
 import { ChatItemType } from "@/types/chat";
 import ChatItem from "./chat-item";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useReachTop } from "@/hooks/use-reach-top";
 
 type Props = {
   items: ChatItemType[];
@@ -8,29 +9,46 @@ type Props = {
 export default function ChatBox({ items = [] }: Props) {
   const boxRef = useRef<HTMLDivElement>();
 
+  const [boxHasScroll, setBoxHasScroll] = useState(false);
+
   useEffect(() => {
     if (!boxRef.current) return;
 
+    const scrollHeight = boxRef.current.scrollHeight;
+    const boxHeight = boxRef.current.clientHeight;
+
+    setBoxHasScroll(scrollHeight > boxHeight);
+
     boxRef.current.scrollTo({
-      top: boxRef.current.scrollHeight,
+      top: scrollHeight,
       behavior: "smooth",
     });
   }, [items?.length, boxRef?.current]);
 
+  let clss =
+    "relative flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8";
+
+  const isReachTop = useReachTop(boxRef?.current);
+
   if (items.length === 0) return;
 
   return (
-    <div
-      className='flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8'
-      ref={(xref) => {
-        if (xref === null) return;
+    <>
+      {!!boxHasScroll && !isReachTop && (
+        <div className='absolute top-[32px] left-0 h-[32px] z-10 bg-gradient-to-b from-white to-transparent w-full flex'></div>
+      )}
+      <div
+        className={clss}
+        ref={(xref) => {
+          if (xref === null) return;
 
-        boxRef.current = xref;
-      }}
-    >
-      {items.map((chat, key) => (
-        <ChatItem item={chat} key={key} />
-      ))}
-    </div>
+          boxRef.current = xref;
+        }}
+      >
+        {items.map((chat, key) => (
+          <ChatItem item={chat} key={key} />
+        ))}
+      </div>
+    </>
   );
 }

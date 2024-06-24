@@ -45,7 +45,11 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // If error response status is 401 and the request was not already retried
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      typeof window !== "undefined"
+    ) {
       // originalRequest._retry = true;
       // // Perform token refresh logic here
       // try {
@@ -70,6 +74,7 @@ axiosInstance.interceptors.response.use(
     const errorData = error.response.data;
 
     if (
+      typeof window !== "undefined" &&
       errorData?.["meta"] &&
       typeof errorData["meta"]?.["message"] === "string"
     ) {

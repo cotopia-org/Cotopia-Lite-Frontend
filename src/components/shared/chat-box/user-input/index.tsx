@@ -12,7 +12,13 @@ export default function ChatUserInput({ onAdd }: Props) {
   const handleAddMessage = () => {
     if (!inputRef.current) return;
 
-    if (onAdd) onAdd(inputRef.current?.value);
+    const value = inputRef.current?.value;
+
+    if (!value) {
+      return;
+    }
+
+    if (onAdd) onAdd(value);
 
     inputRef.current.value = "";
     inputRef.current.focus();
