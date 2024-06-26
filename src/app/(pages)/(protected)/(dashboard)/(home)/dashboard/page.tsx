@@ -1,4 +1,3 @@
-import { __VARS } from "../../../../const/vars";
 import CreateWorkspace from "../components/create-workspace";
 import JoinWorkspaceWithLink from "../components/join-with-link";
 

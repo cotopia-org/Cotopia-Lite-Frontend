@@ -14,5 +14,9 @@ export default async function layout({ children }: Props) {
   //Redirect user to login page
   if (!isAuthenticated) return redirect(__VARS.loginPage);
 
-  return <Dashboard user={data?.user}>{children}</Dashboard>;
+  return (
+    <Dashboard accessToken={data?.accessToken as string} user={data?.user}>
+      {children}
+    </Dashboard>
+  );
 }

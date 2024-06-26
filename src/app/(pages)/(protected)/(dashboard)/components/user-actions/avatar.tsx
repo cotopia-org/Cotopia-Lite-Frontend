@@ -12,8 +12,7 @@ export default function UserActionsAvatarButton() {
 
   //For fallback
   let userShortName = "";
-  if (user?.first_name) userShortName += user.first_name[0];
-  if (user?.last_name) userShortName += user.last_name[0];
+  if (user?.name) userShortName += user.name[0];
 
   if (userShortName === "" && user.username) userShortName = user.username[0];
 
