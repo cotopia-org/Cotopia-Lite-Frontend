@@ -2,11 +2,13 @@ import { ChatItemType } from "@/types/chat";
 import ChatItem from "./chat-item";
 import { useEffect, useRef, useState } from "react";
 import { useReachTop } from "@/hooks/use-reach-top";
+import { UserType } from "@/types/user";
 
 type Props = {
   items: ChatItemType[];
+  observer_user_id?: number;
 };
-export default function ChatBox({ items = [] }: Props) {
+export default function ChatBox({ items = [], observer_user_id }: Props) {
   const boxRef = useRef<HTMLDivElement>();
 
   const [boxHasScroll, setBoxHasScroll] = useState(false);
@@ -46,7 +48,7 @@ export default function ChatBox({ items = [] }: Props) {
         }}
       >
         {items.map((chat, key) => (
-          <ChatItem item={chat} key={key} />
+          <ChatItem item={chat} observer_user_id={observer_user_id} key={key} />
         ))}
       </div>
     </>

@@ -1,50 +1,32 @@
-import ChatBox from "@/components/shared/chat-box";
-import ChatUserInput from "@/components/shared/chat-box/user-input";
-import { ChatItemType } from "@/types/chat";
-import moment from "moment";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import Search from "./search";
+import Users from "./users";
+import { UserMinimalType } from "@/types/user";
+import DirectChat from "./direct-chat";
 
 export default function UserChatDirect() {
-  const [messages, setMessages] = useState<ChatItemType[]>(
-    [
-      "4215215151251212",
-      "42176478261421",
-      "4218641268501",
-      "4216421481276",
-      "47821647218642178",
-      "4126478126481246",
-      "4912764745196421412",
-      "8497124762147816278",
-      "40128489126471264128",
-      "40127498217647214621",
-      "41242176478618764812",
-      "49127492164782164612",
-    ].map((item) => ({
-      id: item,
-      date: moment().unix(),
-      username: "mahdi.dev",
-      message: "Hi",
-    }))
+  const [selectedUser, setSelectedUser] = useState<UserMinimalType>();
+  const handleBackToList = () => {
+    setSelectedUser(undefined);
+  };
+  const [searched, setSearched] = useState("");
+
+  let content = (
+    <>
+      <div className='flex flex-col gap-y-4'>
+        <Search onChange={setSearched} />
+        <Users search={searched ?? undefined} onSelect={setSelectedUser} />
+      </div>
+      <div>xx</div>
+    </>
   );
 
-  const handleAddMessage = useCallback((message: string) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Math.random() * 10000000000000,
-        date: moment().unix(),
-        username: "mahdi.dev",
-        message,
-      },
-    ]);
-  }, []);
+  if (selectedUser)
+    content = <DirectChat user={selectedUser} onBack={handleBackToList} />;
 
   return (
     <div className='relative h-full flex flex-col justify-between pt-8'>
-      <Search />
-      {/* <ChatBox items={messages} /> */}
-      {/* <ChatUserInput onAdd={handleAddMessage} /> */}
+      {content}
     </div>
   );
 }

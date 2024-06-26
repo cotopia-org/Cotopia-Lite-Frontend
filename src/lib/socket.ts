@@ -6,6 +6,7 @@ class SocketService {
 
   public connect(url: string, userToken: string): void {
     if (!this.socket) {
+      console.log("userToken", userToken);
       this.socket = io(url, {
         query: {
           userToken,

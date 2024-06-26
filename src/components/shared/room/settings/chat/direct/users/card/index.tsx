@@ -1,20 +1,24 @@
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import { UserType } from "@/types/user";
+import { UserMinimalType } from "@/types/user";
 import Username from "./username";
 import Message from "./message";
 
 type Props = {
-  user: UserType;
+  user: UserMinimalType;
   latestMessage?: string;
+  onClick: () => void;
 };
-export default function UserCard({ user, latestMessage }: Props) {
+export default function UserCard({ user, latestMessage, onClick }: Props) {
   return (
-    <div className='flex flex-row items-center gap-x-4'>
+    <div
+      className='flex flex-row items-center gap-x-4 cursor-pointer'
+      onClick={onClick}
+    >
       <CotopiaAvatar
         src={user?.avatar?.url ?? undefined}
-        title={user?.name?.[0] ?? undefined}
+        title={(user?.name || user?.username)?.[0] ?? undefined}
       />
-      <div className='flex flex-col gap-y-2'>
+      <div className='flex flex-col'>
         <Username username={user?.username} />
         {!!latestMessage && <Message message={latestMessage} />}
       </div>

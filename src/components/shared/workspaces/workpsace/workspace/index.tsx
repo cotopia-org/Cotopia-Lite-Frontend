@@ -1,17 +1,12 @@
-import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { WorkspaceType } from "@/types/workspace";
-import { MoreHorizontal } from "lucide-react";
 
-import moment from "moment";
 import Link from "next/link";
 import WorkspaceAvatar from "./avatar";
 import WorkspaceTitle from "./title";
 import WorkspaceDate from "./date";
 import WorkspaceActions from "./actions";
-import { useSocket } from "@/app/(pages)/(protected)/(dashboard)/dashboard-wrapper";
-import { toast } from "sonner";
 import { useState } from "react";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
 type Props = {
   item: WorkspaceType;

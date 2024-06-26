@@ -5,6 +5,8 @@ type Props = {
 };
 export default function Time({ time }: Props) {
   return (
-    <span className='text-gray-400'>{moment.unix(time).format("HH:MM a")}</span>
+    <span className='text-gray-400 text-xs'>
+      {moment.unix(time).format("HH:mm a")}
+    </span>
   );
 }

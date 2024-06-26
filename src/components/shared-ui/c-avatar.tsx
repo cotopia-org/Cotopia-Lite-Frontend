@@ -10,7 +10,7 @@ export default function CotopiaAvatar({ title, src, ...rest }: Props) {
   return (
     <Avatar {...rest}>
       <AvatarImage src={src} />
-      <AvatarFallback>{title}</AvatarFallback>
+      <AvatarFallback className='uppercase'>{title}</AvatarFallback>
     </Avatar>
   );
 }

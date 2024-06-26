@@ -3,7 +3,7 @@
 import { __VARS } from "@/app/const/vars";
 import { UserType } from "@/types/user";
 import { cookies } from "next/headers";
-import axiosInstance from "./axios";
+import axiosInstance, { FetchDataType } from "./axios";
 import { redirect } from "next/navigation";
 
 export type UserSession = {
@@ -31,14 +31,14 @@ export default async function getServerSession<T = UserSession>() {
       isAuthenticated: false,
     };
 
-  let user;
+  let user: UserType | undefined;
   try {
-    const res = await axiosInstance.get<UserType>(`/users/me`, {
+    const res = await axiosInstance.get<FetchDataType<UserType>>(`/users/me`, {
       headers: {
         ["Authorization"]: `Bearer ${token}`,
       },
     });
-    user = res.data;
+    user = res.data?.data;
   } catch (e: any) {
     console.log("e?.response?.status", e);
     if (

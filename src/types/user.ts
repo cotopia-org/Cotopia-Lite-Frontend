@@ -18,3 +18,10 @@ export type UserType = {
   video_status: null | string;
   voice_status: null | string;
 };
+
+export type UserMinimalType = {
+  avatar: null | AttachmentFileType;
+  id: number;
+  name: string;
+  username: string;
+};

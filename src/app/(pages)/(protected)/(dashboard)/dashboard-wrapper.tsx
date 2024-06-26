@@ -28,29 +28,11 @@ interface DashboardWrapperProps {
   userToken: string;
 }
 
-export function DashboardWrapper({
-  children,
-  userToken,
-}: DashboardWrapperProps) {
+export function DashboardWrapper({ children }: DashboardWrapperProps) {
   const [sideBarOpen, setSideBarOpen] = useState(false);
 
-  const [socketState, setSocketState] = useState<Socket>();
-  useEffect(() => {
-    socket.connect(__VARS.socketUrl, userToken);
-
-    const instance = socket.getInstance();
-
-    if (instance) setSocketState(instance);
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
   return (
-    <DashboardContext.Provider
-      value={{ sideBarOpen, setSideBarOpen, socketState }}
-    >
+    <DashboardContext.Provider value={{ sideBarOpen, setSideBarOpen }}>
       {children}
     </DashboardContext.Provider>
   );
@@ -65,16 +47,3 @@ export function useDashboardContext() {
 
   return context;
 }
-
-export const useSocket = (event: string, callbackFn: (data: any) => void) => {
-  const { socketState } = useDashboardContext();
-  useEffect(() => {
-    if (!socketState) return;
-    socketState.on(event, callbackFn);
-    return () => {
-      socketState.off(event, callbackFn);
-    };
-  }, [socketState, event, callbackFn]);
-
-  return socketState as Socket;
-};
