@@ -24,4 +24,11 @@ export type UserMinimalType = {
   id: number;
   name: string;
   username: string;
+  coordinates: string | null;
+  video_coordinates: null | string;
+  video_size: null | string;
+  video_status: null | string;
+  voice_status: null | string;
+  screenshare_coordinates: null | string;
+  screenshare_size: null | string;
 };

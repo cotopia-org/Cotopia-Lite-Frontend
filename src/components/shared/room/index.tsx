@@ -4,16 +4,23 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
 import RoomContext from "./room-context";
 import RoomInner from "./room-inner";
+import { WorkspaceRoomType } from "@/types/room";
 
 type Props = {
   token: string;
   workspace_id: string;
   room_id: string;
+  room?: WorkspaceRoomType;
 };
 
-export default function RoomHolder({ token, workspace_id, room_id }: Props) {
+export default function RoomHolder({
+  token,
+  workspace_id,
+  room_id,
+  room,
+}: Props) {
   return (
-    <RoomContext room_id={room_id} workspace_id={workspace_id}>
+    <RoomContext room={room} room_id={room_id} workspace_id={workspace_id}>
       <LiveKitRoom
         video
         audio

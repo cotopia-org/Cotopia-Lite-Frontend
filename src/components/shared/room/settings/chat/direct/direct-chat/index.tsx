@@ -47,17 +47,41 @@ export default function DirectChat({ user, direct_id, onBack }: Props) {
 
   const { sendToDirect } = useChat();
 
+  const handleUpdateMessages = (chat: ChatItemType) => {
+    console.log("chat", chat);
+
+    const chatIds = messages.map((x) => x.id);
+    const foundIndex = chatIds.indexOf(chat.id);
+
+    let newMessages = [...messages];
+
+    if (foundIndex > -1) {
+      newMessages[foundIndex] = chat;
+    } else {
+      newMessages = [chat, ...messages];
+    }
+
+    setMessages(newMessages);
+  };
+
   const handleAddMessage = useCallback(
     async (text: string) => {
       if (!user?.id) return;
-      sendToDirect(text, user?.id);
+      try {
+        const message = await sendToDirect(text, user?.id);
+        if (message) handleUpdateMessages(message);
+      } catch (e) {}
     },
-    [user?.id]
+    [user?.id, handleUpdateMessages]
   );
 
-  useSocket("directMessages", (data: MessageType) => {
-    setMessages((prev) => [data, ...prev]);
-  });
+  useSocket(
+    "directMessages",
+    (data: MessageType) => {
+      handleUpdateMessages(data);
+    },
+    [handleUpdateMessages]
+  );
 
   if (isLoading) return <FullLoading />;
 

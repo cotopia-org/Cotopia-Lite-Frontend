@@ -1,4 +1,5 @@
 import { RoomJoinType } from "./room-join";
+import { UserMinimalType } from "./user";
 
 export type WorkspaceRoomType = {
   active: 1 | 0;
@@ -12,6 +13,7 @@ export type WorkspaceRoomType = {
   updated_at: null | string;
   user_id: number;
   workspace_id: number;
+  participants: UserMinimalType[];
 };
 
 export type WorkspaceRoomJoinType = RoomJoinType;

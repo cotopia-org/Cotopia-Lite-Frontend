@@ -1,7 +1,13 @@
 "use client";
 
 import DraggableComponent from "@/components/shared/draggable";
-import React, { ReactNode, useRef, VideoHTMLAttributes } from "react";
+import React, {
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+  VideoHTMLAttributes,
+} from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
 import ActionsLeft from "./actions-left";
@@ -33,6 +39,11 @@ import { Participant, Track, TrackPublication } from "livekit-client";
 import { isTrackReferencePlaceholder } from "@livekit/components-core";
 import { ScreenShareIcon } from "lucide-react";
 import SessionWrapper from "./wrapper";
+import { useUserTile } from ".";
+import { useProfile, useSocket } from "../protected-wrapper";
+import { UserMinimalType, UserType } from "@/types/user";
+import axiosInstance from "@/lib/axios";
+import { useRoomContext } from "@/components/shared/room/room-context";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -182,9 +193,71 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
   }
 );
 
+const DEFAULT_TILE_POSITION = [0, 0];
+
 export default function DraggableCircle() {
+  const { room } = useRoomContext();
+
+  const [participants, setParticipants] = useState<UserMinimalType[]>(
+    room ? room?.participants : []
+  );
+  useEffect(() => {
+    setParticipants(room?.participants ?? []);
+  }, [room?.participants]);
+
+  const { user } = useProfile();
+  const { track } = useUserTile();
+
+  const livekitIdentity = track?.participant?.identity;
+
+  useSocket("userUpdated", (user: UserMinimalType) => {
+    if (livekitIdentity === user.username) {
+      let userCoordinates = user?.coordinates
+        ? user?.coordinates?.split(",")
+        : DEFAULT_TILE_POSITION;
+
+      userCoordinates = userCoordinates.map((x) => +x);
+
+      setParticipants((prev) => {
+        const prevParticpants = [...(prev ?? [])];
+
+        const participantIds = prev?.map((x) => x.id);
+
+        const foundIndex = participantIds?.findIndex((id) => id === user?.id);
+
+        if (foundIndex && foundIndex > -1) {
+          prevParticpants[foundIndex] = {
+            ...prevParticpants[foundIndex],
+            coordinates: user?.coordinates,
+          };
+        }
+        return prevParticpants;
+      });
+    }
+  });
+
+  const handleUpdateCoordinates = (position: { x: number; y: number }) => {
+    axiosInstance.post(`/users/updateCoordinates`, {
+      coordinates: `${position.x},${position.y}`,
+    });
+  };
+
+  const isMyUser = user?.username === livekitIdentity;
+
+  const positionUser = participants?.find(
+    (x) => x.username === livekitIdentity
+  );
+  const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
+    200, 200,
+  ]; //200 is default position , change in the feature
+
   return (
-    <DraggableComponent>
+    <DraggableComponent
+      onDragEnd={handleUpdateCoordinates}
+      disabled={!isMyUser}
+      x={coordsUser?.[0]}
+      y={coordsUser?.[1]}
+    >
       <SessionWrapper>
         <ParticipantTile />
       </SessionWrapper>

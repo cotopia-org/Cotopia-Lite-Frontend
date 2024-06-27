@@ -40,17 +40,39 @@ export default function UserChatRoom() {
 
   const { sendToRoom } = useChat();
 
+  const handleUpdateMessages = (chat: ChatItemType) => {
+    const chatIds = messages.map((x) => x.id);
+    const foundIndex = chatIds.indexOf(chat.id);
+
+    let newMessages = [...messages];
+
+    if (foundIndex > -1) {
+      newMessages[foundIndex] = chat;
+    } else {
+      newMessages = [chat, ...messages];
+    }
+
+    setMessages(newMessages);
+  };
+
   const handleAddMessage = useCallback(
     async (text: string) => {
       if (!room_id) return;
-      sendToRoom(text, room_id);
+      try {
+        const message = await sendToRoom(text, room_id);
+        if (message) handleUpdateMessages(message);
+      } catch (e) {}
     },
-    [room_id]
+    [room_id, handleUpdateMessages]
   );
 
-  useSocket("roomMessages", (data: MessageType) => {
-    setMessages((prev) => [data, ...prev]);
-  });
+  useSocket(
+    "roomMessages",
+    (data: MessageType) => {
+      handleUpdateMessages(data);
+    },
+    [handleAddMessage]
+  );
 
   let content = (
     <>
