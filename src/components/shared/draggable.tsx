@@ -3,7 +3,7 @@ import Draggable, {
   DraggableEvent,
   DraggableEventHandler,
 } from "react-draggable";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 type Props = {
   children: ReactNode;
@@ -23,13 +23,30 @@ export default function DraggableComponent({
   y,
   disabled = false,
 }: Props) {
+  const [position, setPosition] = useState({
+    x: x ?? DEFAULT_X,
+    y: y ?? DEFAULT_Y,
+  });
+
+  useEffect(() => {
+    setPosition({
+      x: x ?? DEFAULT_X,
+      y: y ?? DEFAULT_Y,
+    });
+  }, [x, y]);
+
   const hanldeDragEnd = (dragEvent: any) => {
-    console.log("dragEvent", dragEvent);
-    if (onDragEnd)
-      onDragEnd({
-        x: dragEvent.x,
-        y: dragEvent.y,
-      });
+    const x = dragEvent?.x + 0;
+    const y = dragEvent?.y + 140;
+
+    const newPosition = {
+      x,
+      y,
+    };
+
+    setPosition(newPosition);
+
+    if (onDragEnd) onDragEnd(newPosition);
   };
 
   return (
@@ -38,7 +55,7 @@ export default function DraggableComponent({
         x: (-1 * window.screen.width) / 2,
         y: (-1 * window.screen.height) / 2,
       }}
-      defaultPosition={{ x: x ?? DEFAULT_X, y: y ?? DEFAULT_Y }}
+      position={position}
       onStop={hanldeDragEnd}
       disabled={disabled}
     >

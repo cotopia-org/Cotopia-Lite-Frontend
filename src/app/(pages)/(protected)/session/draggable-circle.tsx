@@ -218,6 +218,8 @@ export default function DraggableCircle() {
 
       userCoordinates = userCoordinates.map((x) => +x);
 
+      console.log("userCoordinates", userCoordinates);
+
       setParticipants((prev) => {
         const prevParticpants = [...(prev ?? [])];
 
@@ -225,12 +227,15 @@ export default function DraggableCircle() {
 
         const foundIndex = participantIds?.findIndex((id) => id === user?.id);
 
-        if (foundIndex && foundIndex > -1) {
+        if (foundIndex !== undefined && foundIndex > -1) {
           prevParticpants[foundIndex] = {
             ...prevParticpants[foundIndex],
             coordinates: user?.coordinates,
           };
         }
+
+        console.log("prevParticpants", prevParticpants);
+
         return prevParticpants;
       });
     }
@@ -247,10 +252,12 @@ export default function DraggableCircle() {
   const positionUser = participants?.find(
     (x) => x.username === livekitIdentity
   );
+
   const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
     200, 200,
   ]; //200 is default position , change in the feature
 
+  console.log("coordsUser", coordsUser);
   return (
     <DraggableComponent
       onDragEnd={handleUpdateCoordinates}
