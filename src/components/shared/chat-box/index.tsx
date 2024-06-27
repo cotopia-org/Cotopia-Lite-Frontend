@@ -47,9 +47,15 @@ export default function ChatBox({ items = [], observer_user_id }: Props) {
           boxRef.current = xref;
         }}
       >
-        {items.map((chat, key) => (
-          <ChatItem item={chat} observer_user_id={observer_user_id} key={key} />
-        ))}
+        <div className='flex flex-col-reverse w-full gap-y-4'>
+          {items.map((chat, key) => (
+            <ChatItem
+              item={chat}
+              observer_user_id={observer_user_id}
+              key={key}
+            />
+          ))}
+        </div>
       </div>
     </>
   );

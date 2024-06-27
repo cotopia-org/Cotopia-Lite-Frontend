@@ -26,15 +26,17 @@ const ProfileContext = createContext<{ user: UserType; socketState?: Socket }>({
 
 export const useProfile = () => useContext(ProfileContext);
 
-export const useSocket = (event: string, cb: (data: any) => void) => {
+export const useSocket = (event?: string, cb?: (data: any) => void) => {
   const { socketState } = useProfile();
   useEffect(() => {
+    if (!event) return;
+    if (!cb) return;
     if (socketState === undefined) return;
     socketState.on(event, cb);
     return () => {
       socketState.off(event, cb);
     };
-  }, [socketState]);
+  }, [socketState, event]);
 };
 
 export default function ProtectedWrapper({ children, token, user }: Props) {

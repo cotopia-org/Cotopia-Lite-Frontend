@@ -9,42 +9,54 @@ import {
   useSocket,
 } from "@/app/(pages)/(protected)/protected-wrapper";
 import { MessageType } from "@/types/message";
-import { FetchDataType } from "@/lib/axios";
-import { useApi } from "@/hooks/swr";
+import axiosInstance from "@/lib/axios";
 import FullLoading from "@/components/shared/full-loading";
+import useLoading from "@/hooks/use-loading";
 
 export default function UserChatRoom() {
   const { user } = useProfile();
   const { room_id } = useRoomContext();
 
-  const { data, isLoading } = useApi<FetchDataType<any[]>>(
-    `/rooms/${room_id}/messages?page=3`
-  );
-  const items: MessageType[] = !!data ? data?.data : [];
-
+  const { startLoading, stopLoading, isLoading } = useLoading();
   const [messages, setMessages] = useState<ChatItemType[]>([]);
+
+  const getMessages = () => {
+    startLoading();
+    axiosInstance
+      .get(`/rooms/${room_id}/messages`)
+      .then((res) => {
+        const data = res.data;
+        const items: MessageType[] = !!data ? data?.data : [];
+        setMessages(items);
+        stopLoading();
+      })
+      .catch((err) => {
+        stopLoading();
+      });
+  };
   useEffect(() => {
-    setMessages(items ?? []);
-  }, [items?.length]);
+    getMessages();
+  }, []);
+
+  // const { data, isLoading } = useApi<FetchDataType<any[]>>(
+  //   `/rooms/${room_id}/messages`,
+  //   {
+  //     withoutCache: true,
+  //   }
+  // );
 
   const { sendToRoom } = useChat();
 
   const handleAddMessage = useCallback(
     async (text: string) => {
       if (!room_id) return;
-
-      try {
-        const message = await sendToRoom(text, room_id);
-        if (message) {
-          setMessages((prev) => [...prev, message]);
-        }
-      } catch (e) {}
+      sendToRoom(text, room_id);
     },
     [room_id]
   );
 
   useSocket("roomMessages", (data: MessageType) => {
-    setMessages((prev) => [...prev, data]);
+    setMessages((prev) => [data, ...prev]);
   });
 
   let content = (
@@ -54,7 +66,7 @@ export default function UserChatRoom() {
     </>
   );
 
-  if (data === undefined || isLoading) content = <FullLoading />;
+  if (isLoading) content = <FullLoading />;
 
   return (
     <div className='relative h-full flex flex-col justify-between  pt-8'>
