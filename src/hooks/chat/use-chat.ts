@@ -22,5 +22,26 @@ export const useChat = () => {
 
     return res?.data.data;
   };
-  return { sendToRoom };
+
+  const sendToDirect = async (
+    message: string,
+    userId: number | string,
+    replyTo?: number
+  ) => {
+    let payload: { [key: string]: any } = {
+      text: message,
+      user_id: +userId,
+    };
+    if (replyTo) payload["reply_to"] = replyTo;
+    let res;
+    try {
+      res = await axiosInstance.post<FetchDataType<MessageType>>(
+        `/messages`,
+        payload
+      );
+    } catch (e) {}
+
+    return res?.data.data;
+  };
+  return { sendToRoom, sendToDirect };
 };

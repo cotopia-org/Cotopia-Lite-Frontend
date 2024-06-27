@@ -38,13 +38,6 @@ export default function UserChatRoom() {
     getMessages();
   }, []);
 
-  // const { data, isLoading } = useApi<FetchDataType<any[]>>(
-  //   `/rooms/${room_id}/messages`,
-  //   {
-  //     withoutCache: true,
-  //   }
-  // );
-
   const { sendToRoom } = useChat();
 
   const handleAddMessage = useCallback(
