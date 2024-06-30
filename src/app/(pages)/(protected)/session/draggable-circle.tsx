@@ -33,6 +33,7 @@ import {
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
   useParticipantTile,
+  useTrackMutedIndicator,
   VideoTrack,
 } from "@livekit/components-react";
 import { Participant, Track, TrackPublication } from "livekit-client";
@@ -44,6 +45,7 @@ import { useProfile, useSocket } from "../protected-wrapper";
 import { UserMinimalType, UserType } from "@/types/user";
 import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
+import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -142,10 +144,32 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
       [trackReference, layoutContext]
     );
 
+    const livekitIdentity = trackReference.participant?.identity;
+
+    const { isMuted } = useTrackMutedIndicator(trackRef);
+
+    const isSpeaking = trackReference?.participant?.isSpeaking;
+
+    let clss =
+      "relative rounded-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+
+    if (isSpeaking) {
+      clss += ` bg-green-700`;
+    } else {
+      clss += ` bg-primary`;
+    }
+
     return (
-      <div className='relative rounded-full bg-primary w-[96px] h-[96px] flex flex-col items-center justify-center'>
-        <div className='w-[86px] h-[86px] bg-white rounded-full flex flex-col items-center justify-center'>
-          <div className='w-[82px] h-[82px] rounded-full bg-black [&_video]:w-full [&>div]:h-full  [&_video]:rounded-full [&_video]:object-center [&_video]:h-full [&_video]:object-cover'>
+      <div className={clss}>
+        <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
+          {isMuted && (
+            <CotopiaAvatar
+              className='absolute top-0 left-0 w-full h-full z-[1]'
+              src=''
+              title={livekitIdentity?.[0]}
+            />
+          )}
+          <div className='w-[82px] h-[82px] rounded-full [&_video]:w-full [&>div]:h-full [&_video]:rounded-full [&_video]:object-center [&_video]:h-full [&_video]:object-cover'>
             <div ref={ref} style={{ position: "relative" }} {...elementProps}>
               <TrackRefContextIfNeeded trackRef={trackReference}>
                 <ParticipantContextIfNeeded

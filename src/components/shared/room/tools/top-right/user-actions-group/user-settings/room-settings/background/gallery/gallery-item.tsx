@@ -2,6 +2,7 @@ import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import FullLoading from "@/components/shared/full-loading";
 import useLoading from "@/hooks/use-loading";
 import axiosInstance from "@/lib/axios";
+import { AttachmentFileType } from "@/types/file";
 import { GalleryItemType } from "@/types/gallery";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -17,11 +18,14 @@ export default function GalleryItem({ item, room_id, workspace_id }: Props) {
   const handleSetBackground = async () => {
     startLoading();
     try {
-      await axiosInstance.put(`/room/${room_id}`, {
-        background_image: item.source,
-        workspace_id,
+      const res = await axiosInstance.post(`/files`, {
+        path: item.source,
       });
-      toast.success("Room's background has been updated.");
+      const file: AttachmentFileType = res.data.data;
+      await axiosInstance.put(`/rooms/${room_id}`, {
+        background_id: file.id,
+        // workspace_id,
+      });
       stopLoading();
     } catch (e) {
       stopLoading();

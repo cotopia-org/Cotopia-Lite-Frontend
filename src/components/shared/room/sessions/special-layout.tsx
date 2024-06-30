@@ -51,11 +51,9 @@ const SpcialLayout = ({ tracks, children }: Props) => {
     <>
       {finalTracks.map((track, key) => {
         return (
-          <div className='circle w-auto' key={key}>
-            <TrackRefContext.Provider value={track}>
-              {cloneSingleChild(children)}
-            </TrackRefContext.Provider>
-          </div>
+          <TrackRefContext.Provider value={track} key={key}>
+            {cloneSingleChild(children)}
+          </TrackRefContext.Provider>
         );
       })}
     </>

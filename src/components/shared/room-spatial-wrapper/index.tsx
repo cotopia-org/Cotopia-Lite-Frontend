@@ -16,7 +16,7 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
-  const { data, isLoading } = useApi<FetchDataType<WorkspaceRoomType>>(
+  const { data } = useApi<FetchDataType<WorkspaceRoomType>>(
     `/rooms/${room_id}`
   );
   const room = !!data ? data?.data : undefined;

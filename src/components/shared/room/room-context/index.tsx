@@ -1,5 +1,12 @@
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import { WorkspaceRoomType } from "@/types/room";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type Props = {
   children: ReactNode;
@@ -32,6 +39,15 @@ export default function RoomContext({
   room,
   workspace_id,
 }: Props) {
+  const [localRoom, setLocalRoom] = useState(room);
+  useEffect(() => {
+    if (room !== undefined) setLocalRoom(room);
+  }, [room]);
+
+  useSocket("roomUpdated", (data) => {
+    setLocalRoom(data);
+  });
+
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
@@ -39,7 +55,7 @@ export default function RoomContext({
   return (
     <RoomCtx.Provider
       value={{
-        room,
+        room: localRoom,
         room_id,
         workspace_id,
         sidebar,

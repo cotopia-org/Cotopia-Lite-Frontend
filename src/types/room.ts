@@ -1,3 +1,4 @@
+import { AttachmentFileType } from "./file";
 import { RoomJoinType } from "./room-join";
 import { UserMinimalType } from "./user";
 
@@ -14,6 +15,7 @@ export type WorkspaceRoomType = {
   user_id: number;
   workspace_id: number;
   participants: UserMinimalType[];
+  background: AttachmentFileType | null;
 };
 
 export type WorkspaceRoomJoinType = RoomJoinType;
