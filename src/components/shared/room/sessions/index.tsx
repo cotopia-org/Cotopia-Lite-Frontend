@@ -1,14 +1,8 @@
 import UserSession from "@/app/(pages)/(protected)/session";
-import {
-  LocalParticipant,
-  RemoteParticipant,
-  RoomEvent,
-  Track,
-} from "livekit-client";
+import { RoomEvent, Track } from "livekit-client";
 import SpcialLayout from "./special-layout";
 import {
   RoomAudioRenderer,
-  useParticipants,
   useRoomContext,
   useTracks,
 } from "@livekit/components-react";

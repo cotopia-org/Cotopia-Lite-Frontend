@@ -218,8 +218,6 @@ export default function DraggableCircle() {
 
       userCoordinates = userCoordinates.map((x) => +x);
 
-      console.log("userCoordinates", userCoordinates);
-
       setParticipants((prev) => {
         const prevParticpants = [...(prev ?? [])];
 
@@ -234,17 +232,16 @@ export default function DraggableCircle() {
           };
         }
 
-        console.log("prevParticpants", prevParticpants);
-
         return prevParticpants;
       });
     }
   });
 
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    axiosInstance.post(`/users/updateCoordinates`, {
-      coordinates: `${position.x},${position.y}`,
-    });
+    console.log("position", position);
+    // axiosInstance.post(`/users/updateCoordinates`, {
+    //   coordinates: `${position.x},${position.y}`,
+    // });
   };
 
   const isMyUser = user?.username === livekitIdentity;
@@ -257,7 +254,6 @@ export default function DraggableCircle() {
     200, 200,
   ]; //200 is default position , change in the feature
 
-  console.log("coordsUser", coordsUser);
   return (
     <DraggableComponent
       onDragEnd={handleUpdateCoordinates}

@@ -1,9 +1,7 @@
 "use client";
-import Draggable, {
-  DraggableEvent,
-  DraggableEventHandler,
-} from "react-draggable";
+import Draggable from "react-draggable";
 import { ReactNode, useEffect, useState } from "react";
+import { useScreen } from "@/hooks/use-screen";
 
 type Props = {
   children: ReactNode;
@@ -36,12 +34,12 @@ export default function DraggableComponent({
   }, [x, y]);
 
   const hanldeDragEnd = (dragEvent: any) => {
-    const x = dragEvent?.x + 0;
-    const y = dragEvent?.y + 140;
+    const x = dragEvent?.x;
+    const y = dragEvent?.y;
 
     const newPosition = {
       x,
-      y,
+      y: y,
     };
 
     setPosition(newPosition);
@@ -49,11 +47,13 @@ export default function DraggableComponent({
     if (onDragEnd) onDragEnd(newPosition);
   };
 
+  const { height, width } = useScreen();
+
   return (
     <Draggable
       positionOffset={{
-        x: (-1 * window.screen.width) / 2,
-        y: (-1 * window.screen.height) / 2,
+        x: (-1 * width) / 2,
+        y: (-1 * height) / 2,
       }}
       position={position}
       onStop={hanldeDragEnd}

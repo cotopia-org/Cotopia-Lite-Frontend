@@ -22,13 +22,15 @@ export default function RoomSpatialWrapper({
   const room = !!data ? data?.data : undefined;
 
   return (
-    <RoomWrapper>
-      <RoomHolder
-        token={token}
-        room={room}
-        room_id={room_id}
-        workspace_id={workspace_id}
-      />
-    </RoomWrapper>
+    <div className='selection:!bg-transparent'>
+      <RoomWrapper>
+        <RoomHolder
+          token={token}
+          room={room}
+          room_id={room_id}
+          workspace_id={workspace_id}
+        />
+      </RoomWrapper>
+    </div>
   );
 }
