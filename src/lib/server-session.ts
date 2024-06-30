@@ -40,7 +40,6 @@ export default async function getServerSession<T = UserSession>() {
     });
     user = res.data?.data;
   } catch (e: any) {
-    console.log("e?.response?.status", e);
     if (
       e?.response?.status == 401 ||
       e?.response?.data?.meta?.message === "Unauthenticated."

@@ -238,7 +238,6 @@ export default function DraggableCircle() {
   });
 
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    console.log("position", position);
     // axiosInstance.post(`/users/updateCoordinates`, {
     //   coordinates: `${position.x},${position.y}`,
     // });

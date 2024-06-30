@@ -71,9 +71,6 @@ export default function DraggableComponent({
     const finalDiffX = Math.abs(diffX);
     const finalDiffY = Math.abs(diffY);
 
-    console.log("diffX", diffX);
-    console.log("diffY", diffY);
-
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
 

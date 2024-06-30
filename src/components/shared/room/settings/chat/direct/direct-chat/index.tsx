@@ -48,8 +48,6 @@ export default function DirectChat({ user, direct_id, onBack }: Props) {
   const { sendToDirect } = useChat();
 
   const handleUpdateMessages = (chat: ChatItemType) => {
-    console.log("chat", chat);
-
     const chatIds = messages.map((x) => x.id);
     const foundIndex = chatIds.indexOf(chat.id);
 
