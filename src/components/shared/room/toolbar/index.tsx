@@ -4,6 +4,7 @@ import ToolbarTopRight from "./top-right";
 import ToolbarBottomLeft from "./bottom-left";
 import ToolbarBottomRight from "./bottom-right";
 import ToolbarBottomMiddle from "./bottom-middle";
+import ToolbarLeftMiddle from "./left-middle";
 
 type Props = {
   topLeft?: ReactNode;
@@ -11,6 +12,7 @@ type Props = {
   bottomLeft?: ReactNode;
   bottomMiddle?: ReactNode;
   bottomRight?: ReactNode;
+  leftMiddle?: ReactNode;
 };
 
 export default function Toolbar({
@@ -19,6 +21,7 @@ export default function Toolbar({
   bottomLeft,
   bottomRight,
   bottomMiddle,
+  leftMiddle,
 }: Props) {
   return (
     <>
@@ -27,6 +30,7 @@ export default function Toolbar({
       <ToolbarBottomLeft>{bottomLeft}</ToolbarBottomLeft>
       <ToolbarBottomMiddle>{bottomMiddle}</ToolbarBottomMiddle>
       <ToolbarBottomRight>{bottomRight}</ToolbarBottomRight>
+      <ToolbarLeftMiddle>{leftMiddle}</ToolbarLeftMiddle>
     </>
   );
 }
