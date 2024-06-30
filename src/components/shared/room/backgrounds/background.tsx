@@ -9,7 +9,7 @@ export default function Background() {
     <div className='fixed top-0 left-0 bottom-0 right-0 bg-cover bg-center select-none'>
       <Image
         fill
-        src={room?.background?.path ?? `/assets/backgrounds/bg-sample.webp`}
+        src={room?.background?.url ?? `/assets/backgrounds/bg-sample.webp`}
         alt=''
         className='object-cover object-center'
       />
