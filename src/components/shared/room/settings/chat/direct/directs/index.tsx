@@ -26,11 +26,17 @@ export default function Directs({ search, onSelect }: Props) {
   let finalDirects = [...directs];
 
   if (search)
-    finalDirects = finalDirects.filter(
-      (x) =>
-        x.participants.map((x) => x.username)?.includes(search) ||
-        x.participants.map((x) => x.name)?.includes(search)
-    );
+    finalDirects = finalDirects.filter((x) => {
+      const allParticipantsUsername = x.participants
+        .map((x) => x.username)
+        .join(" ");
+      const allParticipantsName = x.participants.map((x) => x.name).join(" ");
+
+      return (
+        new RegExp(search, "i").test(`/${allParticipantsUsername}/`) ||
+        new RegExp(search, "i").test(`/${allParticipantsName}/`)
+      );
+    });
 
   if (finalDirects.length === 0) return <NotFound title='No users found!' />;
 

@@ -258,6 +258,7 @@ export default function DraggableCircle() {
     <DraggableComponent
       onDragEnd={handleUpdateCoordinates}
       disabled={!isMyUser}
+      hasTransition={!isMyUser}
       x={coordsUser?.[0]}
       y={coordsUser?.[1]}
     >
