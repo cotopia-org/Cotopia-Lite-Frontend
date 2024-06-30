@@ -68,13 +68,20 @@ export default function DraggableComponent({
     let x = dragEvent?.x;
     let y = dragEvent?.y;
 
-    x = diffX < 0 ? x - diffX : x - diffX;
-    y = diffY < 0 ? y - diffY : y - diffY;
+    const finalDiffX = Math.abs(diffX);
+    const finalDiffY = Math.abs(diffY);
+
+    console.log("diffX", diffX);
+    console.log("diffY", diffY);
+
+    x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
+    y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
 
     if (sidebar) {
       x = x + 188;
     }
 
+    y = y + 48;
     const newPosition = {
       x,
       y,
@@ -85,7 +92,7 @@ export default function DraggableComponent({
 
     setPosition(newPosition);
 
-    handleUpdateCoordinates({ x, y });
+    handleUpdateCoordinates(newPosition);
 
     if (onDragEnd) onDragEnd(newPosition);
   };
