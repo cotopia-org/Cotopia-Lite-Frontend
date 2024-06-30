@@ -27,6 +27,7 @@ const RoomSpatial = React.memo(() => {
         <div className="col-span-10 relative">
           <RoomHeader className={buttonStyle.base} iconSize={buttonStyle.icon.size} iconStyle={buttonStyle.icon.style} />
           <RoomDraw />
+
           <ToolbarLeftMiddle>
             <div className="flex flex-col bg-white shadow-md rounded-md p-2 gap-3">
               <MapPin size={24} className={iconClass} />
@@ -34,9 +35,9 @@ const RoomSpatial = React.memo(() => {
               <Settings2 size={24} className={iconClass} />
             </div>
           </ToolbarLeftMiddle>
+          
           <RoomFooter buttonStyle={buttonStyle} />
         </div>
-        
         <RoomSpatialSideBar />
       </main>
     </RoomSpatialWrapper>

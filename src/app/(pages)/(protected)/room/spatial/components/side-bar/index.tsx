@@ -8,7 +8,6 @@ export default function RoomSpatialSideBar() {
   const [stageMenu, setStageMenu] = useState<boolean>(false);
   const [workspaceMenu, setWorkspaceMenu] = useState<boolean>(false);
 
-
   const sideBarStyle = {
     li: { base: "flex flex-col gap-2 items-start transition-colors hover:text-black cursor-pointer", span: "flex gap-2 items-center" },
     headerIcon: { style: "text-slate-500 hover:text-white hover:bg-blue-700 transition-colors rounded-sm p-1", size: 30 },
@@ -45,9 +44,7 @@ export default function RoomSpatialSideBar() {
             <div className={`w-full items-center justify-center my-2 ${breakOutMenu ? "flex" : "hidden"}`}>
               Content
             </div>
-
           </li>
-
 
           <li className={sideBarStyle.li.base} onClick={() => setStageMenu(prevState => !prevState)}>
             <span className={sideBarStyle.li.span}>
@@ -62,9 +59,7 @@ export default function RoomSpatialSideBar() {
             <div className={`w-full items-center justify-center my-2 ${stageMenu ? "flex" : "hidden"}`}>
               Content
             </div>
-
           </li>
-
 
           <li className={sideBarStyle.li.base} onClick={() => setWorkspaceMenu(prevState => !prevState)}>
             <span className={sideBarStyle.li.span}>

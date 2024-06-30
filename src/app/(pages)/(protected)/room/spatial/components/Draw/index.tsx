@@ -30,7 +30,7 @@ export default function RoomDraw() {
       ctx.fill();
     }
   }
-
+  
   return (
     <>
       {drawMode && (
