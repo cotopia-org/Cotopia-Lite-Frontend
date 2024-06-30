@@ -6,7 +6,7 @@ import SettingsChatAction from "./chat/action";
 import UserChat from "./chat";
 
 export default function RoomSettings() {
-  const [value, setValue] = useState("user");
+  const [value, setValue] = useState("chat");
 
   let title: ReactNode = "";
   switch (value) {
