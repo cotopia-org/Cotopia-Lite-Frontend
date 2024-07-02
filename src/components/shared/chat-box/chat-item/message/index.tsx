@@ -6,6 +6,11 @@ type Props = {
   item: ChatItemType;
 };
 export default function Message({ item }: Props) {
+  const [stateMessage, setStateMessage] = useState(item);
+  useEffect(() => {
+    if (item !== undefined) setStateMessage(item);
+  }, [item]);
+
   const divRef = useRef<HTMLDivElement>();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -31,10 +36,15 @@ export default function Message({ item }: Props) {
   const { seenMessage } = useChat();
 
   useEffect(() => {
-    if (isVisible && item?.unseen === false) {
-      seenMessage(item?.id);
+    if (isVisible && stateMessage?.seen === false) {
+      seenMessage(stateMessage?.id).then((res) => {
+        setStateMessage({
+          ...stateMessage,
+          seen: true,
+        });
+      });
     }
-  }, [item, isVisible]);
+  }, [stateMessage, isVisible]);
 
   return (
     <p
