@@ -46,6 +46,7 @@ import { UserMinimalType, UserType } from "@/types/user";
 import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
+import { getUserFullname } from "@/lib/utils";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -159,14 +160,23 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
       clss += ` bg-primary`;
     }
 
+    const { room } = useRoomContext();
+    const participants = room?.participants;
+
+    const targetUser = participants?.find(
+      (x) => x.username === livekitIdentity
+    );
+
+    const userFullName = getUserFullname(targetUser);
+
     return (
       <div className={clss}>
         <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
           {isMuted && (
             <CotopiaAvatar
               className='absolute top-0 left-0 w-full h-full z-[1]'
-              src=''
-              title={livekitIdentity?.[0]}
+              src={targetUser?.avatar?.url ?? ""}
+              title={userFullName?.[0] ?? livekitIdentity?.[0]}
             />
           )}
           <div className='w-[82px] h-[82px] rounded-full [&_video]:w-full [&>div]:h-full [&_video]:rounded-full [&_video]:object-center [&_video]:h-full [&_video]:object-cover'>
