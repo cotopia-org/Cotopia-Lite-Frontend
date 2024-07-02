@@ -20,6 +20,7 @@
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "copy-to-clipboard": "^3.3.3",
     "formik": "^2.4.6",
     "livekit-client": "^2.1.5",
     "lucide-react": "^0.379.0",
@@ -33,6 +34,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "use-bus": "^2.5.2",
     "yup": "^1.4.0"
   },
   "devDependencies": {

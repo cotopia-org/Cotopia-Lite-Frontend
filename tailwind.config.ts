@@ -68,23 +68,38 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "scale-up": {
+          "0%": {
+            transform: "scale(1)",
+            animationTimingFunction: "cubic-bezier(0.8,0,1,1)",
+          },
+          "50%": {
+            transform: "scale(1.2)",
+            animationTimingFunction: "cubic-bezier(0,0,0.2,1)",
+          },
+          "100%": {
+            transform: "scale(1)",
+            animationTimingFunction: "cubic-bezier(0,0,0.2,1)",
+          },
+        },
       },
       animation: {
+        "scale-custom": "scale-up 0.3s ease-in-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       screens: {
-        'xs': '495px',
-        '2xs': '200px',
+        xs: "495px",
+        "2xs": "200px",
       },
       width: {
-        'nearly-full': '90%',
-        '10.5': '10.25rem',
-        'wide': '666px',
+        "nearly-full": "90%",
+        "10.5": "10.25rem",
+        wide: "666px",
       },
       height: {
-        '3.25': '3.125rem',
-      }
+        "3.25": "3.125rem",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

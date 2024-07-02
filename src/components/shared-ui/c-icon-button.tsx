@@ -7,7 +7,7 @@ type Props = ButtonProps & {
 
 export default function CotopiaIconButton({ loading, ...rest }: Props) {
   let clssName = rest?.className ?? "";
-  clssName += ` bg-white rounded-full hover:bg-gray-100`;
+  clssName += ` flex flex-col !p-0 items-center justify-center bg-white rounded-full hover:bg-gray-100`;
 
   return (
     <CotopiaButton

@@ -5,7 +5,7 @@ import InviteDetails from "@/components/shared/invite-details";
 import { useApi } from "@/hooks/swr";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { InviteType } from "@/types/invite";
-import { WorkspaceRoomJoinType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -19,24 +19,23 @@ export default function Wrapper({ inviteCode }: Props) {
   const invite = !!data ? data?.data : null;
 
   const router = useRouter();
-  const handleJoined = async (type: "room" | "workspace") => {
-    switch (type) {
+  const handleJoined = async () => {
+    switch (invite?.type) {
       case "room":
-        if (invite?.room)
-          try {
-            const res = await axiosInstance.get<
-              FetchDataType<WorkspaceRoomJoinType>
-            >(`/rooms/${invite?.room.id}/join`);
-            const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+        const room = invite?.inviteable as WorkspaceRoomType;
+        try {
+          const res = await axiosInstance.get<
+            FetchDataType<WorkspaceRoomJoinType>
+          >(`/rooms/${invite?.inviteable.id}/join`);
+          const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
-            if (livekitToken) {
-              router.push(
-                `/workspaces/${invite.workspace.id}/rooms/${invite.room.id}?token=${livekitToken}`
-              );
-              return;
-            }
-          } catch (e) {}
-
+          if (livekitToken) {
+            router.push(
+              `/workspaces/${room.workspace_id}/rooms/${room.id}?token=${livekitToken}`
+            );
+            return;
+          }
+        } catch (e) {}
         break;
       case "workspace":
         router.push(`/workspaces/all`);

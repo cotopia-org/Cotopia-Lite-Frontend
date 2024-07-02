@@ -16,6 +16,16 @@ export type WorkspaceRoomType = {
   workspace_id: number;
   participants: UserMinimalType[];
   background: AttachmentFileType | null;
+  unseens: number;
+};
+
+export type WorkspaceRoomShortType = {
+  background: AttachmentFileType;
+  id: number;
+  is_private: 0 | 1;
+  logo: null | AttachmentFileType;
+  title: string;
+  unseens: number;
 };
 
 export type WorkspaceRoomJoinType = RoomJoinType;

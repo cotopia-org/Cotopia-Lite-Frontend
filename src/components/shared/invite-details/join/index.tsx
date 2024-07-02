@@ -8,13 +8,13 @@ import { toast } from "sonner";
 
 type Props = {
   invite: InviteType;
-  onJoined?: (type: "room" | "workspace") => void;
+  onJoined?: (type: "room" | "workspace" | "job") => void;
 };
 
 export default function JoinButton({ invite, onJoined }: Props) {
   const { startLoading, stopLoading, isLoading } = useLoading();
 
-  const targetInvitation = invite?.room ? "room" : "workspace";
+  const targetInvitation = invite.type;
 
   const handleJoin = async () => {
     startLoading();

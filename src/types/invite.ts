@@ -1,4 +1,5 @@
 import { AttachmentFileType } from "./file";
+import { JobType } from "./jon";
 import { WorkspaceRoomType } from "./room";
 import { WorkspaceType } from "./workspace";
 
@@ -11,7 +12,7 @@ export type InviteType = {
     name: null | string;
     username: string;
   };
-  room: null | WorkspaceRoomType;
+  inviteable: WorkspaceRoomType | WorkspaceType;
   status: "pending" | "joined" | "declined";
   user: {
     avatar: null | AttachmentFileType;
@@ -19,5 +20,5 @@ export type InviteType = {
     name: string;
     username: string;
   };
-  workspace: WorkspaceType;
+  type: "workspace" | "room" | "job";
 };

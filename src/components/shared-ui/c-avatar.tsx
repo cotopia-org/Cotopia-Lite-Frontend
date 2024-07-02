@@ -9,7 +9,7 @@ type Props = AvatarProps & {
 export default function CotopiaAvatar({ title, src, ...rest }: Props) {
   return (
     <Avatar {...rest}>
-      <AvatarImage src={src} />
+      <AvatarImage className='object-cover object-center' src={src} />
       <AvatarFallback className='uppercase'>{title}</AvatarFallback>
     </Avatar>
   );

@@ -1,16 +1,17 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
 import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
-import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomShortType } from "@/types/room";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type Props = {
-  room: WorkspaceRoomType;
+  room: WorkspaceRoomShortType;
+  workspace_id: number;
 };
 
-export default function WorkspaceRoom({ room }: Props) {
+export default function WorkspaceRoom({ workspace_id, room }: Props) {
   const router = useRouter();
 
   const { startLoading, stopLoading, isLoading } = useLoading();
@@ -26,7 +27,7 @@ export default function WorkspaceRoom({ room }: Props) {
 
       if (livekitToken) {
         router.push(
-          `/workspaces/${room.workspace_id}/rooms/${room.id}?token=${livekitToken}`
+          `/workspaces/${workspace_id}/rooms/${room.id}?token=${livekitToken}`
         );
         return;
       }

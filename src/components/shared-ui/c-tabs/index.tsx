@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 type Tab = {
   value: string;
-  title?: string;
+  title?: ReactNode;
   icon?: ReactNode;
   content: ReactNode;
 };
@@ -43,7 +43,11 @@ export default function CTabs({
       onValueChange={handleChangeTab}
     >
       <div className='tab-holder flex flex-row items-center justify-between'>
-        {!!title && <strong className={titleClassName ?? ""}>{title}</strong>}
+        {!!title && typeof title === "string" ? (
+          <strong className={titleClassName ?? ""}>{title}</strong>
+        ) : (
+          title
+        )}
         <TabsList className='flex flex-row justify-start bg-black/5'>
           {items.map((x) => (
             <TabsTrigger value={x.value} key={x.value}>

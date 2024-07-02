@@ -1,4 +1,3 @@
-import CotopiaButton from "@/components/shared-ui/c-button";
 import {
   Card,
   CardContent,
@@ -14,9 +13,11 @@ import JoinButton from "./join";
 
 type Props = {
   item: InviteType;
-  onJoined?: (type: "room" | "workspace") => void;
+  onJoined?: (type: "room" | "workspace" | "job") => void;
 };
 export default function InviteDetails({ item, onJoined }: Props) {
+  const inviteableTiitle = item?.inviteable?.title;
+
   return (
     <Card>
       <CardHeader>
@@ -26,9 +27,9 @@ export default function InviteDetails({ item, onJoined }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>{`${getUserFullname(item.owner)} invited you to the ${
-          item?.workspace?.title
-        }, do you want to continue?`}</p>
+        <p>{`${getUserFullname(
+          item.owner
+        )} invited you to the ${inviteableTiitle}, do you want to continue?`}</p>
       </CardContent>
       <CardFooter>
         <div className='flex flex-row items-center gap-x-2'>
