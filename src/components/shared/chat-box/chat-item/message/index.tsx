@@ -1,15 +1,52 @@
+import { useChat } from "@/hooks/chat/use-chat";
+import { ChatItemType } from "@/types/chat";
+import { useEffect, useRef, useState } from "react";
+
 type Props = {
-  message: string;
+  item: ChatItemType;
 };
-export default function Message({ message }: Props) {
+export default function Message({ item }: Props) {
+  const divRef = useRef<HTMLDivElement>();
+
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.5 } // Trigger when 50% of the element is visible
+    );
+
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, []);
+
+  const { seenMessage } = useChat();
+
+  useEffect(() => {
+    if (isVisible && item?.unseen === false) {
+      seenMessage(item?.id);
+    }
+  }, [item, isVisible]);
+
   return (
     <p
       className='text-wrap'
       style={{
         overflowWrap: "anywhere",
       }}
+      ref={(x) => {
+        if (x !== null) divRef.current = x;
+      }}
     >
-      {message}
+      {item?.text}
     </p>
   );
 }

@@ -10,4 +10,5 @@ export type MessageType = {
   user: UserType;
   created_at: number;
   updated_at?: number;
+  unseen: boolean;
 };

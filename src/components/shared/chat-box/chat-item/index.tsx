@@ -22,7 +22,7 @@ export default function ChatItem({ item, observer_user_id }: Props) {
           <div className='flex flex-row items-center gap-x-1'>
             <Username username={item.user.username} />
           </div>
-          <Message message={item.text} />
+          <Message item={item} />
         </div>
         <div className='absolute bottom-1 right-2'>
           <Time time={item.created_at} />

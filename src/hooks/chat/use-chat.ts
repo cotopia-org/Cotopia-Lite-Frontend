@@ -2,6 +2,10 @@ import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { MessageType } from "@/types/message";
 
 export const useChat = () => {
+  const seenMessage = (messageId: number) => {
+    return axiosInstance.get(`/messages/${messageId}/seen`);
+  };
+
   const sendToRoom = async (
     message: string,
     roomId: number | string,
@@ -43,5 +47,5 @@ export const useChat = () => {
 
     return res?.data.data;
   };
-  return { sendToRoom, sendToDirect };
+  return { sendToRoom, sendToDirect, seenMessage };
 };
