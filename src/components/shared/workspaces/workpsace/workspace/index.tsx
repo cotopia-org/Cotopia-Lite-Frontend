@@ -35,9 +35,9 @@ export default function WorkspaceItem({ item }: Props) {
           <WorkspaceDate date={localWorkspace.created_at ?? null} />
         </div>
       </div>
-      <div>
+      {/* <div>
         <WorkspaceActions item={localWorkspace} />
-      </div>
+      </div> */}
     </Link>
   );
 }

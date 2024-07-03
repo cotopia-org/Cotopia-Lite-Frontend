@@ -27,7 +27,7 @@ export default function UserChatDirect() {
         />
         <Directs search={searched ?? undefined} onSelect={setSelectedDirect} />
       </div>
-      <div>xx</div>
+      {/* <div>xx</div> */}
     </>
   );
 

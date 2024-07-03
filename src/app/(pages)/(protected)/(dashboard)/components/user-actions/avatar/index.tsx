@@ -24,20 +24,18 @@ export default function UserActionsAvatarButton({ size = "large" }: Props) {
   }
 
   return (
-    <>
-      <FullModalBox
-        trigger={(open) => (
-          <CotopiaAvatar
-            src={user?.avatar?.url ?? undefined}
-            title={userFullName?.[0]}
-            className={avatarClss}
-            onClick={open}
-          />
-        )}
-        className='w-[640px]'
-      >
-        {(open, close) => <UserSettings />}
-      </FullModalBox>
-    </>
+    <FullModalBox
+      trigger={(open) => (
+        <CotopiaAvatar
+          src={user?.avatar?.url ?? undefined}
+          title={userFullName?.[0]}
+          className={avatarClss}
+          onClick={open}
+        />
+      )}
+      className='w-[640px]'
+    >
+      {(open, close) => <UserSettings />}
+    </FullModalBox>
   );
 }
