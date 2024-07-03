@@ -1,14 +1,7 @@
 "use client";
 
-import axiosInstance from "@/lib/axios";
 import { UserType } from "@/types/user";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { DashboardWrapper } from "./dashboard-wrapper";
 
 type Props = {

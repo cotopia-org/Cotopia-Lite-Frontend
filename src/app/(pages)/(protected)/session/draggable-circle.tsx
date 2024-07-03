@@ -157,7 +157,7 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
     if (isSpeaking) {
       clss += ` bg-green-700`;
     } else {
-      clss += ` bg-primary`;
+      clss += ` bg-black/20`;
     }
 
     const { room } = useRoomContext();

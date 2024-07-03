@@ -20,7 +20,11 @@ export default function UserChatDirect() {
     <>
       <div className='flex flex-col gap-y-4'>
         <Search onChange={setSearched} />
-        {/* <Users search={searched ?? undefined} onSelect={setSelectedUser} /> */}
+        <Users
+          search={searched ?? undefined}
+          onSelect={() => {}}
+          showNotFound={false}
+        />
         <Directs search={searched ?? undefined} onSelect={setSelectedDirect} />
       </div>
       <div>xx</div>

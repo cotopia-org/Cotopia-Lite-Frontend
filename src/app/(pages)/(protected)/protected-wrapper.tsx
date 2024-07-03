@@ -64,6 +64,8 @@ export default function ProtectedWrapper({ children, token, user }: Props) {
     };
   }, [token]);
 
+  const handleUpdateUser = (user: UserType) => {};
+
   //Show nothing if token is not set
   if (!tokenSet) return;
 

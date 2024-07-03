@@ -7,6 +7,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const querystring = require("querystring");
+const getQueryParams = (obj: object) => querystring.stringify(obj);
+
+export function urlWithQueryParams(url: string, object: any) {
+  if (typeof object !== "object") return "";
+
+  if (!url) return "";
+
+  const params = getQueryParams(object);
+
+  return `${url}?${params}`;
+}
+
 export const isScreenShareExist = (tracks: TrackReferenceOrPlaceholder[]) => {
   let hasShareScreen = false;
   let shareScreenTrack = [];

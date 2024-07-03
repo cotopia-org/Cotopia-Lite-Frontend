@@ -2,19 +2,28 @@ import { ChatItemType } from "@/types/chat";
 import ChatItem from "./chat-item";
 import { useEffect, useRef, useState } from "react";
 import { useReachTop } from "@/hooks/use-reach-top";
-import { UserType } from "@/types/user";
 
 type Props = {
   items: ChatItemType[];
   observer_user_id?: number;
+  onLoadMessage?: () => void;
+  fetchNewMessage?: boolean;
 };
-export default function ChatBox({ items = [], observer_user_id }: Props) {
+export default function ChatBox({
+  items = [],
+  observer_user_id,
+  onLoadMessage,
+  fetchNewMessage,
+}: Props) {
+  const [isGetNewMessages, setIsGetNewMessages] = useState(false);
+
   const boxRef = useRef<HTMLDivElement>();
 
   const [boxHasScroll, setBoxHasScroll] = useState(false);
 
   useEffect(() => {
     if (!boxRef.current) return;
+    if (isGetNewMessages) return;
 
     const scrollHeight = boxRef.current.scrollHeight;
     const boxHeight = boxRef.current.clientHeight;
@@ -25,12 +34,35 @@ export default function ChatBox({ items = [], observer_user_id }: Props) {
       top: scrollHeight,
       behavior: "smooth",
     });
-  }, [items?.length, boxRef?.current]);
+  }, [items?.length, boxRef?.current, isGetNewMessages]);
 
   let clss =
     "relative flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8";
 
   const isReachTop = useReachTop(boxRef?.current);
+  const isReachTopToFetchComments = useReachTop(boxRef?.current, 500);
+
+  const loadMoreMessages = () => {
+    if (!boxRef.current) return;
+
+    if (onLoadMessage) {
+      onLoadMessage();
+      setIsGetNewMessages(true);
+      // boxRef.current.scrollTo({
+      //   top: 600,
+      // });
+    }
+  };
+
+  useEffect(() => {
+    if (fetchNewMessage === false) {
+      return;
+    }
+
+    if (isReachTopToFetchComments) {
+      loadMoreMessages();
+    }
+  }, [isReachTopToFetchComments, fetchNewMessage]);
 
   if (items.length === 0) return;
 

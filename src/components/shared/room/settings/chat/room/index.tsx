@@ -19,23 +19,33 @@ export default function UserChatRoom() {
 
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [messages, setMessages] = useState<ChatItemType[]>([]);
+  const [hasFetchNewMessage, setHasFetchNewMessage] = useState(true);
 
-  const getMessages = () => {
-    startLoading();
+  const [page, setPage] = useState(1);
+
+  const getMessages = (firstTime: boolean = false) => {
+    if (firstTime) {
+      startLoading();
+    }
     axiosInstance
-      .get(`/rooms/${room_id}/messages`)
+      .get(`/rooms/${room_id}/messages?page=${page}`)
       .then((res) => {
         const data = res.data;
         const items: MessageType[] = !!data ? data?.data : [];
-        setMessages(items);
-        stopLoading();
+        if (items.length === 0) {
+          setHasFetchNewMessage(false);
+        }
+        setMessages((prev) => (firstTime ? items : [...prev, ...items]));
+        //Page should be set for next page whenever fetch new data
+        setPage((prev) => prev + 1);
+        if (firstTime) stopLoading();
       })
       .catch((err) => {
-        stopLoading();
+        if (firstTime) stopLoading();
       });
   };
   useEffect(() => {
-    getMessages();
+    getMessages(true);
   }, []);
 
   const { sendToRoom } = useChat();
@@ -76,7 +86,12 @@ export default function UserChatRoom() {
 
   let content = (
     <>
-      <ChatBox items={messages} observer_user_id={user?.id} />
+      <ChatBox
+        items={messages}
+        observer_user_id={user?.id}
+        onLoadMessage={getMessages}
+        fetchNewMessage={hasFetchNewMessage}
+      />
       <ChatUserInput onAdd={handleAddMessage} />
     </>
   );
