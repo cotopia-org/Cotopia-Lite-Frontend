@@ -9,6 +9,7 @@ export default function ChatActionsGroup() {
 
   return (
     <div className='flex flex-row items-center bg-white rounded-xl px-2'>
+      
       {!!sidebar ? (
         <CloseSidebar onClick={closeSidebar} />
       ) : (
@@ -18,6 +19,7 @@ export default function ChatActionsGroup() {
           <UserCalendarSettingsButtonTool />
         </>
       )}
+
     </div>
   );
 }
