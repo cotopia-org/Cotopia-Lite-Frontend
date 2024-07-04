@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "./development.sh",
     "build": "next build",
     "start": "./production.sh",
     "lint": "next lint",
