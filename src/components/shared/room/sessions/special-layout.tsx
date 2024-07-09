@@ -1,10 +1,13 @@
 import { isScreenShareExist } from "@/lib/utils";
 import {
   TrackRefContext,
+  TrackReference,
   TrackReferenceOrPlaceholder,
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Children, ReactNode, cloneElement, isValidElement } from "react";
+import DraggableComponent from "../../draggable";
+import ScreenShareCard from "../components/screen-share-card";
 
 type Props = {
   tracks: TrackReferenceOrPlaceholder[];
@@ -36,58 +39,26 @@ export const cloneSingleChild = (
 const SpcialLayout = ({ tracks, children }: Props) => {
   let finalTracks: TrackReferenceOrPlaceholder[] = [...tracks];
 
-  //exclude shareScreen track from all tracks
-  const excludedTracks = useExcludeShareScreenTrack(finalTracks);
-
-  const { hasShareScreen, shareScreenTrack } = isScreenShareExist(finalTracks);
-
-  let colClss = "animate-show-content col-span-12";
-
-  if (excludedTracks.length > 0 && !hasShareScreen) {
-    colClss += " md:!col-span-6";
-  }
-
   let content = (
     <>
-      {finalTracks.map((track, key) => {
-        return (
-          <TrackRefContext.Provider value={track} key={key}>
-            {cloneSingleChild(children)}
-          </TrackRefContext.Provider>
-        );
-      })}
+      {finalTracks
+        .filter((x) => x.source === Track.Source.ScreenShare)
+        .map((track, key) => (
+          <ScreenShareCard track={track as TrackReference} key={key} />
+        ))}
+      {finalTracks
+        .filter((x) => x.source !== Track.Source.ScreenShare)
+        .map((track, key) => {
+          return (
+            <TrackRefContext.Provider value={track} key={key}>
+              {cloneSingleChild(children)}
+            </TrackRefContext.Provider>
+          );
+        })}
     </>
   );
 
-  if (excludedTracks.length > 0 && hasShareScreen) {
-    content = (
-      <>
-        <div className='share-screen fixed right-[40%] bottom-[24%]'>
-          <div
-            className={
-              "w-[400px] h-[300px] [&_.rounded-full]:!w-full [&_.rounded-full]:!h-full [&_.rounded-full]:!rounded-md"
-            }
-            // key={getTrackReferenceId(shareScreenTrack) ?? "-"}
-            // key={}
-          >
-            <TrackRefContext.Provider value={shareScreenTrack}>
-              {cloneSingleChild(children)}
-            </TrackRefContext.Provider>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return <div>{content}</div>;
 };
-
-// const trackPropsEqual = (prevProps: Props, nextProps: Props) => {
-//   if (prevProps.tracks.length !== nextProps.tracks.length) {
-//     return false
-//   } else {
-//     return true
-//   }
-// }
 
 export default SpcialLayout;

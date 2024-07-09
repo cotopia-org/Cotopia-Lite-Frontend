@@ -2,7 +2,6 @@
 import Draggable from "react-draggable";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useScreen } from "@/hooks/use-screen";
-import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "./room/room-context";
 
 type Props = {
@@ -40,12 +39,6 @@ export default function DraggableComponent({
       y: y ?? DEFAULT_Y,
     });
   }, [x, y]);
-
-  const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    axiosInstance.post(`/users/updateCoordinates`, {
-      coordinates: `${position.x},${position.y}`,
-    });
-  };
 
   const [diffX, setDiffX] = useState(0);
   const [diffY, setDiffY] = useState(0);
@@ -88,8 +81,6 @@ export default function DraggableComponent({
     setDiffY(0);
 
     setPosition(newPosition);
-
-    handleUpdateCoordinates(newPosition);
 
     if (onDragEnd) onDragEnd(newPosition);
   };

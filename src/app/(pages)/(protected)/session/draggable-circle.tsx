@@ -169,6 +169,38 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
 
     const userFullName = getUserFullname(targetUser);
 
+    let trackContent = null;
+
+    if (isTrackReference(trackReference)) {
+      //Default state
+      trackContent = (
+        <AudioTrack
+          trackRef={trackReference}
+          onSubscriptionStatusChanged={handleSubscribe}
+        />
+      );
+
+      if (
+        trackReference.publication?.kind === "video" &&
+        trackReference.source === Track.Source.Camera
+      ) {
+        trackContent = (
+          <VideoTrack
+            trackRef={trackReference}
+            onSubscriptionStatusChanged={handleSubscribe}
+            manageSubscription={autoManageSubscription}
+          />
+        );
+      }
+
+      // if (
+      //   trackReference.publication?.kind === "video" &&
+      //   trackReference.source === Track.Source.ScreenShare
+      // ) {
+      //   trackContent = <div>xx</div>;
+      // }
+    }
+
     return (
       <div className={clss}>
         <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
@@ -179,7 +211,7 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
               title={userFullName?.[0] ?? livekitIdentity?.[0]}
             />
           )}
-          <div className='w-[82px] h-[82px] rounded-full [&_video]:w-full [&>div]:h-full [&_video]:rounded-full [&_video]:object-center [&_video]:h-full [&_video]:object-cover'>
+          <div className={``}>
             <div ref={ref} style={{ position: "relative" }} {...elementProps}>
               <TrackRefContextIfNeeded trackRef={trackReference}>
                 <ParticipantContextIfNeeded
@@ -187,10 +219,10 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
                 >
                   {children ?? (
                     <>
-                      {isTrackReference(trackReference) &&
-                      (trackReference.publication?.kind === "video" ||
-                        trackReference.source === Track.Source.Camera ||
-                        trackReference.source === Track.Source.ScreenShare) ? (
+                      {trackContent}
+                      {/* {isTrackReference(trackReference) &&
+                      trackReference.publication?.kind === "video" &&
+                      trackReference.source === Track.Source.Camera ? (
                         <VideoTrack
                           trackRef={trackReference}
                           onSubscriptionStatusChanged={handleSubscribe}
@@ -203,7 +235,7 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
                             onSubscriptionStatusChanged={handleSubscribe}
                           />
                         )
-                      )}
+                      )} */}
                     </>
                   )}
                 </ParticipantContextIfNeeded>
@@ -272,9 +304,9 @@ export default function DraggableCircle() {
   });
 
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    // axiosInstance.post(`/users/updateCoordinates`, {
-    //   coordinates: `${position.x},${position.y}`,
-    // });
+    axiosInstance.post(`/users/updateCoordinates`, {
+      coordinates: `${position.x},${position.y}`,
+    });
   };
 
   const isMyUser = user?.username === livekitIdentity;
