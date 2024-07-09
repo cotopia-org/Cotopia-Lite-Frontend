@@ -11,7 +11,7 @@ export default function ScreenShareCard({ track }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   let clss = "w-[400px] h-[160px] relative transition-all";
-  if (isExpanded) clss += ` fixed w-[1200px] h-[480px]`;
+  if (isExpanded) clss += ` fixed !w-[1200px] !h-[480px]`;
 
   return (
     <DraggableComponent x={200} y={200}>
