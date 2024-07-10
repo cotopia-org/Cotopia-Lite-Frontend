@@ -6,6 +6,7 @@ import { useRoomContext } from "./room/room-context";
 
 type Props = {
   children: ReactNode;
+  onDragging?: () => void;
   onDragEnd?: (position: { x: number; y: number }) => void;
   x?: number;
   y?: number;
@@ -19,6 +20,7 @@ const DEFAULT_Y = 0;
 export default function DraggableComponent({
   children,
   onDragEnd,
+  onDragging,
   x,
   y,
   disabled = false,
@@ -55,6 +57,8 @@ export default function DraggableComponent({
 
     setDiffX(startX - x);
     setDiffY(startY - y);
+
+    if (onDragging) onDragging();
   };
 
   const hanldeDragEnd = (dragEvent: any) => {

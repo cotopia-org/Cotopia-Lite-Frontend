@@ -1,34 +1,21 @@
 "use client";
 
 import DraggableComponent from "@/components/shared/draggable";
-import React, {
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-  VideoHTMLAttributes,
-} from "react";
+import React, { useEffect, useState } from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
 import ActionsLeft from "./actions-left";
 import UserButton from "./actions-left/user";
 import {
   AudioTrack,
-  ConnectionQualityIndicator,
-  FocusToggle,
   isTrackReference,
-  LockLockedIcon,
   ParticipantContext,
-  ParticipantName,
-  ParticipantPlaceholder,
   ParticipantTileProps,
   PinState,
-  TrackMutedIndicator,
   TrackRefContext,
   TrackReferenceOrPlaceholder,
   useEnsureTrackRef,
   useFeatureContext,
-  useIsEncrypted,
   useMaybeLayoutContext,
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
@@ -47,6 +34,9 @@ import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { getUserFullname } from "@/lib/utils";
+import VoiceAreaHearing from "./wrapper/voice-area-hearing";
+import { dispatch } from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -107,101 +97,105 @@ function TrackRefContextIfNeeded(
   );
 }
 
-const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
-  function ParticipantTile(
-    {
-      trackRef,
-      children,
-      onParticipantClick,
-      disableSpeakingIndicator,
-      ...htmlProps
-    }: ParticipantTileProps,
-    ref
-  ) {
-    const trackReference = useEnsureTrackRef(trackRef);
+const ParticipantTile = React.forwardRef<
+  HTMLDivElement,
+  ParticipantTileProps & { isDragging: boolean }
+>(function ParticipantTile(
+  {
+    trackRef,
+    children,
+    onParticipantClick,
+    disableSpeakingIndicator,
+    isDragging,
+    ...htmlProps
+  }: ParticipantTileProps & { isDragging: boolean },
+  ref
+) {
+  const trackReference = useEnsureTrackRef(trackRef);
 
-    const { elementProps } = useParticipantTile<HTMLDivElement>({
-      htmlProps,
-      disableSpeakingIndicator,
-      onParticipantClick,
-      trackRef: trackReference,
-    });
-    const layoutContext = useMaybeLayoutContext();
+  const { elementProps } = useParticipantTile<HTMLDivElement>({
+    htmlProps,
+    disableSpeakingIndicator,
+    onParticipantClick,
+    trackRef: trackReference,
+  });
+  const layoutContext = useMaybeLayoutContext();
 
-    const autoManageSubscription = useFeatureContext()?.autoSubscription;
+  const autoManageSubscription = useFeatureContext()?.autoSubscription;
 
-    const handleSubscribe = React.useCallback(
-      (subscribed: boolean) => {
-        if (
-          trackReference.source &&
-          !subscribed &&
-          layoutContext &&
-          layoutContext.pin.dispatch &&
-          isTrackReferencePinned(trackReference, layoutContext.pin.state)
-        ) {
-          layoutContext.pin.dispatch({ msg: "clear_pin" });
-        }
-      },
-      [trackReference, layoutContext]
-    );
+  const handleSubscribe = React.useCallback(
+    (subscribed: boolean) => {
+      if (
+        trackReference.source &&
+        !subscribed &&
+        layoutContext &&
+        layoutContext.pin.dispatch &&
+        isTrackReferencePinned(trackReference, layoutContext.pin.state)
+      ) {
+        layoutContext.pin.dispatch({ msg: "clear_pin" });
+      }
+    },
+    [trackReference, layoutContext]
+  );
 
-    const livekitIdentity = trackReference.participant?.identity;
+  const livekitIdentity = trackReference.participant?.identity;
 
-    const { isMuted } = useTrackMutedIndicator(trackRef);
+  const { isMuted } = useTrackMutedIndicator(trackRef);
 
-    const isSpeaking = trackReference?.participant?.isSpeaking;
+  const isSpeaking = trackReference?.participant?.isSpeaking;
 
-    let clss =
-      "relative w-full h-full absolute top-0 left-0 rounded-full p-1 [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
-
+  useEffect(() => {
     if (isSpeaking) {
-      clss += ` bg-green-700`;
+      dispatch({ type: _BUS.someoneStartTalking, payload: livekitIdentity });
     } else {
-      clss += ` bg-black/20`;
+      dispatch({ type: _BUS.someoneStopTalking, payload: livekitIdentity });
     }
+  }, [isSpeaking]);
 
-    const { room } = useRoomContext();
-    const participants = room?.participants;
+  let clss =
+    "relative w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
 
-    const targetUser = participants?.find(
-      (x) => x.username === livekitIdentity
+  if (isSpeaking) {
+    clss += ` bg-green-700`;
+  } else {
+    clss += ` bg-black/10`;
+  }
+
+  const { room } = useRoomContext();
+  const participants = room?.participants;
+
+  const targetUser = participants?.find((x) => x.username === livekitIdentity);
+
+  const userFullName = getUserFullname(targetUser);
+
+  let trackContent = null;
+
+  if (isTrackReference(trackReference)) {
+    //Default state
+    trackContent = (
+      <AudioTrack
+        trackRef={trackReference}
+        onSubscriptionStatusChanged={handleSubscribe}
+      />
     );
 
-    const userFullName = getUserFullname(targetUser);
-
-    let trackContent = null;
-
-    if (isTrackReference(trackReference)) {
-      //Default state
+    if (
+      trackReference.publication?.kind === "video" &&
+      trackReference.source === Track.Source.Camera
+    ) {
       trackContent = (
-        <AudioTrack
+        <VideoTrack
           trackRef={trackReference}
           onSubscriptionStatusChanged={handleSubscribe}
+          manageSubscription={autoManageSubscription}
         />
       );
-
-      if (
-        trackReference.publication?.kind === "video" &&
-        trackReference.source === Track.Source.Camera
-      ) {
-        trackContent = (
-          <VideoTrack
-            trackRef={trackReference}
-            onSubscriptionStatusChanged={handleSubscribe}
-            manageSubscription={autoManageSubscription}
-          />
-        );
-      }
-
-      // if (
-      //   trackReference.publication?.kind === "video" &&
-      //   trackReference.source === Track.Source.ScreenShare
-      // ) {
-      //   trackContent = <div>xx</div>;
-      // }
     }
+  }
 
-    return (
+  return (
+    <>
+      <VoiceAreaHearing isDragging={isDragging} />
       <div className={clss}>
         <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
           {isMuted && (
@@ -217,27 +211,7 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
                 <ParticipantContextIfNeeded
                   participant={trackReference.participant}
                 >
-                  {children ?? (
-                    <>
-                      {trackContent}
-                      {/* {isTrackReference(trackReference) &&
-                      trackReference.publication?.kind === "video" &&
-                      trackReference.source === Track.Source.Camera ? (
-                        <VideoTrack
-                          trackRef={trackReference}
-                          onSubscriptionStatusChanged={handleSubscribe}
-                          manageSubscription={autoManageSubscription}
-                        />
-                      ) : (
-                        isTrackReference(trackReference) && (
-                          <AudioTrack
-                            trackRef={trackReference}
-                            onSubscriptionStatusChanged={handleSubscribe}
-                          />
-                        )
-                      )} */}
-                    </>
-                  )}
+                  {children ?? <>{trackContent}</>}
                 </ParticipantContextIfNeeded>
               </TrackRefContextIfNeeded>
             </div>
@@ -255,13 +229,18 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
           <UserButton />
         </ActionsLeft>
       </div>
-    );
-  }
-);
+    </>
+  );
+});
 
 const DEFAULT_TILE_POSITION = [0, 0];
 
 export default function DraggableCircle() {
+  const [isDragging, setIsDragging] = useState(false);
+  const handleStartDragging = () => {
+    setIsDragging(true);
+  };
+
   const { room } = useRoomContext();
 
   const [participants, setParticipants] = useState<UserMinimalType[]>(
@@ -321,14 +300,18 @@ export default function DraggableCircle() {
 
   return (
     <DraggableComponent
-      onDragEnd={handleUpdateCoordinates}
+      onDragEnd={(position) => {
+        handleUpdateCoordinates(position);
+        setIsDragging(false);
+      }}
+      onDragging={handleStartDragging}
       disabled={!isMyUser}
       hasTransition={!isMyUser}
       x={coordsUser?.[0]}
       y={coordsUser?.[1]}
     >
       <SessionWrapper>
-        <ParticipantTile />
+        <ParticipantTile isDragging={isDragging} />
       </SessionWrapper>
     </DraggableComponent>
   );

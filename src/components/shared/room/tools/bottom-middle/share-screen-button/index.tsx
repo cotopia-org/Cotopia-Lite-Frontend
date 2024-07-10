@@ -8,6 +8,8 @@ import {
   LocalVideoTrack,
   Track,
 } from "livekit-client";
+import useBus from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 export default function ShareScreenButtonTool() {
   const [screenTrack, setScreenTrack] = useState<any>(null);
@@ -25,13 +27,17 @@ export default function ShareScreenButtonTool() {
     }
   }, [room]);
 
-  const stopScreenShare = useCallback(() => {
-    if (screenTrack) {
-      localParticipant.unpublishTrack(screenTrack);
-      screenTrack.stop();
-      setScreenTrack(null);
+  const stopScreenShare = useCallback(async () => {
+    try {
+      await room.localParticipant.setScreenShareEnabled(false);
+    } catch (err) {
+      console.error("Error sharing screen:", err);
     }
   }, [room, screenTrack]);
+
+  useBus(_BUS.stopMyScreenSharing, () => {
+    stopScreenShare();
+  });
 
   return (
     <CotopiaIconButton className='text-black' onClick={startScreenShare}>

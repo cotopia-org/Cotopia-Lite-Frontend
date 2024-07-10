@@ -1,8 +1,10 @@
+import { _BUS } from "@/app/const/bus";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import DraggableComponent from "@/components/shared/draggable";
 import { TrackReference, VideoTrack } from "@livekit/components-react";
-import { Expand, Minimize } from "lucide-react";
+import { Expand, Minimize, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { dispatch } from "use-bus";
 
 type Props = {
   track: TrackReference;
@@ -16,12 +18,20 @@ export default function ScreenShareCard({ track }: Props) {
   return (
     <DraggableComponent x={200} y={200}>
       <div className={clss}>
-        <CotopiaIconButton
-          className='absolute top-4 left-4 text-black/60 z-10'
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
-          {isExpanded ? <Minimize /> : <Expand />}
-        </CotopiaIconButton>
+        <div className='absolute top-4 left-4 flex flex-row items-center gap-x-2'>
+          <CotopiaIconButton
+            className='text-black/60 z-10'
+            onClick={() => setIsExpanded((prev) => !prev)}
+          >
+            {isExpanded ? <Minimize /> : <Expand />}
+          </CotopiaIconButton>
+          <CotopiaIconButton
+            className='text-black/60 z-10'
+            onClick={() => dispatch(_BUS.stopMyScreenSharing)}
+          >
+            <X />
+          </CotopiaIconButton>
+        </div>
         <VideoTrack trackRef={track} />
       </div>
     </DraggableComponent>

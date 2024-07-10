@@ -10,6 +10,7 @@ import UserSessions from "../sessions";
 import { useRoomContext } from "../room-context";
 import RoomSidebar from "../sidebar";
 import RoomSettings from "../settings";
+import LiveKitAudioManager from "../components/audio-manager";
 
 export default function RoomInner() {
   const { sidebar } = useRoomContext();
@@ -37,6 +38,7 @@ export default function RoomInner() {
           </RoomSidebar>
         </div>
       )}
+      <LiveKitAudioManager />
     </div>
   );
 }
