@@ -152,7 +152,7 @@ const ParticipantTile = React.forwardRef<HTMLDivElement, ParticipantTileProps>(
     const isSpeaking = trackReference?.participant?.isSpeaking;
 
     let clss =
-      "relative rounded-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+      "relative w-full h-full absolute top-0 left-0 rounded-full p-1 [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
 
     if (isSpeaking) {
       clss += ` bg-green-700`;

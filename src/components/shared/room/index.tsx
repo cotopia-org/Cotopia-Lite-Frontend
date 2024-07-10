@@ -5,6 +5,7 @@ import { __VARS } from "@/app/const/vars";
 import RoomContext from "./room-context";
 import RoomInner from "./room-inner";
 import { WorkspaceRoomType } from "@/types/room";
+import { AudioPresets } from "livekit-client";
 
 type Props = {
   token: string;
@@ -65,6 +66,8 @@ export default function RoomHolder({
                 },
               },
             ],
+            audioPreset: AudioPresets.musicHighQualityStereo,
+            forceStereo: true,
           },
           videoCaptureDefaults: {
             deviceId: "",
@@ -75,9 +78,8 @@ export default function RoomHolder({
               frameRate: 30,
             },
           },
-
           audioCaptureDefaults: {
-            autoGainControl: true,
+            autoGainControl: false,
             deviceId: "",
             echoCancellation: true,
             noiseSuppression: true,

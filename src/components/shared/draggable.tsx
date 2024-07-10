@@ -50,8 +50,8 @@ export default function DraggableComponent({
     const startY = dragEvent.clientY;
 
     const rect = divRef.current.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
+    const x = rect.left;
+    const y = rect.top;
 
     setDiffX(startX - x);
     setDiffY(startY - y);
@@ -71,7 +71,7 @@ export default function DraggableComponent({
       x = x + 188;
     }
 
-    y = y + 48;
+    y = y;
     const newPosition = {
       x,
       y,
@@ -87,7 +87,7 @@ export default function DraggableComponent({
 
   const { height, width } = useScreen();
 
-  let defaultClassName = "";
+  let defaultClassName = "fixed";
 
   if (hasTransition) defaultClassName += ` transition-all`;
 

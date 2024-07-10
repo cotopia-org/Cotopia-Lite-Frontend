@@ -45,7 +45,6 @@ export default function RoomContext({
   }, [room]);
 
   useSocket("roomUpdated", (data) => {
-    console.log("data", data);
     setLocalRoom(data);
   });
 
