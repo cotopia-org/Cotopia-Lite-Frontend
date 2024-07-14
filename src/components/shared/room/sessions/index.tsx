@@ -32,7 +32,7 @@ export default function UserSessions() {
     <SpcialLayout tracks={tracks}>
       <>
         <UserSession />
-        <RoomAudioRenderer volume={100} />
+        <RoomAudioRenderer />
       </>
     </SpcialLayout>
   );

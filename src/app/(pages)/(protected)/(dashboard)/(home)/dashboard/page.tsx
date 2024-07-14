@@ -1,3 +1,4 @@
+import WorkspaceList from "@/components/shared/room/components/menu/workspaces";
 import CreateWorkspace from "../components/create-workspace";
 import JoinWorkspaceWithLink from "../components/join-with-link";
 
@@ -36,6 +37,7 @@ export default function HomePage() {
         <JoinWorkspaceWithLink />
         <CreateWorkspace />
       </div>
+      <WorkspaceList className='!p-0' />
     </div>
   );
 }
