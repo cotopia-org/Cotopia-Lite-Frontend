@@ -142,7 +142,7 @@ const ParticipantTile = React.forwardRef<
   const isSpeaking = trackReference?.participant?.isSpeaking;
 
   let clss =
-    "relative transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+    "relative user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
 
   const { user } = useProfile();
 
@@ -205,6 +205,8 @@ const ParticipantTile = React.forwardRef<
   if (!meet) {
     clss += ` bg-gray-600`;
   }
+
+  if (!isMuted && isMyUser) showAvatar = false;
 
   return (
     <>
