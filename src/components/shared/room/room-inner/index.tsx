@@ -1,7 +1,6 @@
 import React from "react";
 import Background from "../backgrounds/background";
 import Toolbar from "../toolbar";
-import MenuButton from "../components/workspace-button";
 import TopRightTools from "../tools/top-right";
 import BottomLeftTools from "../tools/bottom-left";
 import BottomMiddleTools from "../tools/bottom-middle";
@@ -11,7 +10,7 @@ import { useRoomContext } from "../room-context";
 import RoomSidebar from "../sidebar";
 import RoomSettings from "../settings";
 import LiveKitAudioManager from "../components/audio-manager";
-import TopLeftTools from "../toolbar/top-left";
+import TopLeftTools from "../tools/top-left";
 
 export default function RoomInner() {
   const { sidebar } = useRoomContext();
