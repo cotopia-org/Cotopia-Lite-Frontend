@@ -4,6 +4,7 @@ import { CalendarDays, MessagesSquare, User } from "lucide-react";
 import SettingsUserAction from "./user/action";
 import SettingsChatAction from "./chat/action";
 import UserChat from "./chat";
+import Schedule from "./schedule";
 
 export default function RoomSettings() {
   const [value, setValue] = useState("chat");
@@ -26,18 +27,13 @@ export default function RoomSettings() {
         onChangeTab={setValue}
         items={[
           {
-            icon: <User />,
-            content: <>xx</>,
-            value: "user",
-          },
-          {
             icon: <MessagesSquare />,
             content: <UserChat />,
             value: "chat",
           },
           {
             icon: <CalendarDays />,
-            content: <>xx</>,
+            content: <Schedule />,
             value: "calendar",
           },
         ]}

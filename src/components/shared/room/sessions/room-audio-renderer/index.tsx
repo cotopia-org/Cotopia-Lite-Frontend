@@ -7,6 +7,7 @@ import { UserMinimalType, UserType } from "@/types/user";
 import { useRoomContext } from "../../room-context";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import { __VARS } from "@/app/const/vars";
+import { doCirclesMeet } from "@/lib/utils";
 
 /** @public */
 export interface RoomAudioRendererProps {
@@ -33,47 +34,6 @@ export interface RoomAudioRendererProps {
  * ```
  * @public
  */
-
-const DEFAULT_X = 0;
-const DEFAULT_Y = 0;
-
-function doCirclesMeet(circle1?: UserMinimalType, circle2?: UserMinimalType) {
-  if (!circle2 || !circle1)
-    return {
-      distance: undefined,
-      meet: false,
-      volumePercentage: 0,
-    };
-
-  const radius = 46; // radius of each circle
-  const radiusHearing = __VARS.voiceAreaRadius - 50;
-
-  const userCoordinate1 = circle1.coordinates?.split(",")?.map((x) => +x) ?? [
-    DEFAULT_X,
-    DEFAULT_Y,
-  ];
-  const user1Position = { x: userCoordinate1[0], y: userCoordinate1[1] };
-  const userCoordinate2 = circle2.coordinates?.split(",")?.map((x) => +x) ?? [
-    DEFAULT_X,
-    DEFAULT_Y,
-  ];
-  const user2Position = { x: userCoordinate2[0], y: userCoordinate2[1] };
-
-  // Calculate the distance between the centers of the circles
-  const distance = Math.sqrt(
-    Math.pow(user1Position.x - user2Position.x, 2) +
-      Math.pow(user1Position.y - user2Position.y, 2) // Fixed y-coordinate difference calculation
-  );
-
-  // Check if the distance is less than or equal to the sum of the radii
-  const meet = distance <= 2 * radius + radiusHearing;
-
-  const percentage = !meet
-    ? 0
-    : 100 - Math.min((distance / radiusHearing) * 100, 100);
-
-  return { meet, distance, volumePercentage: percentage };
-}
 
 export function RoomAudioRenderer() {
   const { user } = useProfile();
@@ -112,10 +72,10 @@ export function RoomAudioRenderer() {
           trackOwner
         );
 
-        let volume = volumePercentage / 20;
+        let volume = volumePercentage / 100;
         let isMuted = !meet;
 
-        if (volume > 5) volume = 5;
+        if (volume >= 1) volume = 1;
 
         return (
           <AudioTrack

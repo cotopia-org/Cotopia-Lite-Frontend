@@ -13,7 +13,7 @@ export default function ChatActionsGroup() {
         <CloseSidebar onClick={closeSidebar} />
       ) : (
         <>
-          <UserSettingsButtonTool />
+          {/* <UserSettingsButtonTool /> */}
           <UserChatsSettingsButtonTool />
           <UserCalendarSettingsButtonTool />
         </>

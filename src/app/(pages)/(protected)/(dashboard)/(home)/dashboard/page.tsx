@@ -1,4 +1,4 @@
-import WorkspaceList from "@/components/shared/room/components/menu/workspaces";
+import WorkspaceList from "@/components/shared/room/components/workspace-button/workspaces";
 import CreateWorkspace from "../components/create-workspace";
 import JoinWorkspaceWithLink from "../components/join-with-link";
 

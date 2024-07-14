@@ -32,7 +32,7 @@ import { UserMinimalType } from "@/types/user";
 import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import { getUserFullname } from "@/lib/utils";
+import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 
 function ParticipantContextIfNeeded(
@@ -142,16 +142,16 @@ const ParticipantTile = React.forwardRef<
   const isSpeaking = trackReference?.participant?.isSpeaking;
 
   let clss =
-    "relative w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+    "relative transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
 
-  if (isSpeaking) {
-    clss += ` bg-green-700`;
-  } else {
-    clss += ` bg-black/10`;
-  }
+  const { user } = useProfile();
+
+  const isMyUser = user?.username === livekitIdentity;
 
   const { room } = useRoomContext();
   const participants = room?.participants;
+
+  const updatedMyUser = participants?.find((x) => x.username === user.username);
 
   const targetUser = participants?.find((x) => x.username === livekitIdentity);
 
@@ -182,12 +182,36 @@ const ParticipantTile = React.forwardRef<
     }
   }
 
+  let showAvatar = false;
+
+  //I heet the circles? checking
+  const { meet } = doCirclesMeet(updatedMyUser, targetUser);
+
+  //Show user avatar if user is muted or isn't in user's area
+  showAvatar = !(isMuted || meet) || isMuted || isMyUser;
+
+  //Scale down the user profile if user isn't in user's area
+  if (!meet) clss += ` scale-[0.6]`;
+
+  //Highlight user circle in different states
+  if (isSpeaking && meet) {
+    clss += ` bg-green-700`;
+  }
+
+  if (!isSpeaking) {
+    clss += ` bg-black/10`;
+  }
+
+  if (!meet) {
+    clss += ` bg-gray-600`;
+  }
+
   return (
     <>
       <VoiceAreaHearing isDragging={isDragging} />
       <div className={clss}>
         <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
-          {isMuted && (
+          {showAvatar && (
             <CotopiaAvatar
               className='absolute top-0 left-0 w-full h-full z-[1]'
               src={targetUser?.avatar?.url ?? ""}

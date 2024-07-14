@@ -1,7 +1,7 @@
 import React from "react";
 import Background from "../backgrounds/background";
 import Toolbar from "../toolbar";
-import MenuButton from "../components/menu";
+import MenuButton from "../components/workspace-button";
 import TopRightTools from "../tools/top-right";
 import BottomLeftTools from "../tools/bottom-left";
 import BottomMiddleTools from "../tools/bottom-middle";
@@ -11,6 +11,7 @@ import { useRoomContext } from "../room-context";
 import RoomSidebar from "../sidebar";
 import RoomSettings from "../settings";
 import LiveKitAudioManager from "../components/audio-manager";
+import TopLeftTools from "../toolbar/top-left";
 
 export default function RoomInner() {
   const { sidebar } = useRoomContext();
@@ -23,7 +24,7 @@ export default function RoomInner() {
       <div className='w-full h-full relative flex items-center justify-center'>
         <Background />
         <Toolbar
-          topLeft={<MenuButton />}
+          topLeft={<TopLeftTools />}
           topRight={<TopRightTools />}
           bottomLeft={<BottomLeftTools />}
           bottomMiddle={<BottomMiddleTools />}
