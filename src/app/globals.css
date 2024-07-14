@@ -78,7 +78,7 @@
 }
 
 
-.lk-participant-media-video {
+.user-circle .lk-participant-media-video {
   transform: rotateY(180deg);
     -webkit-transform:rotateY(180deg);  
     -moz-transform:rotateY(180deg); 

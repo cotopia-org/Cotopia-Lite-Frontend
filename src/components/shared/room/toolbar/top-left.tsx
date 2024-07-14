@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import WorkspaceButton from "../tools/top-left/workspace-button";
 
 type Props = {
   children: ReactNode;
