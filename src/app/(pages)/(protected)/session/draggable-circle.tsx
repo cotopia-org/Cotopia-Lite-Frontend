@@ -214,9 +214,9 @@ const ParticipantTile = React.forwardRef<
             }}
           />
         </ActionsRight>
-        <ActionsLeft>
+        {/* <ActionsLeft>
           <UserButton />
-        </ActionsLeft>
+        </ActionsLeft> */}
       </div>
     </>
   );

@@ -16,7 +16,8 @@ export default function ScreenShareCard({ track }: Props) {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  let clss = "w-[400px] h-[160px] relative transition-all";
+  let clss =
+    "w-[400px] h-[160px] relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible";
 
   if (isFullScreen) {
     clss += ` !fixed bg-black w-screen h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`;
@@ -26,9 +27,11 @@ export default function ScreenShareCard({ track }: Props) {
 
   const myScreenShare = track?.participant?.identity === user?.username;
 
+  const videoContent = <VideoTrack trackRef={track} />;
+
   const content = (
     <div className={clss}>
-      <div className='absolute top-4 left-4 flex flex-row items-center gap-x-2'>
+      <div className='actions absolute top-4 left-4 flex flex-row items-center gap-x-2 opacity-0 invisible transition-all'>
         <CotopiaIconButton
           className='text-black/60 z-10'
           onClick={() => setIsFullScreen((prev) => !prev)}
@@ -50,7 +53,11 @@ export default function ScreenShareCard({ track }: Props) {
           </CotopiaIconButton>
         )}
       </div>
-      <VideoTrack trackRef={track} />
+      {!isFullScreen ? (
+        <div className='flex rounded-lg overflow-hidden'>{videoContent}</div>
+      ) : (
+        videoContent
+      )}
     </div>
   );
 
