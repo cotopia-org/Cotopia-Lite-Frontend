@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
 export const useReachTop = (element?: HTMLElement, offset?: number) => {
-  const [reachTop, setReachTop] = useState(false);
+  const [diff, setDiff] = useState<number>(0);
 
   useEffect(() => {
     if (!element) return;
 
     function scrollManager() {
-      setReachTop((element?.scrollTop ?? 0) - (offset ?? 0) <= 0);
+      const diff = (element?.scrollTop ?? 0) - (offset ?? 0);
+      setDiff(diff);
     }
 
     element?.addEventListener("scroll", scrollManager);
@@ -17,5 +18,8 @@ export const useReachTop = (element?: HTMLElement, offset?: number) => {
     };
   }, [element?.scrollTop, offset]);
 
-  return reachTop;
+  return {
+    reachTop: diff <= 0,
+    diff,
+  };
 };

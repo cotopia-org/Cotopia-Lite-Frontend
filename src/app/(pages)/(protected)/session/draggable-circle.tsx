@@ -241,7 +241,7 @@ export default function DraggableCircle() {
     setIsDragging(true);
   };
 
-  const { room } = useRoomContext();
+  const { room, updateUserCoords } = useRoomContext();
 
   const [participants, setParticipants] = useState<UserMinimalType[]>(
     room ? room?.participants : []
@@ -288,6 +288,10 @@ export default function DraggableCircle() {
     });
   };
 
+  const handleUpdateLocalCoords = (position: { x: number; y: number }) => {
+    updateUserCoords(user?.username, position);
+  };
+
   const isMyUser = user?.username === livekitIdentity;
 
   const positionUser = participants?.find(
@@ -304,7 +308,8 @@ export default function DraggableCircle() {
         handleUpdateCoordinates(position);
         setIsDragging(false);
       }}
-      onDragging={handleStartDragging}
+      onDragging={handleUpdateLocalCoords}
+      onStartDragging={handleStartDragging}
       disabled={!isMyUser}
       hasTransition={!isMyUser}
       x={coordsUser?.[0]}

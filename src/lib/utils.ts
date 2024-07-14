@@ -1,3 +1,4 @@
+import { mergePropsMain } from "@/components/shared/room/sessions/room-audio-renderer/use-media-track-by-source-or-name/merge-props";
 import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import { type ClassValue, clsx } from "clsx";
 import { Track } from "livekit-client";
@@ -43,3 +44,19 @@ export const getUserFullname = (user: any) => {
 
   return fullName;
 };
+
+/** @internal */
+export function isProp<
+  U extends HTMLElement,
+  T extends React.HTMLAttributes<U>
+>(prop: T | undefined): prop is T {
+  return prop !== undefined;
+}
+
+/** @internal */
+export function mergeProps<
+  U extends HTMLElement,
+  T extends Array<React.HTMLAttributes<U> | undefined>
+>(...props: T) {
+  return mergePropsMain(...(props.filter(isProp) as any));
+}

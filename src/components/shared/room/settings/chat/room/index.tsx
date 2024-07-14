@@ -23,10 +23,21 @@ export default function UserChatRoom() {
 
   const [page, setPage] = useState(1);
 
+  const {
+    startLoading: startFetchOldMessagesLoading,
+    stopLoading: stopOldMessagesLoading,
+    isLoading: fetchOldMessagesLoading,
+  } = useLoading();
+
   const getMessages = (firstTime: boolean = false) => {
+    if (fetchOldMessagesLoading) return;
+
     if (firstTime) {
       startLoading();
     }
+
+    startFetchOldMessagesLoading();
+
     axiosInstance
       .get(`/rooms/${room_id}/messages?page=${page}`)
       .then((res) => {
@@ -38,10 +49,14 @@ export default function UserChatRoom() {
         setMessages((prev) => (firstTime ? items : [...prev, ...items]));
         //Page should be set for next page whenever fetch new data
         setPage((prev) => prev + 1);
-        if (firstTime) stopLoading();
+        if (firstTime) {
+          stopLoading();
+        }
+        stopOldMessagesLoading();
       })
       .catch((err) => {
         if (firstTime) stopLoading();
+        stopOldMessagesLoading();
       });
   };
   useEffect(() => {

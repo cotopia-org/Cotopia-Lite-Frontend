@@ -22,6 +22,15 @@ export default function ChatBox({
   const [boxHasScroll, setBoxHasScroll] = useState(false);
 
   useEffect(() => {
+    if (!boxRef?.current) return;
+    if (!isGetNewMessages) return;
+
+    boxRef.current.scrollTo({
+      top: 10 * 92,
+    });
+  }, [items?.length, boxRef?.current, isGetNewMessages]);
+
+  useEffect(() => {
     if (!boxRef.current) return;
     if (isGetNewMessages) return;
 
@@ -39,8 +48,10 @@ export default function ChatBox({
   let clss =
     "relative flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8";
 
-  const isReachTop = useReachTop(boxRef?.current);
-  const isReachTopToFetchComments = useReachTop(boxRef?.current, 500);
+  const { reachTop: isReachTop } = useReachTop(boxRef?.current);
+  const { reachTop: isReachTopToFetchChats, diff } = useReachTop(
+    boxRef?.current
+  );
 
   const loadMoreMessages = () => {
     if (!boxRef.current) return;
@@ -48,9 +59,6 @@ export default function ChatBox({
     if (onLoadMessage) {
       onLoadMessage();
       setIsGetNewMessages(true);
-      // boxRef.current.scrollTo({
-      //   top: 600,
-      // });
     }
   };
 
@@ -59,10 +67,10 @@ export default function ChatBox({
       return;
     }
 
-    if (isReachTopToFetchComments) {
+    if (diff < 920) {
       loadMoreMessages();
     }
-  }, [isReachTopToFetchComments, fetchNewMessage]);
+  }, [diff, fetchNewMessage]);
 
   if (items.length === 0) return;
 

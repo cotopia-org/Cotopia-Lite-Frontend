@@ -6,7 +6,8 @@ import { useRoomContext } from "./room/room-context";
 
 type Props = {
   children: ReactNode;
-  onDragging?: () => void;
+  onDragging?: (position: { x: number; y: number }) => void;
+  onStartDragging?: () => void;
   onDragEnd?: (position: { x: number; y: number }) => void;
   x?: number;
   y?: number;
@@ -20,6 +21,7 @@ const DEFAULT_Y = 0;
 export default function DraggableComponent({
   children,
   onDragEnd,
+  onStartDragging,
   onDragging,
   x,
   y,
@@ -45,6 +47,34 @@ export default function DraggableComponent({
   const [diffX, setDiffX] = useState(0);
   const [diffY, setDiffY] = useState(0);
 
+  const handleDragging = (dragEvent: any) => {
+    let x = dragEvent?.x;
+    let y = dragEvent?.y;
+
+    const finalDiffX = Math.abs(diffX);
+    const finalDiffY = Math.abs(diffY);
+
+    x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
+    y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
+
+    if (sidebar) {
+      x = x + 188;
+    }
+
+    y = y;
+    const newPosition = {
+      x,
+      y,
+    };
+
+    setDiffX(0);
+    setDiffY(0);
+
+    setPosition(newPosition);
+
+    if (onDragging) onDragging(newPosition);
+  };
+
   const handleDragStart = (dragEvent: any) => {
     if (!divRef.current) return;
 
@@ -58,7 +88,7 @@ export default function DraggableComponent({
     setDiffX(startX - x);
     setDiffY(startY - y);
 
-    if (onDragging) onDragging();
+    if (onStartDragging) onStartDragging();
   };
 
   const hanldeDragEnd = (dragEvent: any) => {
@@ -104,6 +134,7 @@ export default function DraggableComponent({
       position={position}
       onStop={hanldeDragEnd}
       onStart={handleDragStart}
+      onDrag={handleDragging}
       disabled={disabled}
       bounds={{
         top: 0,

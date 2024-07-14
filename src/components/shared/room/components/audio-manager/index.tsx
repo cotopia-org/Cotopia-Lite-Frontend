@@ -5,11 +5,6 @@ import { useRoomContext } from "../../room-context";
 import { useRoomContext as livekitRoomContext } from "@livekit/components-react";
 import { UserMinimalType } from "@/types/user";
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
-import {
-  LocalAudioTrack,
-  LocalTrack,
-  LocalTrackPublication,
-} from "livekit-client";
 
 const DEFAULT_TILE_POSITION = [0, 0];
 const BOUNDRY_RADIUS = 50;
@@ -24,8 +19,6 @@ const LiveKitAudioManager = () => {
   const users = room?.participants ?? [];
 
   const checkBoundaries = () => {
-    console.log("users", users);
-
     for (let i = 0; i < users.length; i++) {
       for (let j = i + 1; j < users.length; j++) {
         if (isOverlap(users[i], users[j])) {
@@ -82,8 +75,7 @@ const LiveKitAudioManager = () => {
     if (room) {
       const participant = participants.find((x) => x.identity === userName);
       if (participant !== undefined) {
-        console.log("xxxscsacas", participant);
-        participant.audioLevel = 0;
+        participant.audioLevel = 100;
       }
     }
   };
@@ -96,11 +88,7 @@ const LiveKitAudioManager = () => {
   //     setParticipantVolume("koroush", 0);
   //   }, []);
 
-  return (
-    <div>
-      <h1>LiveKit Audio Manager</h1>
-    </div>
-  );
+  return null;
 };
 
 export default LiveKitAudioManager;

@@ -22,7 +22,7 @@ export default function RoomSpatialWrapper({
   const room = !!data ? data?.data : undefined;
 
   return (
-    <div className='selection:!bg-transparent'>
+    <div className='selection:!bg-transparent overflow-hidden max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}

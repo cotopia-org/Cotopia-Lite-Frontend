@@ -1,12 +1,9 @@
 import UserSession from "@/app/(pages)/(protected)/session";
 import { RoomEvent, Track } from "livekit-client";
 import SpcialLayout from "./special-layout";
-import {
-  RoomAudioRenderer,
-  useRoomContext,
-  useTracks,
-} from "@livekit/components-react";
+import { useRoomContext, useTracks } from "@livekit/components-react";
 import FullLoading from "../../full-loading";
+import { RoomAudioRenderer } from "./room-audio-renderer";
 
 export default function UserSessions() {
   const { state } = useRoomContext();
@@ -35,7 +32,7 @@ export default function UserSessions() {
     <SpcialLayout tracks={tracks}>
       <>
         <UserSession />
-        <RoomAudioRenderer />
+        <RoomAudioRenderer volume={100} />
       </>
     </SpcialLayout>
   );

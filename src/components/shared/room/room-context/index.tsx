@@ -20,6 +20,10 @@ const RoomCtx = createContext<{
   room_id?: string;
   workspace_id?: string;
   openSidebar: (node: ReactNode) => void;
+  updateUserCoords: (
+    username: string,
+    position: { x: number; y: number }
+  ) => void;
   closeSidebar: () => void;
   sidebar?: ReactNode;
 }>({
@@ -27,6 +31,7 @@ const RoomCtx = createContext<{
   room_id: undefined,
   workspace_id: undefined,
   sidebar: undefined,
+  updateUserCoords: (username, position) => {},
   openSidebar: (item) => {},
   closeSidebar: () => {},
 });
@@ -43,6 +48,23 @@ export default function RoomContext({
   useEffect(() => {
     if (room !== undefined) setLocalRoom(room);
   }, [room]);
+
+  const updateUserCoords = (
+    username: string,
+    position: { x: number; y: number }
+  ) => {
+    if (!localRoom) return;
+    setLocalRoom({
+      ...localRoom,
+      participants: localRoom.participants.map((x) => {
+        if (x.username === username) {
+          x.coordinates = `${position.x},${position.y}`;
+        }
+
+        return x;
+      }),
+    });
+  };
 
   useSocket("roomUpdated", (data) => {
     setLocalRoom(data);
@@ -61,6 +83,7 @@ export default function RoomContext({
         sidebar,
         closeSidebar,
         openSidebar,
+        updateUserCoords,
       }}
     >
       {children}
