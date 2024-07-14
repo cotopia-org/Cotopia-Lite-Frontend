@@ -8,4 +8,5 @@ export const __VARS = {
   registerPage: `/auth/register`,
   forgetPasswordPage: `/auth/forget-password`,
   signOutApiPage: `/api/auth/sign-out`,
+  voiceAreaRadius: 340,
 };

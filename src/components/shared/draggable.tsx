@@ -61,14 +61,10 @@ export default function DraggableComponent({
       x = x + 188;
     }
 
-    y = y;
     const newPosition = {
       x,
       y,
     };
-
-    setDiffX(0);
-    setDiffY(0);
 
     setPosition(newPosition);
 
@@ -105,7 +101,6 @@ export default function DraggableComponent({
       x = x + 188;
     }
 
-    y = y;
     const newPosition = {
       x,
       y,

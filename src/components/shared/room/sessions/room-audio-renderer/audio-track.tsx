@@ -91,8 +91,5 @@ export const AudioTrack = /* @__PURE__ */ React.forwardRef<
     }
   }, [muted, pub, track]);
 
-  console.log("volume", volume);
-  console.log("muted", muted);
-
   return <audio ref={mediaEl} {...elementProps} />;
 });

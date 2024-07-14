@@ -23,20 +23,17 @@ import {
   useTrackMutedIndicator,
   VideoTrack,
 } from "@livekit/components-react";
-import { Participant, Track, TrackPublication } from "livekit-client";
+import { Participant, Track } from "livekit-client";
 import { isTrackReferencePlaceholder } from "@livekit/components-core";
-import { ScreenShareIcon } from "lucide-react";
 import SessionWrapper from "./wrapper";
 import { useUserTile } from ".";
 import { useProfile, useSocket } from "../protected-wrapper";
-import { UserMinimalType, UserType } from "@/types/user";
+import { UserMinimalType } from "@/types/user";
 import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
-import { dispatch } from "use-bus";
-import { _BUS } from "@/app/const/bus";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -143,14 +140,6 @@ const ParticipantTile = React.forwardRef<
   const { isMuted } = useTrackMutedIndicator(trackRef);
 
   const isSpeaking = trackReference?.participant?.isSpeaking;
-
-  useEffect(() => {
-    if (isSpeaking) {
-      dispatch({ type: _BUS.someoneStartTalking, payload: livekitIdentity });
-    } else {
-      dispatch({ type: _BUS.someoneStopTalking, payload: livekitIdentity });
-    }
-  }, [isSpeaking]);
 
   let clss =
     "relative w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";

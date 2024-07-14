@@ -6,6 +6,7 @@ import { AudioTrack } from "./audio-track";
 import { UserMinimalType, UserType } from "@/types/user";
 import { useRoomContext } from "../../room-context";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import { __VARS } from "@/app/const/vars";
 
 /** @public */
 export interface RoomAudioRendererProps {
@@ -45,7 +46,7 @@ function doCirclesMeet(circle1?: UserMinimalType, circle2?: UserMinimalType) {
     };
 
   const radius = 46; // radius of each circle
-  const radiusHearing = 200;
+  const radiusHearing = __VARS.voiceAreaRadius - 50;
 
   const userCoordinate1 = circle1.coordinates?.split(",")?.map((x) => +x) ?? [
     DEFAULT_X,
@@ -74,7 +75,7 @@ function doCirclesMeet(circle1?: UserMinimalType, circle2?: UserMinimalType) {
   return { meet, distance, volumePercentage: percentage };
 }
 
-export function RoomAudioRenderer({ volume, muted }: RoomAudioRendererProps) {
+export function RoomAudioRenderer() {
   const { user } = useProfile();
 
   const { room } = useRoomContext();
@@ -99,8 +100,6 @@ export function RoomAudioRenderer({ volume, muted }: RoomAudioRendererProps) {
       !isLocal(ref.participant) && ref.publication.kind === Track.Kind.Audio
   );
 
-  console.log("tracks", tracks);
-
   return (
     <div style={{ display: "none" }}>
       {tracks.map((trackRef) => {
@@ -113,8 +112,10 @@ export function RoomAudioRenderer({ volume, muted }: RoomAudioRendererProps) {
           trackOwner
         );
 
-        let volume = volumePercentage;
+        let volume = volumePercentage / 20;
         let isMuted = !meet;
+
+        if (volume > 5) volume = 5;
 
         return (
           <AudioTrack

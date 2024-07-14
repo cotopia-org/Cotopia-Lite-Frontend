@@ -33,8 +33,8 @@ export default function RoomHolder({
               maxFramerate: 30,
             },
             screenShareEncoding: {
-              maxBitrate: 1_500_000,
-              maxFramerate: 30,
+              maxBitrate: 3_000_000,
+              maxFramerate: 60,
             },
             dtx: true,
             videoSimulcastLayers: [
