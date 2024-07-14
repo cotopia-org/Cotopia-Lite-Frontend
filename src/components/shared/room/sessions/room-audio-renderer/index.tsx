@@ -84,8 +84,6 @@ export function RoomAudioRenderer({ volume, muted }: RoomAudioRendererProps) {
     (x) => x.username === user.username
   );
 
-  console.log("allParticipants", allParticipants);
-
   const tracks = useTracks(
     [
       Track.Source.Microphone,

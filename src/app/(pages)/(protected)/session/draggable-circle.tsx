@@ -271,10 +271,22 @@ export default function DraggableCircle() {
         const foundIndex = participantIds?.findIndex((id) => id === user?.id);
 
         if (foundIndex !== undefined && foundIndex > -1) {
-          prevParticpants[foundIndex] = {
-            ...prevParticpants[foundIndex],
+          const foundUser = prevParticpants[foundIndex];
+
+          const updatedUser: UserMinimalType = {
+            ...foundUser,
             coordinates: user?.coordinates,
           };
+
+          const userPosition = updatedUser.coordinates
+            ?.split(",")
+            ?.map((x) => +x) ?? [0, 0];
+
+          prevParticpants[foundIndex] = updatedUser;
+          updateUserCoords(foundUser.username, {
+            x: userPosition[0],
+            y: userPosition[1],
+          });
         }
 
         return prevParticpants;
