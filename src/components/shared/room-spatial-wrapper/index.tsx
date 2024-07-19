@@ -3,8 +3,9 @@
 import RoomHolder from "@/components/shared/room";
 import RoomWrapper from "@/components/shared/room/wrapper";
 import { useApi } from "@/hooks/swr";
-import { FetchDataType } from "@/lib/axios";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { WorkspaceRoomType } from "@/types/room";
+import { useEffect, useState } from "react";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -16,17 +17,24 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
-  const { data } = useApi<FetchDataType<WorkspaceRoomType>>(
-    `/rooms/${room_id}`
-  );
-  const room = !!data ? data?.data : undefined;
+  const [room, setRoom] = useState<WorkspaceRoomType>();
 
+  useEffect(() => {
+    if (room_id !== undefined) {
+      axiosInstance
+        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
+        .then((res) => {
+          setRoom(res?.data?.data);
+        });
+    }
+  }, [room_id]);
   return (
     <div className='selection:!bg-transparent overflow-hidden max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}
           room={room}
+          onRoomUpdated={setRoom}
           room_id={room_id}
           workspace_id={workspace_id}
         />

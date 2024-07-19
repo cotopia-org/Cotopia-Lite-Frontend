@@ -24,7 +24,6 @@ export default function GalleryItem({ item, room_id, workspace_id }: Props) {
       const file: AttachmentFileType = res.data.data;
       await axiosInstance.put(`/rooms/${room_id}`, {
         background_id: file.id,
-        // workspace_id,
       });
       stopLoading();
     } catch (e) {

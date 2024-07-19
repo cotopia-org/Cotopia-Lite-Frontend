@@ -11,6 +11,7 @@ type Props = {
   workspace_id: string;
   room_id: string;
   room?: WorkspaceRoomType;
+  onRoomUpdated?: (item: WorkspaceRoomType) => void;
 };
 
 export default function RoomHolder({
@@ -18,9 +19,15 @@ export default function RoomHolder({
   workspace_id,
   room_id,
   room,
+  onRoomUpdated,
 }: Props) {
   return (
-    <RoomContext room={room} room_id={room_id} workspace_id={workspace_id}>
+    <RoomContext
+      room={room}
+      room_id={room_id}
+      onRoomUpdated={onRoomUpdated}
+      workspace_id={workspace_id}
+    >
       <LiveKitRoom
         video
         audio

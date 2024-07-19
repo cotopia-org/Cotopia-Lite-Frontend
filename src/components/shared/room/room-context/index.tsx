@@ -12,6 +12,7 @@ type Props = {
   children: ReactNode;
   room_id?: string;
   room?: WorkspaceRoomType;
+  onRoomUpdated?: (item: WorkspaceRoomType) => void;
   workspace_id?: string;
 };
 
@@ -42,6 +43,7 @@ export default function RoomContext({
   children,
   room_id,
   room,
+  onRoomUpdated,
   workspace_id,
 }: Props) {
   const [localRoom, setLocalRoom] = useState(room);
@@ -54,20 +56,33 @@ export default function RoomContext({
     position: { x: number; y: number }
   ) => {
     if (!localRoom) return;
-    setLocalRoom({
-      ...localRoom,
-      participants: localRoom.participants.map((x) => {
-        if (x.username === username) {
-          x.coordinates = `${position.x},${position.y}`;
-        }
 
-        return x;
-      }),
+    setLocalRoom((prev) => {
+      const updatedPartValues = {
+        participants: localRoom.participants.map((x) => {
+          if (x.username === username) {
+            x.coordinates = `${position.x},${position.y}`;
+          }
+
+          return x;
+        }),
+      };
+
+      return prev
+        ? {
+            ...prev,
+            ...updatedPartValues,
+          }
+        : {
+            ...localRoom,
+            ...updatedPartValues,
+          };
     });
   };
 
   useSocket("roomUpdated", (data) => {
     setLocalRoom(data);
+    if (onRoomUpdated) onRoomUpdated(data);
   });
 
   const [sidebar, setSidebar] = useState<ReactNode>();
