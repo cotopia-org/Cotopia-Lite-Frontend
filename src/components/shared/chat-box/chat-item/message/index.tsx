@@ -1,6 +1,7 @@
 import { useChat } from "@/hooks/chat/use-chat";
 import { ChatItemType } from "@/types/chat";
 import { useEffect, useRef, useState } from "react";
+import Linkify from "react-linkify";
 
 type Props = {
   item: ChatItemType;
@@ -47,16 +48,28 @@ export default function Message({ item }: Props) {
   }, [stateMessage, isVisible]);
 
   return (
-    <p
-      className='text-wrap'
-      style={{
-        overflowWrap: "anywhere",
-      }}
-      ref={(x) => {
-        if (x !== null) divRef.current = x;
-      }}
-    >
-      {item?.text}
-    </p>
+    <div className='text-wrap mb-3'>
+      <Linkify
+        componentDecorator={(
+          decoratedHref: string,
+          decoratedText: string,
+          key: number
+        ) => (
+          <a
+            href={decoratedHref}
+            key={key}
+            target='_blank'
+            className='text-blue-600 hover:underline'
+            style={{
+              overflowWrap: "anywhere",
+            }}
+          >
+            {decoratedText}
+          </a>
+        )}
+      >
+        {item?.text}
+      </Linkify>
+    </div>
   );
 }

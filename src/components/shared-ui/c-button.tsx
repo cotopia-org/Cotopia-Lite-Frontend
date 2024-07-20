@@ -1,6 +1,5 @@
 import { Loader } from "lucide-react";
 import { Button, ButtonProps } from "../ui/button";
-import { Input, InputProps } from "../ui/input";
 import { ReactNode } from "react";
 
 type Props = ButtonProps & {

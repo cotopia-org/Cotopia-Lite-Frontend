@@ -2,48 +2,88 @@ import { ChatItemType } from "@/types/chat";
 import ChatItem from "./chat-item";
 import { useEffect, useRef, useState } from "react";
 import { useReachTop } from "@/hooks/use-reach-top";
+import useBus from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 type Props = {
   items: ChatItemType[];
   observer_user_id?: number;
   onLoadMessage?: () => void;
   fetchNewMessage?: boolean;
+  isFetching?: boolean;
 };
 export default function ChatBox({
   items = [],
   observer_user_id,
   onLoadMessage,
   fetchNewMessage,
+  isFetching,
 }: Props) {
   const [isGetNewMessages, setIsGetNewMessages] = useState(false);
 
   const boxRef = useRef<HTMLDivElement>();
 
   const [boxHasScroll, setBoxHasScroll] = useState(false);
+  const [boxScrollHeight, setBoxScrollHeight] = useState(0);
+  const [scrollDirection, setScrollDirection] = useState<"top" | "down">("top");
+
+  useEffect(() => {
+    if (!boxRef.current) return;
+
+    const handleWheel = (event: WheelEvent) => {
+      if (event.deltaY < 0) {
+        setScrollDirection("top");
+      } else {
+        setScrollDirection("down");
+      }
+    };
+
+    boxRef.current.addEventListener("wheel", handleWheel);
+
+    return () => {
+      boxRef.current?.removeEventListener("wheel", handleWheel);
+    };
+  }, [boxRef?.current]);
 
   useEffect(() => {
     if (!boxRef?.current) return;
     if (!isGetNewMessages) return;
+  }, [items?.length, boxRef?.current]);
 
-    boxRef.current.scrollTo({
-      top: 10 * 92,
-    });
-  }, [items?.length, boxRef?.current, isGetNewMessages]);
+  useBus(
+    _BUS.scrollEndChatBox,
+    () => {
+      if (!boxRef.current) return;
 
-  useEffect(() => {
-    if (!boxRef.current) return;
-    if (isGetNewMessages) return;
+      const scrollHeight = boxRef.current.scrollHeight;
+      const boxHeight = boxRef.current.clientHeight;
 
-    const scrollHeight = boxRef.current.scrollHeight;
-    const boxHeight = boxRef.current.clientHeight;
+      setBoxHasScroll(scrollHeight > boxHeight);
 
-    setBoxHasScroll(scrollHeight > boxHeight);
+      boxRef.current.scrollTo({
+        top: scrollHeight,
+      });
+    },
+    [boxRef.current]
+  );
 
-    boxRef.current.scrollTo({
-      top: scrollHeight,
-      behavior: "smooth",
-    });
-  }, [items?.length, boxRef?.current, isGetNewMessages]);
+  useBus(
+    _BUS.scrollToTopNewChatMessages,
+    () => {
+      setTimeout(() => {
+        if (!boxRef.current) return;
+
+        const previousScrollHeight = boxScrollHeight;
+        const newScrollHeight = boxRef?.current?.scrollHeight;
+
+        boxRef.current.scrollTo({
+          top: newScrollHeight - previousScrollHeight,
+          behavior: "instant",
+        });
+      }, 100);
+    },
+    [boxRef.current, boxScrollHeight]
+  );
 
   let clss =
     "relative flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8";
@@ -55,8 +95,10 @@ export default function ChatBox({
 
   const loadMoreMessages = () => {
     if (!boxRef.current) return;
+    if (scrollDirection === "down") return;
 
     if (onLoadMessage) {
+      setBoxScrollHeight(boxRef?.current.scrollHeight);
       onLoadMessage();
       setIsGetNewMessages(true);
     }
@@ -67,7 +109,7 @@ export default function ChatBox({
       return;
     }
 
-    if (diff < 920) {
+    if (diff < 200) {
       loadMoreMessages();
     }
   }, [diff, fetchNewMessage]);

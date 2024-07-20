@@ -12,6 +12,8 @@ import { MessageType } from "@/types/message";
 import axiosInstance from "@/lib/axios";
 import FullLoading from "@/components/shared/full-loading";
 import useLoading from "@/hooks/use-loading";
+import { dispatch } from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 export default function UserChatRoom() {
   const { user } = useProfile();
@@ -51,6 +53,9 @@ export default function UserChatRoom() {
         setPage((prev) => prev + 1);
         if (firstTime) {
           stopLoading();
+          dispatch(_BUS.scrollEndChatBox);
+        } else {
+          dispatch(_BUS.scrollToTopNewChatMessages);
         }
         stopOldMessagesLoading();
       })
@@ -86,6 +91,7 @@ export default function UserChatRoom() {
       try {
         const message = await sendToRoom(text, room_id);
         if (message) handleUpdateMessages(message);
+        dispatch(_BUS.scrollEndChatBox);
       } catch (e) {}
     },
     [room_id, handleUpdateMessages]
@@ -106,6 +112,7 @@ export default function UserChatRoom() {
         observer_user_id={user?.id}
         onLoadMessage={getMessages}
         fetchNewMessage={hasFetchNewMessage}
+        isFetching={fetchOldMessagesLoading}
       />
       <ChatUserInput onAdd={handleAddMessage} />
     </>

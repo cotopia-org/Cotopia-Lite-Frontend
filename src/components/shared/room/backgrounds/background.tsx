@@ -6,7 +6,7 @@ export default function Background() {
   const { room } = useRoomContext();
 
   return (
-    <div className='fixed top-0 left-0 bottom-0 right-0 bg-cover bg-center select-none'>
+    <div className='fixed top-0 left-0 bottom-0 right-0 bg-cover bg-center'>
       <Image
         fill
         src={room?.background?.url ?? `/assets/backgrounds/bg-sample.webp`}

@@ -104,3 +104,15 @@ export function doCirclesMeet(
 
   return { meet, distance, volumePercentage: percentage };
 }
+
+export function convertMinutesToHHMMSS(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.floor(minutes % 60);
+  const secs = Math.floor((minutes * 60) % 60);
+
+  const formattedHours = String(hours).padStart(2, "0");
+  const formattedMinutes = String(mins).padStart(2, "0");
+  const formattedSeconds = String(secs).padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+}

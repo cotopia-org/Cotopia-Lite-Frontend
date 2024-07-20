@@ -2,6 +2,7 @@ import {
   useProfile,
   useSocket,
 } from "@/app/(pages)/(protected)/protected-wrapper";
+import { _BUS } from "@/app/const/bus";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import ChatBox from "@/components/shared/chat-box";
 import ChatUserInput from "@/components/shared/chat-box/user-input";
@@ -15,6 +16,7 @@ import { MessageType } from "@/types/message";
 import { UserMinimalType } from "@/types/user";
 import { ChevronLeft } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { dispatch } from "use-bus";
 
 type Props = {
   user: UserMinimalType;
@@ -68,6 +70,7 @@ export default function DirectChat({ user, direct_id, onBack }: Props) {
       try {
         const message = await sendToDirect(text, user?.id);
         if (message) handleUpdateMessages(message);
+        dispatch(_BUS.scrollEndChatBox);
       } catch (e) {}
     },
     [user?.id, handleUpdateMessages]

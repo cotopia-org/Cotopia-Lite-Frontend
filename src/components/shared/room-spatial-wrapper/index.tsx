@@ -29,7 +29,7 @@ export default function RoomSpatialWrapper({
     }
   }, [room_id]);
   return (
-    <div className='selection:!bg-transparent overflow-hidden max-h-screen'>
+    <div className='overflow-hidden max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}
