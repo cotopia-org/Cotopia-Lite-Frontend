@@ -39,10 +39,6 @@ export default function TimeTrackingButtonTool() {
     timer = setInterval(() => {
       setSeconds((prev) => (prev as number) + 1);
     }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
   }, [seconds]);
 
   return (
