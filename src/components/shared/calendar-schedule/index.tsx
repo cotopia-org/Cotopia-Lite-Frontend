@@ -9,6 +9,7 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import { Save } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import useLoading from "@/hooks/use-loading";
+import CreateSchedule from "./create-schedule";
 
 type Props = {
   calendar: CalendarType;
@@ -41,6 +42,7 @@ export default function CalendarSchedule({ calendar }: Props) {
 
   return (
     <div className='flex flex-col gap-y-4'>
+      <CreateSchedule />
       <Calendar
         mode='range'
         selected={date}

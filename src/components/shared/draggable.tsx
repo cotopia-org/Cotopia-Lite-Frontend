@@ -38,11 +38,12 @@ export default function DraggableComponent({
   });
 
   useEffect(() => {
-    setPosition({
-      x: x ?? DEFAULT_X,
-      y: y ?? DEFAULT_Y,
-    });
-  }, [x, y]);
+    if (position.x === 0 && position.y === 0)
+      setPosition({
+        x: x ?? DEFAULT_X,
+        y: y ?? DEFAULT_Y,
+      });
+  }, [x, y, position]);
 
   const [diffX, setDiffX] = useState(0);
   const [diffY, setDiffY] = useState(0);
