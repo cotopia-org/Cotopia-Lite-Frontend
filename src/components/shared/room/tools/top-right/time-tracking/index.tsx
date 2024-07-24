@@ -7,8 +7,9 @@ import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { useEffect, useState } from "react";
 import { convertMinutesToHHMMSS, urlWithQueryParams } from "@/lib/utils";
-
-let timer: NodeJS.Timeout;
+import PopupBox from "@/components/shared/popup-box";
+import TimeTrackingDetails from "./details";
+import TimeTrackingButton from "./button";
 
 export default function TimeTrackingButtonTool() {
   const [seconds, setSeconds] = useState<undefined | number>();
@@ -31,26 +32,26 @@ export default function TimeTrackingButtonTool() {
     getActivityTime();
   }, []);
 
-  useEffect(() => {
-    if (seconds === undefined) return;
-
-    if (timer) clearInterval(timer);
-
-    timer = setInterval(() => {
-      setSeconds((prev) => (prev as number) + 1);
-    }, 1000);
-  }, [seconds]);
-
   return (
-    <>
-      <CotopiaButton
-        loading={isLoading}
-        className='relative bg-white hover:bg-white text-black rounded-xl !pr-6'
-        startIcon={<Clock />}
-      >
-        <div className='absolute top-2 right-2 w-2 h-2 bg-red-600 rounded-full animate-pulse'></div>
-        {seconds && convertMinutesToHHMMSS(seconds / 60)}
-      </CotopiaButton>
-    </>
+    <PopupBox
+      trigger={(open) => (
+        <TimeTrackingButton
+          defaultSeconds={seconds ?? 0}
+          onClick={open}
+          isLoading={isLoading}
+        />
+      )}
+    >
+      {(style, open, close) => {
+        return (
+          <div
+            className='bg-white rounded-lg p-4 fixed mt-4 '
+            style={{ top: style.top, zIndex: style.zIndex }}
+          >
+            <TimeTrackingDetails />
+          </div>
+        );
+      }}
+    </PopupBox>
   );
 }

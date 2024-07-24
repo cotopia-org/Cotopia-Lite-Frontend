@@ -1,14 +1,10 @@
 "use client";
 
 import { CalendarType } from "@/types/calendar";
-import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { useApi } from "@/hooks/swr";
-import axiosInstance, { FetchDataType } from "@/lib/axios";
-import CotopiaButton from "@/components/shared-ui/c-button";
-import { Save } from "lucide-react";
+import { FetchDataType } from "@/lib/axios";
 import { DateRange } from "react-day-picker";
-import useLoading from "@/hooks/use-loading";
 import CreateSchedule from "./create-schedule";
 
 type Props = {
@@ -35,15 +31,10 @@ export default function CalendarSchedule({ calendar }: Props) {
     }
   };
 
-  const { startLoading, stopLoading, isLoading } = useLoading();
-  const handleStoreCalendarSchedule = () => {
-    // axiosInstance.post()
-  };
-
   return (
-    <div className='flex flex-col gap-y-4'>
-      <CreateSchedule />
-      <Calendar
+    <div className='flex flex-col gap-y-4 w-[280px] max-w-full'>
+      {!!calendarData && <CreateSchedule calendar={calendarData} />}
+      {/* <Calendar
         mode='range'
         selected={date}
         onSelect={handleChangeDate}
@@ -57,7 +48,7 @@ export default function CalendarSchedule({ calendar }: Props) {
         >
           Save
         </CotopiaButton>
-      </div>
+      </div> */}
     </div>
   );
 }
