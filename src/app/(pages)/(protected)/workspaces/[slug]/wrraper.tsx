@@ -11,7 +11,7 @@ export default function Wrapper({ workspace_id }: Props) {
     <DashboardLayoutMaker
       leftSidebar={<WorkspaceRooms workspace_id={workspace_id} />}
     >
-      Hello
+      <WorkspaceRooms workspace_id={workspace_id} />
     </DashboardLayoutMaker>
   );
 }
