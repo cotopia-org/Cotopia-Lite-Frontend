@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useApi } from "@/hooks/swr";
 import { FetchDataType } from "@/lib/axios";
 import { DateRange } from "react-day-picker";
-import CreateSchedule from "./create-schedule";
 import CreateSchedule2 from "./create-schedule-2";
 
 type Props = {
@@ -33,7 +32,7 @@ export default function CalendarSchedule({ calendar }: Props) {
   };
 
   return (
-    <div className='flex flex-col gap-y-4 w-[280px] max-w-full'>
+    <div className='flex flex-col gap-y-4 w-[280px] max-h-[800px] max-w-full overflow-y-auto'>
       {/* {!!calendarData && <CreateSchedule calendar={calendarData} />} */}
       <CreateSchedule2 calendar={calendar} />
       {/* <Calendar

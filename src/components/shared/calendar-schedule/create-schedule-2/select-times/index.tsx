@@ -6,11 +6,20 @@ import { Calendar } from "@/components/ui/calendar";
 import colors from "tailwindcss/colors";
 import { RecurrenceDays } from "@/types/calendar";
 
+function afterDayWeek(day: number) {
+  let finalDay = day + 1;
+  if (finalDay > 6) finalDay = 0;
+  return finalDay;
+}
+
 export default function SelectTimes() {
   const { setStep, options } = useSchudleCreate();
 
   const modifiers = options.days.reduce(
-    (a, v) => ({ ...a, [RecurrenceDays[v].toLowerCase()]: { dayOfWeek: [v] } }),
+    (a, v) => ({
+      ...a,
+      [RecurrenceDays[v].toLowerCase()]: { dayOfWeek: [afterDayWeek(v)] },
+    }),
     {}
   );
 
