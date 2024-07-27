@@ -45,6 +45,12 @@ export default function DraggableComponent({
       });
   }, [x, y, position]);
 
+  useEffect(() => {
+    if (x !== undefined && y !== undefined) {
+      setPosition({ x, y });
+    }
+  }, [x, y]);
+
   const [diffX, setDiffX] = useState(0);
   const [diffY, setDiffY] = useState(0);
 

@@ -206,8 +206,6 @@ const ParticipantTile = React.forwardRef<
 
   if (!isMuted && isMyUser) showAvatar = false;
 
-  console.log("targetUser", targetUser);
-
   return (
     <>
       <VoiceAreaHearing isDragging={isDragging} />

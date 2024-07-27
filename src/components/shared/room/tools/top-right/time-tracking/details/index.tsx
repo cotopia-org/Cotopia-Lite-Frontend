@@ -5,11 +5,11 @@ import Timer from "../timer";
 
 export default function TimeTrackingDetails() {
   const { data: monthData, isLoading: monthIsLoading } = useApi(
-    urlWithQueryParams(`/users/activities`, { currentMonth: true })
+    urlWithQueryParams(`/users/activities`, { period: "currentMonth" })
   );
 
   const { data: yesterdayData, isLoading: yesterdayIsLoading } = useApi(
-    urlWithQueryParams(`/users/activities`, { yesterday: true })
+    urlWithQueryParams(`/users/activities`, { period: "yesterday" })
   );
 
   const monthMinutes = monthData !== undefined ? monthData?.data : 0;

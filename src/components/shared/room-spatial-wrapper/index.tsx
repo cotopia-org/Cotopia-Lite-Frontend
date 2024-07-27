@@ -22,13 +22,12 @@ export default function RoomSpatialWrapper({
   useEffect(() => {
     if (room_id !== undefined) {
       axiosInstance
-        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
+        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}/join`)
         .then((res) => {
-          setRoom(res?.data?.data);
           axiosInstance
-            .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}/join`)
+            .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
             .then((res) => {
-              console.log("join again");
+              setRoom(res?.data?.data);
             });
         });
     }
