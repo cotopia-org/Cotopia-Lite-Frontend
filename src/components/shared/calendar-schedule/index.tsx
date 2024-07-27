@@ -35,7 +35,7 @@ export default function CalendarSchedule({ calendar }: Props) {
   return (
     <div className='flex flex-col gap-y-4 w-[280px] max-w-full'>
       {/* {!!calendarData && <CreateSchedule calendar={calendarData} />} */}
-      <CreateSchedule2 />
+      <CreateSchedule2 calendar={calendar} />
       {/* <Calendar
         mode='range'
         selected={date}
