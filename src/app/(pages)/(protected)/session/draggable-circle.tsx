@@ -4,8 +4,6 @@ import DraggableComponent from "@/components/shared/draggable";
 import React, { useEffect, useState } from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
-import ActionsLeft from "./actions-left";
-import UserButton from "./actions-left/user";
 import {
   AudioTrack,
   isTrackReference,
@@ -207,6 +205,8 @@ const ParticipantTile = React.forwardRef<
   }
 
   if (!isMuted && isMyUser) showAvatar = false;
+
+  console.log("targetUser", targetUser);
 
   return (
     <>

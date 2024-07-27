@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/swr";
 import { FetchDataType } from "@/lib/axios";
 import { DateRange } from "react-day-picker";
 import CreateSchedule from "./create-schedule";
+import CreateSchedule2 from "./create-schedule-2";
 
 type Props = {
   calendar: CalendarType;
@@ -33,7 +34,8 @@ export default function CalendarSchedule({ calendar }: Props) {
 
   return (
     <div className='flex flex-col gap-y-4 w-[280px] max-w-full'>
-      {!!calendarData && <CreateSchedule calendar={calendarData} />}
+      {/* {!!calendarData && <CreateSchedule calendar={calendarData} />} */}
+      <CreateSchedule2 />
       {/* <Calendar
         mode='range'
         selected={date}

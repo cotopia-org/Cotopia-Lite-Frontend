@@ -25,9 +25,15 @@ export default function RoomSpatialWrapper({
         .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
         .then((res) => {
           setRoom(res?.data?.data);
+          axiosInstance
+            .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}/join`)
+            .then((res) => {
+              console.log("join again");
+            });
         });
     }
   }, [room_id]);
+
   return (
     <div className='overflow-hidden max-h-screen'>
       <RoomWrapper>
