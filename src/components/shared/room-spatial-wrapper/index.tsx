@@ -26,6 +26,8 @@ export default function RoomSpatialWrapper({
 
     if (!room_id) return;
 
+    socket.emit("joinedRoom", room_id);
+
     socket.on("joined", () => {
       socket.emit("joinedRoom", room_id);
     });
