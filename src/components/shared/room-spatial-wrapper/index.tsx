@@ -1,8 +1,8 @@
 "use client";
 
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import RoomHolder from "@/components/shared/room";
 import RoomWrapper from "@/components/shared/room/wrapper";
-import { useApi } from "@/hooks/swr";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
@@ -19,19 +19,34 @@ export default function RoomSpatialWrapper({
 }: Props) {
   const [room, setRoom] = useState<WorkspaceRoomType>();
 
+  const socket = useSocket();
+
   useEffect(() => {
-    if (room_id !== undefined) {
+    if (!socket) return;
+
+    if (!room_id) return;
+
+    socket.on("joined", () => {
+      socket.emit("joinedRoom", room_id);
+    });
+
+    socket.on("joinedInRoom", () => {
       axiosInstance
         .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}/join`)
-        .then((res) => {
+        .then(() => {
           axiosInstance
             .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
             .then((res) => {
               setRoom(res?.data?.data);
             });
         });
-    }
-  }, [room_id]);
+    });
+
+    return () => {
+      socket.off("joined");
+      socket.off("joinedInRoom");
+    };
+  }, [socket, room_id]);
 
   return (
     <div className='overflow-hidden max-h-screen'>

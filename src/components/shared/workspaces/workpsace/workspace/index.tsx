@@ -4,7 +4,6 @@ import Link from "next/link";
 import WorkspaceAvatar from "./avatar";
 import WorkspaceTitle from "./title";
 import WorkspaceDate from "./date";
-import WorkspaceActions from "./actions";
 import { useState } from "react";
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 

@@ -18,7 +18,7 @@ export default function TimeTrackingButtonTool() {
   const getActivityTime = () => {
     startLoading();
     axiosInstance
-      .get(urlWithQueryParams(`/users/activities`, { today: true }))
+      .get(urlWithQueryParams(`/users/activities`, { period: "today" }))
       .then((res) => {
         const mins = res.data.data;
         setSeconds(mins * 60);

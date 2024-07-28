@@ -14,7 +14,6 @@ const BOUNDRY_CENTER_Y = 500;
 const LiveKitAudioManager = () => {
   const participants = useParticipants();
 
-  const livekitRoom = livekitRoomContext();
   const { room } = useRoomContext();
   const users = room?.participants ?? [];
 
@@ -84,9 +83,9 @@ const LiveKitAudioManager = () => {
     checkBoundaries();
   });
 
-  //   useEffect(() => {
-  //     setParticipantVolume("koroush", 0);
-  //   }, []);
+  useSocket("updateCoordinate", (data) => {
+    checkBoundaries();
+  });
 
   return null;
 };

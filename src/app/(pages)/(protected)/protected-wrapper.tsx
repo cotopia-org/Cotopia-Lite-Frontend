@@ -41,6 +41,8 @@ export const useSocket = (
       socketState.off(event, cb);
     };
   }, [socketState, event, deps]);
+
+  return socketState;
 };
 
 export default function ProtectedWrapper({ children, token, user }: Props) {
@@ -57,7 +59,10 @@ export default function ProtectedWrapper({ children, token, user }: Props) {
 
     const instance = socket.getInstance();
 
-    if (instance) setSocketState(instance);
+    if (instance)
+      instance?.on("connect", () => {
+        setSocketState(instance);
+      });
 
     return () => {
       socket.disconnect();

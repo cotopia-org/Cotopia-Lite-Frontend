@@ -1,8 +1,16 @@
 "use client";
 
 import { UserType } from "@/types/user";
-import { createContext, ReactNode, useContext } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { DashboardWrapper } from "./dashboard-wrapper";
+import { useSocket } from "../protected-wrapper";
+import FullLoading from "@/components/shared/full-loading";
 
 type Props = {
   user?: UserType;
@@ -17,6 +25,16 @@ const AuthContext = createContext<{ user?: UserType }>({
 export const useAuth = () => useContext(AuthContext);
 
 export default function Dashboard({ user, children, accessToken }: Props) {
+  const socket = useSocket();
+
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  useEffect(() => {
+    setSocketConnected(!!socket?.connected);
+  }, [socket]);
+
+  if (!socketConnected) return <FullLoading />;
+
   return (
     <AuthContext.Provider value={{ user }}>
       <DashboardWrapper userToken={accessToken}>{children}</DashboardWrapper>

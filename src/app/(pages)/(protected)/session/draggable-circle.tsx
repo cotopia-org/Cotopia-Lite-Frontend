@@ -249,6 +249,8 @@ const ParticipantTile = React.forwardRef<
 const DEFAULT_TILE_POSITION = [0, 0];
 
 export default function DraggableCircle() {
+  const socket = useSocket();
+
   const [isDragging, setIsDragging] = useState(false);
   const handleStartDragging = () => {
     setIsDragging(true);
@@ -269,47 +271,47 @@ export default function DraggableCircle() {
   const livekitIdentity = track?.participant?.identity;
 
   useSocket("userUpdated", (user: UserMinimalType) => {
-    if (livekitIdentity === user.username) {
-      let userCoordinates = user?.coordinates
-        ? user?.coordinates?.split(",")
-        : DEFAULT_TILE_POSITION;
+    let userCoordinates = user?.coordinates
+      ? user?.coordinates?.split(",")
+      : DEFAULT_TILE_POSITION;
 
-      userCoordinates = userCoordinates.map((x) => +x);
+    userCoordinates = userCoordinates.map((x) => +x);
 
-      setParticipants((prev) => {
-        const prevParticpants = [...(prev ?? [])];
+    setParticipants((prev) => {
+      const prevParticpants = [...(prev ?? [])];
 
-        const participantIds = prev?.map((x) => x.id);
+      const participantIds = prev?.map((x) => x.id);
 
-        const foundIndex = participantIds?.findIndex((id) => id === user?.id);
+      const foundIndex = participantIds?.findIndex((id) => id === user?.id);
 
-        if (foundIndex !== undefined && foundIndex > -1) {
-          const foundUser = prevParticpants[foundIndex];
+      if (foundIndex !== undefined && foundIndex > -1) {
+        const foundUser = prevParticpants[foundIndex];
 
-          const updatedUser: UserMinimalType = {
-            ...foundUser,
-            coordinates: user?.coordinates,
-          };
+        const updatedUser: UserMinimalType = {
+          ...foundUser,
+          coordinates: user?.coordinates,
+        };
 
-          const userPosition = updatedUser.coordinates
-            ?.split(",")
-            ?.map((x) => +x) ?? [0, 0];
+        const userPosition = updatedUser.coordinates
+          ?.split(",")
+          ?.map((x) => +x) ?? [0, 0];
 
-          prevParticpants[foundIndex] = updatedUser;
-          updateUserCoords(foundUser.username, {
-            x: userPosition[0],
-            y: userPosition[1],
-          });
-        }
+        prevParticpants[foundIndex] = updatedUser;
+        updateUserCoords(foundUser.username, {
+          x: userPosition[0],
+          y: userPosition[1],
+        });
+      }
 
-        return prevParticpants;
-      });
-    }
+      return prevParticpants;
+    });
   });
 
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    axiosInstance.post(`/users/updateCoordinates`, {
+    socket?.emit("updateCoordinates", {
+      room_id: room?.id,
       coordinates: `${position.x},${position.y}`,
+      username: livekitIdentity,
     });
   };
 
