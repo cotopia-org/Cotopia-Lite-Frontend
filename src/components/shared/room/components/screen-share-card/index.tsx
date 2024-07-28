@@ -2,15 +2,19 @@ import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import { _BUS } from "@/app/const/bus";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import DraggableComponent from "@/components/shared/draggable";
+import { doCirclesMeet } from "@/lib/utils";
 import { TrackReference, VideoTrack } from "@livekit/components-react";
 import { Expand, Maximize2, Minimize, Minimize2, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { dispatch } from "use-bus";
+import { useRoomContext } from "../../room-context";
 
 type Props = {
   track: TrackReference;
 };
 export default function ScreenShareCard({ track }: Props) {
+  const { room } = useRoomContext();
+
   const { user } = useProfile();
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -25,7 +29,21 @@ export default function ScreenShareCard({ track }: Props) {
     clss += ` fixed !w-[1200px] !h-[480px]`;
   }
 
-  const myScreenShare = track?.participant?.identity === user?.username;
+  const liveKitIdentity = track?.participant?.identity;
+
+  const targetUser = room?.participants?.find(
+    (a) => a.username === liveKitIdentity
+  );
+
+  const myTargetUser = room?.participants?.find(
+    (a) => a.username === user.username
+  );
+
+  const myScreenShare = liveKitIdentity === user?.username;
+
+  const { meet } = doCirclesMeet(myTargetUser, targetUser);
+
+  if (!meet) return;
 
   const videoContent = <VideoTrack trackRef={track} />;
 
