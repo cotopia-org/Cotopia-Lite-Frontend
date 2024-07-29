@@ -27,7 +27,7 @@ export default function ModalBox({ trigger, children, className }: Props) {
 
 //Export full Modal
 export function FullModalBox({ ...props }: Props) {
-  let clss = "max-w-full";
+  let clss = "max-w-full max-h-[calc(100vh-200px)] overflow-y-auto";
   if (props?.className) clss += ` ${props.className}`;
 
   return <ModalBox {...props} className={clss} />;

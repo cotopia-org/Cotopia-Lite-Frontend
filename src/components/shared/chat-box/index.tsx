@@ -129,7 +129,7 @@ export default function ChatBox({
           boxRef.current = xref;
         }}
       >
-        <div className='flex flex-col-reverse w-full gap-y-4'>
+        <div className='flex flex-col-reverse w-full gap-y-4' dir='auto'>
           {items.map((chat, key) => (
             <ChatItem
               item={chat}

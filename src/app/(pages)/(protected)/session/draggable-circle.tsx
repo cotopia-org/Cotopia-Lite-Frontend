@@ -32,6 +32,8 @@ import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
+import { Tooltip } from "@/components/ui/tooltip";
+import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -207,7 +209,7 @@ const ParticipantTile = React.forwardRef<
   if (!isMuted && isMyUser) showAvatar = false;
 
   return (
-    <>
+    <CotopiaTooltip title={userFullName}>
       <VoiceAreaHearing isDragging={isDragging} />
       <div className={clss}>
         <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
@@ -242,7 +244,7 @@ const ParticipantTile = React.forwardRef<
           <UserButton />
         </ActionsLeft> */}
       </div>
-    </>
+    </CotopiaTooltip>
   );
 });
 
