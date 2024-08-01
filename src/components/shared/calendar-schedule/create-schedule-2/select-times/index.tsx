@@ -5,6 +5,8 @@ import { CreateStep, useSchudleCreate } from "..";
 import { Calendar } from "@/components/ui/calendar";
 import colors from "tailwindcss/colors";
 import { RecurrenceDays } from "@/types/calendar";
+import RepeatableEvents from "./repeatable-events";
+import PeriodTimes from "../period";
 
 function afterDayWeek(day: number) {
   let finalDay = day + 1;
@@ -39,10 +41,8 @@ export default function SelectTimes() {
       <TitleEl title='Calendar'>
         <Calendar modifiers={modifiers} modifiersStyles={modifierStyles} />
       </TitleEl>
-      <TitleEl title='Times of the day'>
-        <DaysTime />
-      </TitleEl>
-
+      <DaysTime />
+      <RepeatableEvents />
       <div className='flex flex-row justify-end items-center gap-x-2'>
         <CotopiaButton
           variant={"outline"}

@@ -33,20 +33,7 @@ export default function DayTime({ day, defaultValue, onChange }: Props) {
   return (
     <AccordionItem value={"" + day}>
       <AccordionTrigger>{RecurrenceDays[day]}</AccordionTrigger>
-      <AccordionContent>
-        <div className='flex flex-row items-center gap-x-2'>
-          <TimeSelector
-            label='From'
-            defaultValue={time?.from}
-            onTimeChange={(time) => handleChangeTime(time, "from")}
-          />
-          <TimeSelector
-            label='To'
-            defaultValue={time?.to}
-            onTimeChange={(time) => handleChangeTime(time, "to")}
-          />
-        </div>
-      </AccordionContent>
+      <AccordionContent></AccordionContent>
     </AccordionItem>
   );
 }

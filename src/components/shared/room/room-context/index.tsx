@@ -27,6 +27,9 @@ const RoomCtx = createContext<{
   ) => void;
   closeSidebar: () => void;
   sidebar?: ReactNode;
+  videoState: boolean;
+  audioState: boolean;
+  changePermissionState: (key: "video" | "audio", newValue: boolean) => void;
 }>({
   room: undefined,
   room_id: undefined,
@@ -35,6 +38,9 @@ const RoomCtx = createContext<{
   updateUserCoords: (username, position) => {},
   openSidebar: (item) => {},
   closeSidebar: () => {},
+  audioState: false,
+  videoState: false,
+  changePermissionState: (key, newValue) => {},
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -46,7 +52,14 @@ export default function RoomContext({
   onRoomUpdated,
   workspace_id,
 }: Props) {
-  const socket = useSocket();
+  const [permissionState, setPermissionState] = useState({
+    audio: false,
+    video: false,
+  });
+
+  const changePermissionState = (key: "video" | "audio", newValue: boolean) => {
+    setPermissionState((prev) => ({ ...prev, [key]: newValue }));
+  };
 
   const [localRoom, setLocalRoom] = useState(room);
   useEffect(() => {
@@ -83,7 +96,6 @@ export default function RoomContext({
   };
 
   useSocket("roomUpdated", (data) => {
-    console.log("xxx", data);
     setLocalRoom(data);
     if (onRoomUpdated) onRoomUpdated(data);
   });
@@ -135,6 +147,9 @@ export default function RoomContext({
         closeSidebar,
         openSidebar,
         updateUserCoords,
+        audioState: permissionState.audio,
+        videoState: permissionState.video,
+        changePermissionState,
       }}
     >
       {children}

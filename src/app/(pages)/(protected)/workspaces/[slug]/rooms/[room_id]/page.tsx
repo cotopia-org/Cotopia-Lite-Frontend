@@ -1,4 +1,4 @@
-import RoomSpatialWrapper from "@/components/shared/room-spatial-wrapper";
+import RoomSpatial from "@/components/shared/room-spatial-wrapper";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -23,7 +23,5 @@ export default function RoomPage({
     return notFound();
   }
 
-  return (
-    <RoomSpatialWrapper token={token} workspace_id={slug} room_id={room_id} />
-  );
+  return <RoomSpatial token={token} workspace_id={slug} room_id={room_id} />;
 }

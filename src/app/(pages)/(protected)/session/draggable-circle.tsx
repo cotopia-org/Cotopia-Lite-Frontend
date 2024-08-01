@@ -148,7 +148,7 @@ const ParticipantTile = React.forwardRef<
 
   const isMyUser = user?.username === livekitIdentity;
 
-  const { room } = useRoomContext();
+  const { room, videoState, audioState } = useRoomContext();
   const participants = room?.participants;
 
   const updatedMyUser = participants?.find((x) => x.username === user.username);
@@ -208,6 +208,8 @@ const ParticipantTile = React.forwardRef<
 
   if (!isMuted && isMyUser) showAvatar = false;
 
+  if (!videoState) showAvatar = true;
+
   return (
     <CotopiaTooltip title={userFullName}>
       <VoiceAreaHearing isDragging={isDragging} />
@@ -240,9 +242,6 @@ const ParticipantTile = React.forwardRef<
             }}
           />
         </ActionsRight>
-        {/* <ActionsLeft>
-          <UserButton />
-        </ActionsLeft> */}
       </div>
     </CotopiaTooltip>
   );
