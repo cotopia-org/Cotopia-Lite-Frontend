@@ -140,7 +140,7 @@ export default function JobModal({ title, isOpen, handleClose }: Props) {
 
               <hr className="my-[10px]" />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <p className="mb-2">Tags</p>
                 <CotopiaButton className="flex bg-transparent hover:bg-blue-50 transition-colors text-blue-600">
                   <span>
@@ -163,7 +163,7 @@ export default function JobModal({ title, isOpen, handleClose }: Props) {
 
               <hr className="my-[10px]" />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <p className="mb-2">Invited People</p>
                 <CotopiaButton className="flex bg-transparent hover:bg-blue-50 transition-colors text-blue-600">
                   <span>

@@ -1,33 +1,29 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as MenubarPrimitive from "@radix-ui/react-menubar"
+import * as React from "react";
+import * as MenubarPrimitive from "@radix-ui/react-menubar";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Menubar = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Root>
 >(({ className, ...props }, ref) => (
-  <MenubarPrimitive.Root
-    ref={ref}
-    className={cn("z-50", className)}
-    {...props}
-  />
-))
-Menubar.displayName = MenubarPrimitive.Root.displayName
+  <MenubarPrimitive.Root ref={ref} className={cn(className)} {...props} />
+));
+Menubar.displayName = MenubarPrimitive.Root.displayName;
 
 const MenubarPortal = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Portal>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Portal>
->(({ className, ...props }, ref) => (
+>(({ ...props }, ref) => (
   <MenubarPrimitive.Portal
     // ref={ref}
-    className={cn("z-50 flex space-x-4 bg-gray-100 p-2 rounded-md shadow-md", className)}
+    // className={cn("z-50 flex space-x-4 bg-gray-100 p-2 rounded-md shadow-md", className)}
     {...props}
   />
-))
-MenubarPortal.displayName = MenubarPrimitive.Portal.displayName
+));
+MenubarPortal.displayName = MenubarPrimitive.Portal.displayName;
 
 const MenubarMenu = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Menu>,
@@ -38,8 +34,8 @@ const MenubarMenu = React.forwardRef<
     // className={cn("relative", className)}
     {...props}
   />
-))
-MenubarMenu.displayName = MenubarPrimitive.Menu.displayName
+));
+MenubarMenu.displayName = MenubarPrimitive.Menu.displayName;
 
 const MenubarTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Trigger>,
@@ -50,8 +46,8 @@ const MenubarTrigger = React.forwardRef<
     className={cn("cursor-pointer", className)}
     {...props}
   />
-))
-MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
+));
+MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
 const MenubarContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Content>,
@@ -62,8 +58,8 @@ const MenubarContent = React.forwardRef<
     className={cn("min-w-24 bg-white rounded-2xl shadow-lg", className)}
     {...props}
   />
-))
-MenubarContent.displayName = MenubarPrimitive.Content.displayName
+));
+MenubarContent.displayName = MenubarPrimitive.Content.displayName;
 
 const MenubarLabel = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Label>,
@@ -74,8 +70,8 @@ const MenubarLabel = React.forwardRef<
     className={cn("px-4 py-2 text-sm font-semibold text-gray-900", className)}
     {...props}
   />
-))
-MenubarLabel.displayName = MenubarPrimitive.Label.displayName
+));
+MenubarLabel.displayName = MenubarPrimitive.Label.displayName;
 
 const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
@@ -83,11 +79,14 @@ const MenubarItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Item
     ref={ref}
-    className={cn("px-2 py-1 transition-all hover:bg-gray-100 hover:border-none rounded-md cursor-pointer", className)}
+    className={cn(
+      "px-2 py-1 transition-all hover:bg-gray-100 hover:border-none rounded-md cursor-pointer",
+      className
+    )}
     {...props}
   />
-))
-MenubarItem.displayName = MenubarPrimitive.Item.displayName
+));
+MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 
 const MenubarGroup = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Group>,
@@ -98,8 +97,8 @@ const MenubarGroup = React.forwardRef<
     className={cn("space-y-1", className)}
     {...props}
   />
-))
-MenubarGroup.displayName = MenubarPrimitive.Group.displayName
+));
+MenubarGroup.displayName = MenubarPrimitive.Group.displayName;
 
 const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
@@ -107,11 +106,14 @@ const MenubarCheckboxItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
-    className={cn("px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer", className)}
+    className={cn(
+      "px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer",
+      className
+    )}
     {...props}
   />
-))
-MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
+));
+MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
 
 const MenubarRadioGroup = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioGroup>,
@@ -122,8 +124,8 @@ const MenubarRadioGroup = React.forwardRef<
     className={cn("space-y-1", className)}
     {...props}
   />
-))
-MenubarRadioGroup.displayName = MenubarPrimitive.RadioGroup.displayName
+));
+MenubarRadioGroup.displayName = MenubarPrimitive.RadioGroup.displayName;
 
 const MenubarRadioItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioItem>,
@@ -131,11 +133,14 @@ const MenubarRadioItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}
-    className={cn("px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer", className)}
+    className={cn(
+      "px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer",
+      className
+    )}
     {...props}
   />
-))
-MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
+));
+MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
 
 const MenubarItemIndicator = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.ItemIndicator>,
@@ -143,11 +148,14 @@ const MenubarItemIndicator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.ItemIndicator
     ref={ref}
-    className={cn("absolute left-0 top-0 w-2 h-2 bg-blue-500 rounded-full", className)}
+    className={cn(
+      "absolute left-0 top-0 w-2 h-2 bg-blue-500 rounded-full",
+      className
+    )}
     {...props}
   />
-))
-MenubarItemIndicator.displayName = MenubarPrimitive.ItemIndicator.displayName
+));
+MenubarItemIndicator.displayName = MenubarPrimitive.ItemIndicator.displayName;
 
 // const MenubarSub = React.forwardRef<
 //   React.ElementRef<typeof MenubarPrimitive.Sub>,
@@ -167,11 +175,14 @@ const MenubarSubTrigger = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubTrigger
     ref={ref}
-    className={cn("px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer", className)}
+    className={cn(
+      "px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md cursor-pointer",
+      className
+    )}
     {...props}
   />
-))
-MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
+));
+MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 
 const MenubarSubContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubContent>,
@@ -179,11 +190,14 @@ const MenubarSubContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
-    className={cn("absolute left-full top-0 mt-2 w-48 bg-white rounded-md shadow-lg", className)}
+    className={cn(
+      "absolute left-full top-0 mt-2 w-48 bg-white rounded-md shadow-lg",
+      className
+    )}
     {...props}
   />
-))
-MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
+));
+MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
 const MenubarSeparator = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Separator>,
@@ -194,8 +208,8 @@ const MenubarSeparator = React.forwardRef<
     className={cn("my-1 h-px bg-gray-300", className)}
     {...props}
   />
-))
-MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
+));
+MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
 const MenubarArrow = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Arrow>,
@@ -206,25 +220,25 @@ const MenubarArrow = React.forwardRef<
     className={cn("absolute top-0 left-0 w-2 h-2 bg-blue-500", className)}
     {...props}
   />
-))
-MenubarArrow.displayName = MenubarPrimitive.Arrow.displayName
+));
+MenubarArrow.displayName = MenubarPrimitive.Arrow.displayName;
 
-export { 
-  Menubar, 
-  MenubarMenu, 
-  MenubarTrigger, 
-  MenubarPortal, 
-  MenubarContent, 
-  MenubarLabel, 
-  MenubarItem, 
-  MenubarGroup, 
-  MenubarCheckboxItem, 
-  MenubarRadioGroup, 
-  MenubarRadioItem, 
-  MenubarItemIndicator, 
-//   MenubarSub, 
-  MenubarSubTrigger, 
-  MenubarSubContent, 
-  MenubarSeparator, 
-  MenubarArrow 
-}
+export {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarPortal,
+  MenubarContent,
+  MenubarLabel,
+  MenubarItem,
+  MenubarGroup,
+  MenubarCheckboxItem,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarItemIndicator,
+  //   MenubarSub,
+  MenubarSubTrigger,
+  MenubarSubContent,
+  MenubarSeparator,
+  MenubarArrow,
+};
