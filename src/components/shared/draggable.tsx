@@ -119,6 +119,9 @@ export default function DraggableComponent({
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
 
+    if (y < (bounds?.top ?? 0)) y = bounds?.top ?? 0;
+    if (x < (bounds?.left ?? 0)) x = bounds?.left ?? 0;
+
     if (sidebar) {
       x = x + 188;
     }
