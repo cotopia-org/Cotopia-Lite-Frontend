@@ -55,6 +55,7 @@ export default async function layout({ children }: Props) {
         header={<Header />}
         leftSidebar={<DashboardMenus items={ITEMS} className='gap-y-2' />}
         rightSidebar={<DashbordDirects />}
+        className='px-4'
       >
         {children}
       </DashboardLayoutMaker>

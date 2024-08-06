@@ -8,12 +8,14 @@ type Props = {
   children?: ReactNode;
   rightSidebar?: ReactNode;
   header?: ReactNode;
+  className?: string;
 };
 export default function DashboardLayoutMaker({
   leftSidebar,
   children,
   rightSidebar,
   header,
+  className,
 }: Props) {
   const { windowSize } = useWindowSize();
   const { sideBarOpen } = useDashboardContext();
@@ -27,7 +29,7 @@ export default function DashboardLayoutMaker({
   }
 
   return (
-    <main className='w-screen min-h-screen flex flex-col'>
+    <main className={`w-screen min-h-screen flex flex-col ${className ?? ""}`}>
       {!!header && header}
       <div className='grid lg:grid-cols-12 gap-4 w-full'>
         {/* In Display Biger than or = 1020 */}

@@ -362,7 +362,7 @@ export default function DraggableCircle() {
       }}
       bounds={{
         top: 0,
-        left: 0,
+        left: leftDashboardColWidth ?? 0,
         right: finalWidth,
         bottom: height,
       }}
