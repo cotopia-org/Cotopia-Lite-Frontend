@@ -7,17 +7,20 @@ import VideoButtonTool from "./video-button";
 import VoiceButtonTool from "./voice-button";
 import MegaPhoneButtonTool from "./megaphone-button";
 import GridViewButtonTool from "./gridview-button";
+import { useRoomSpatialContext } from "@/app/(pages)/(protected)/room/spatial/room-spatial-wrapper";
 
 export default function BottomMiddleTools() {
+  const {setDrawMode} = useRoomSpatialContext();
+
   return (
     <div className='flex flex-row items-center bg-white rounded-xl p-2'>
       <AddButtonTool />
-      <EditButtonTool />
-      <ShareScreenButtonTool />
+      <EditButtonTool onClick={() => setDrawMode(prevState => !prevState)}/>
+      {/* <ShareScreenButtonTool /> */}
       <ChatButtonTool />
       <BroadcastButtonTool />
-      <VideoButtonTool />
-      <VoiceButtonTool />
+      {/* <VideoButtonTool /> */}
+      {/* <VoiceButtonTool /> */}
       <MegaPhoneButtonTool />
       <GridViewButtonTool />
     </div>
