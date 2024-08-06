@@ -34,6 +34,7 @@ import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import { Tooltip } from "@/components/ui/tooltip";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
+import { useScreen } from "@/hooks/use-screen";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -330,6 +331,19 @@ export default function DraggableCircle() {
     200, 200,
   ]; //200 is default position , change in the feature
 
+  const { height, width } = useScreen();
+
+  const [leftDashboardColWidth, setLeftDashboardColWidth] = useState(0);
+  useEffect(() => {
+    const leftDashboardWidth = document.getElementById("dashboard-left-col");
+
+    if (!leftDashboardWidth) return;
+
+    setLeftDashboardColWidth(leftDashboardWidth.getBoundingClientRect().width);
+  }, []);
+
+  const finalWidth = width + leftDashboardColWidth;
+
   return (
     <DraggableComponent
       onDragEnd={(position) => {
@@ -342,6 +356,16 @@ export default function DraggableCircle() {
       hasTransition={!isMyUser}
       x={coordsUser?.[0]}
       y={coordsUser?.[1]}
+      positionOffset={{
+        x: (-1 * finalWidth) / 2,
+        y: (-1 * height) / 2,
+      }}
+      bounds={{
+        top: 0,
+        left: 0,
+        right: finalWidth,
+        bottom: height,
+      }}
     >
       <SessionWrapper>
         <ParticipantTile isDragging={isDragging} />

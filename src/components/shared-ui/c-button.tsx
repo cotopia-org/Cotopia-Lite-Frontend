@@ -28,7 +28,7 @@ export default function CotopiaButton({
             {!!startIcon && startIcon}
             {rest?.children}
           </div>
-          {!!endIcon && endIcon}
+          {!!endIcon && <div>{endIcon}</div>}
         </>
       )}
     </Button>

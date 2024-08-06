@@ -16,7 +16,7 @@ import InitRoom from "./init-room";
 export default function RoomInner() {
   const { sidebar } = useRoomContext();
 
-  let mainRoomHolderClss = "main-room-holder w-screen h-screen";
+  let mainRoomHolderClss = "main-room-holder w-full h-screen";
   if (sidebar) mainRoomHolderClss += " pr-[376px]";
 
   return (
