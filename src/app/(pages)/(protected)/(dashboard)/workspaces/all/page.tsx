@@ -5,5 +5,9 @@ export const metadata = {
 };
 
 export default function AllWorkspacesPage() {
-  return <Wrapper />;
+  return (
+    <div className='w-[500px] max-w-full mx-auto'>
+      <Wrapper />
+    </div>
+  );
 }

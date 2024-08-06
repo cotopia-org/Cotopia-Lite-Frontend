@@ -6,7 +6,7 @@ import React from "react";
 export default function VideoControl() {
   const { videoState, changePermissionState } = useRoomContext();
 
-  let clss = "!bg-black !text-white";
+  let clss = "!bg-destructive !text-white";
 
   if (videoState === false) clss = "text-black border bg-white";
 

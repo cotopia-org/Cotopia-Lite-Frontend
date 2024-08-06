@@ -53,8 +53,8 @@ export default function RoomContext({
   workspace_id,
 }: Props) {
   const [permissionState, setPermissionState] = useState({
-    audio: false,
-    video: false,
+    audio: true,
+    video: true,
   });
 
   const changePermissionState = (key: "video" | "audio", newValue: boolean) => {

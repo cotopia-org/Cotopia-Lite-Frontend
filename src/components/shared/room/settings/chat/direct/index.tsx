@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import Search from "./search";
 import Users from "./users";
@@ -45,7 +47,7 @@ export default function UserChatDirect() {
     );
 
   return (
-    <div className='relative h-full flex flex-col justify-between pt-8'>
+    <div className='relative h-full flex flex-col justify-between'>
       {content}
     </div>
   );
