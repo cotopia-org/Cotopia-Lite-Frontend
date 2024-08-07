@@ -1,6 +1,8 @@
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { cn } from "@/lib/utils";
 import { EllipsisVertical, Menu } from "lucide-react";
+import { Fragment } from "react";
 
 interface Invite {
   name?: string;
@@ -14,9 +16,9 @@ interface InviteList {
 
 export default function InviteList({ list }: InviteList) {
   return (
-    <div className="bg-gray-100 rounded-md p-2">
+    <div className="bg-gray-100 rounded-md p-2 mt-1">
       {list.map(({ status, avatar, name = "imebneali" }, index) => (
-        <>
+        <Fragment key={index}>
           <div className="flex items-center justify-between py-2 px-3">
             <div className="flex gap-1 items-center">
               <CotopiaAvatar title="A" />
@@ -34,11 +36,13 @@ export default function InviteList({ list }: InviteList) {
               >
                 {status}
               </p>
-              <EllipsisVertical size={20} />
+              <CotopiaIconButton className="text-black !bg-transparent hover:!bg-gray-200">
+                <EllipsisVertical size={20} />
+              </CotopiaIconButton>
             </div>
           </div>
           {index + 1 !== list.length && <hr />}
-        </>
+        </Fragment>
       ))}
     </div>
   );
