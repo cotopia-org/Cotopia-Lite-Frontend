@@ -13,6 +13,16 @@ type Props = {
   y?: number;
   disabled?: boolean;
   hasTransition?: boolean;
+  positionOffset?: {
+    x: number;
+    y: number;
+  };
+  bounds?: {
+    top: number;
+    left: number;
+    right: number;
+    bottom: number;
+  };
 };
 
 const DEFAULT_X = 0;
@@ -27,6 +37,8 @@ export default function DraggableComponent({
   y,
   disabled = false,
   hasTransition = false,
+  positionOffset,
+  bounds,
 }: Props) {
   const { sidebar } = useRoomContext();
 
@@ -63,6 +75,9 @@ export default function DraggableComponent({
 
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
+
+    if (y < (bounds?.top ?? 0)) y = bounds?.top ?? 0;
+    if (x < (bounds?.left ?? 0)) x = bounds?.left ?? 0;
 
     if (sidebar) {
       x = x + 188;
@@ -104,6 +119,9 @@ export default function DraggableComponent({
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
 
+    if (y < (bounds?.top ?? 0)) y = bounds?.top ?? 0;
+    if (x < (bounds?.left ?? 0)) x = bounds?.left ?? 0;
+
     if (sidebar) {
       x = x + 188;
     }
@@ -129,21 +147,13 @@ export default function DraggableComponent({
 
   return (
     <Draggable
-      positionOffset={{
-        x: (-1 * width) / 2,
-        y: (-1 * height) / 2,
-      }}
+      positionOffset={positionOffset}
       position={position}
       onStop={hanldeDragEnd}
       onStart={handleDragStart}
       onDrag={handleDragging}
       disabled={disabled}
-      bounds={{
-        top: 0,
-        left: 0,
-        right: width,
-        bottom: height,
-      }}
+      bounds={bounds}
       defaultClassName={defaultClassName}
     >
       <div ref={divRef}>{children}</div>

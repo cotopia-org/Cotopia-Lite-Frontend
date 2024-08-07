@@ -4,21 +4,37 @@ import AddRoom from "./add-room";
 import WorkspaceRooms from "@/components/shared/workspaces/rooms";
 import { WorkspaceRoomShortType, WorkspaceRoomType } from "@/types/room";
 import { FetchDataType } from "@/lib/axios";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type Props = {
   workspace_id: string;
 };
 
 export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
+  const { room_id } = useParams();
+
   const { data, isLoading } = useApi<FetchDataType<WorkspaceRoomShortType[]>>(
     `/workspaces/${workspace_id}/rooms`
   );
   const items = !!data ? data?.data : [];
 
+  const [rooms, setRooms] = useState<WorkspaceRoomShortType[]>([]);
+  useEffect(() => {
+    setRooms(items);
+  }, [items]);
+
+  const handleAddRoom = (room: WorkspaceRoomShortType) =>
+    setRooms((prev) => [...prev, room]);
+
   let content = (
     <div className='flex flex-col gap-y-4'>
-      <WorkspaceRooms workspace_id={+workspace_id} rooms={items} />
-      <AddRoom workspace_id={workspace_id} />
+      <WorkspaceRooms
+        workspace_id={+workspace_id}
+        rooms={rooms}
+        selected_room_id={room_id ? +room_id : undefined}
+      />
+      <AddRoom workspace_id={workspace_id} onAdd={handleAddRoom} />
     </div>
   );
 

@@ -1,9 +1,10 @@
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import { UserType } from "@/types/user";
+
 type Props = {
   title: string;
+  src?: string;
 };
 
-export default function Avatar({ title }: Props) {
-  return <CotopiaAvatar title={title} />;
+export default function Avatar({ title, src }: Props) {
+  return <CotopiaAvatar src={src} title={title} />;
 }

@@ -1,5 +1,4 @@
 import WorkspaceList from "@/components/shared/room/components/workspace-button/workspaces";
-import CreateWorkspace from "../components/create-workspace";
 import JoinWorkspaceWithLink from "../components/join-with-link";
 
 export const metadata = {
@@ -23,7 +22,7 @@ export default function HomePage() {
   // }
 
   return (
-    <div className='max-w-full w-[500px] mx-auto px-4 md:px-0'>
+    <div className='max-w-full w-[500px] mx-auto px-4 md:px-0 flex flex-col gap-y-8'>
       <div className='flex flex-col gap-y-4 w-full'>
         <div className='w-full'>
           <h1 className='md:font-medium text-black 2xs:text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center'>
@@ -33,9 +32,7 @@ export default function HomePage() {
             Connecting everyone through video conferencing with CotopiaLite.
           </p>
         </div>
-
         <JoinWorkspaceWithLink />
-        <CreateWorkspace />
       </div>
       <WorkspaceList className='!p-0' />
     </div>

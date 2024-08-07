@@ -5,7 +5,7 @@ import TitleEl from "@/components/shared/title-el";
 import { AvailabiltyType } from "@/types/calendar";
 
 type Props = {
-  defaultValue?: CBadgeValueType;
+  defaultValue?: CBadgeValueType[];
   onChange: (value: CBadgeValueType[]) => void;
 };
 
@@ -19,10 +19,8 @@ export default function Availability({ defaultValue, onChange }: Props) {
           { title: "Text", value: AvailabiltyType.Text },
         ]}
         onChange={onChange}
-        defaultSelected={
-          defaultValue !== undefined ? [defaultValue] : undefined
-        }
-        isSingular
+        defaultSelected={defaultValue ?? []}
+        // isSingular
       />
     </TitleEl>
   );

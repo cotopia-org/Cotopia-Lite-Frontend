@@ -13,7 +13,7 @@ import SelectOptions from "./select-options";
 import SelectTimes from "./select-times";
 
 export type SchuldeOptions = {
-  availability: AvailabiltyType;
+  availability: AvailabiltyType[];
   days: RecurrenceDays[];
   daysTimes: { [key: number]: { from: string; to: string } };
 };
@@ -25,7 +25,7 @@ export enum CreateStep {
 
 const initStep = CreateStep.SelectOptions;
 const initOptions = {
-  availability: AvailabiltyType.Video,
+  availability: [],
   days: [],
   daysTimes: {},
 };

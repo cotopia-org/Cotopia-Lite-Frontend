@@ -34,13 +34,9 @@ export default function RoomSpatialWrapper({
 
     socket.on("joinedInRoom", () => {
       axiosInstance
-        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}/join`)
-        .then(() => {
-          axiosInstance
-            .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
-            .then((res) => {
-              setRoom(res?.data?.data);
-            });
+        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
+        .then((res) => {
+          setRoom(res?.data?.data);
         });
     });
 

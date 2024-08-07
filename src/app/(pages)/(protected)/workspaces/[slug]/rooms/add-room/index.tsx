@@ -3,11 +3,13 @@ import ModalBox from "@/components/shared/modal-box";
 import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import AddRoomForm from "./form";
+import { WorkspaceRoomShortType } from "@/types/room";
 
 type Props = {
   workspace_id: string;
+  onAdd: (room: WorkspaceRoomShortType) => void;
 };
-export default function AddRoom({ workspace_id }: Props) {
+export default function AddRoom({ workspace_id, onAdd }: Props) {
   return (
     <ModalBox
       trigger={(open) => (
@@ -26,7 +28,11 @@ export default function AddRoom({ workspace_id }: Props) {
           <>
             <DialogTitle>{`Adding room to workspace`}</DialogTitle>
             <DialogDescription>{`You are going to create room in your workspace`}</DialogDescription>
-            <AddRoomForm workspace_id={workspace_id} onSubmit={close} />
+            <AddRoomForm
+              workspace_id={workspace_id}
+              onSubmit={close}
+              onCreated={onAdd}
+            />
           </>
         );
       }}

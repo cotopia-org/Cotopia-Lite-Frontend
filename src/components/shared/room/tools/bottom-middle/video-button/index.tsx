@@ -3,8 +3,11 @@ import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Video, VideoOff } from "lucide-react";
+import { useRoomContext } from "../../../room-context";
 
 export default function VideoButtonTool() {
+  const { changePermissionState } = useRoomContext();
+
   const { localParticipant } = useLocalParticipant();
 
   const voiceTrack = localParticipant.getTrackPublication(Track.Source.Camera);
@@ -20,8 +23,10 @@ export default function VideoButtonTool() {
 
     if (isUpstreamPaused) {
       track.unmute();
+      changePermissionState("video", true);
     } else {
       track.mute();
+      changePermissionState("video", false);
     }
   };
 

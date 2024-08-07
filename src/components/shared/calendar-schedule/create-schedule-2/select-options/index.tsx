@@ -6,9 +6,11 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import { ArrowRight } from "lucide-react";
 import { CreateStep, useSchudleCreate } from "..";
 import { toast } from "sonner";
+import PeriodTimes from "../period";
+import TitleEl from "@/components/shared/title-el";
 
 type Props = {
-  onChangeAvailability: (value?: CBadgeValueType) => void;
+  onChangeAvailability: (value?: CBadgeValueType[]) => void;
   onChangeDays: (value?: CBadgeValueType[]) => void;
 };
 
@@ -30,13 +32,19 @@ export default function SelectOptions({
   return (
     <div className='flex flex-col gap-y-4'>
       <Availability
-        defaultValue={options.availability}
-        onChange={(x) => onChangeAvailability(x.length > 0 ? x[0] : undefined)}
+        defaultValue={options.availability ?? []}
+        onChange={(x) => onChangeAvailability(x)}
       />
       <Days
         defaultValue={options.days}
         onChange={(days) => onChangeDays(days)}
       />
+      <TitleEl title='Start event'>
+        <PeriodTimes />
+      </TitleEl>
+      <TitleEl title='End event'>
+        <PeriodTimes />
+      </TitleEl>
       <div className='flex flex-row items-center justify-end'>
         <CotopiaButton
           onClick={handleNextStep}

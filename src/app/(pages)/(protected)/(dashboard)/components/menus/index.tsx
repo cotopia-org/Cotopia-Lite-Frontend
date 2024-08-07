@@ -1,4 +1,3 @@
-import { Clock, Star } from "lucide-react";
 import { ReactNode } from "react";
 import DashboardMenuItem from "./item";
 
@@ -7,6 +6,8 @@ export type DashboardMenuItemType = {
   href: string;
   icon?: ReactNode;
   children?: DashboardMenuItemType[];
+  after?: ReactNode;
+  showByDefault?: boolean;
 };
 
 type Props = {
