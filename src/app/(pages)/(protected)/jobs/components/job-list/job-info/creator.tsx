@@ -11,10 +11,10 @@ function JobCreator({ username, avatar, roomName }: Props) {
   return (
     <div className="flex gap-2 items-center justify-between text-gray-400">
       <CotopiaAvatar src={avatar} title="A" className="size-8 static" />
-      <p className="">Created By {username}</p>
+      <span>Created By {username}</span>
       /
       <Hash size={16} />
-      <p className="">{roomName}</p>
+      <span>{roomName}</span>
     </div>
   );
 }

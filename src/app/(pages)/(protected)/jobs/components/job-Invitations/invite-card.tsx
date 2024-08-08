@@ -35,9 +35,9 @@ export default function InviteCard({
           !isSelf ? "border rounded-xl" : "border-b"
         }`}
       >
-        {seen ? null : (
-          <div className="w-">
-            <span className="inline-block size-3 bg-[#5D11FF] rounded-full"></span>
+        {!seen ? null : (
+          <div>
+            <span className="inline-block size-3 bg-indigo-700 rounded-full" />
           </div>
         )}
         <div className="flex-auto">

@@ -24,7 +24,7 @@ export default function JobDetails({ title, handleClose }: Props) {
         <div className="flex items-center gap-4">
           <CotopiaButton
             startIcon={<CirclePlay size={16} />}
-            className="bg-[#1B5BFF]"
+            className="bg-blue-600"
           >
             Start the Job
           </CotopiaButton>

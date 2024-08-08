@@ -12,7 +12,7 @@ function TagItem({ size = "md", title, handleDelete }: Props) {
   return (
     <span
       className={cn(
-        `bg-[#F2F2F2] flex items-center justify-between rounded-lg font-semibold ${
+        `bg-gray-100 flex items-center justify-between rounded-lg font-semibold ${
           size === "sm" ? "p-1 gap-1 text-xs" : "py-1 px-2 gap-2 text-sm"
         }`
       )}

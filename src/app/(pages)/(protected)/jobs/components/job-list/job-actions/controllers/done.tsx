@@ -6,9 +6,9 @@ function DoneJob() {
   return (
     <CotopiaIconButton
       onClick={handleDone}
-      className="!bg-[#00ad2566] hover:opacity-80 size-8"
+      className="!bg-green-600/40 hover:opacity-80 size-8"
     >
-      <Check size={17} color="#00AD26" />
+      <Check size={17} color="green" />
     </CotopiaIconButton>
   );
 }

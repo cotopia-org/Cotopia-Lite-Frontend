@@ -6,7 +6,7 @@ function PlayJob() {
   return (
     <CotopiaIconButton
       onClick={handlePlay}
-      className="!bg-[#1b5cff66] hover:opacity-80 size-8"
+      className="!bg-blue-600/30 hover:opacity-80 size-8"
     >
       <Play size={17} color="#1B5BFF" />
     </CotopiaIconButton>

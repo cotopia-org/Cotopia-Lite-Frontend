@@ -8,7 +8,7 @@ function Duration() {
     <Badge
       title={formattedTime}
       icon={<Clock size={16} color="#0040E0" />}
-      className="bg-[#EBF0FF] text-blue-600"
+      className="bg-blue-50 text-blue-600"
     />
   );
 }

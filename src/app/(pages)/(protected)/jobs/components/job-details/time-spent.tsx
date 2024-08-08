@@ -3,14 +3,17 @@ import DetailsSection from "./detail-section";
 
 function TimeSpent() {
   return (
-    <DetailsSection
-      title="Time Spent"
-      content={
-        <div className="flex">
-          <Duration />
-        </div>
-      }
-    />
+    <>
+      <DetailsSection
+        title="Time Spent"
+        content={
+          <div className="flex">
+            <Duration />
+          </div>
+        }
+      />
+      <hr className="my-2" />
+    </>
   );
 }
 

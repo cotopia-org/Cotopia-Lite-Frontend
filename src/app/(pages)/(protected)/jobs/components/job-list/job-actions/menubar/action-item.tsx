@@ -11,7 +11,7 @@ function ActionItem({ title, icon, onClick }: Props) {
   return (
     <CotopiaButton
       onClick={onClick}
-      className="flex justify-start w-full !p-0 text-[#656B9F]"
+      className="flex justify-start w-full !p-0 text-slate-500"
       variant={"ghost"}
       startIcon={icon}
     >

@@ -9,7 +9,7 @@ type Props = {
 function JobList({ title, jobList }: Props) {
   return (
     <>
-      <h3 className="font-semibold text-xl text-[#A4A7C6] my-4">{title}</h3>
+      <h3 className="font-semibold text-xl text-neutral-400 my-4">{title}</h3>
       {jobList.map((job) => (
         <JobCard {...job} />
       ))}

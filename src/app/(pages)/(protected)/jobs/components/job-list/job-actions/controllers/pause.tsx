@@ -6,7 +6,7 @@ function PauseJob() {
   return (
     <CotopiaIconButton
       onClick={handlePause}
-      className="!bg-[#ad9c0066] hover:opacity-80 size-8"
+      className="!bg-yellow-500/40 hover:opacity-80 size-8"
     >
       <Pause size={17} color="#AD9C00" />
     </CotopiaIconButton>

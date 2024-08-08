@@ -6,7 +6,7 @@ function Status() {
     <Badge
       title="paused"
       icon={<PauseCircle size={16} color="#E6CF00" />}
-      className="bg-[#FFFDEB] text-[#E6CF00] border border-[#E6CF00]"
+      className="bg-yellow-50 text-yellow-400 border border-yellow-400"
     />
   );
 }

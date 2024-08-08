@@ -26,7 +26,7 @@ export default function Drawer({ title, isOpen, handleClose }: Props) {
   return (
     <>
       <div
-        className={`fixed bg-[#191b295d] z-10 w-screen h-screen top-0 left-0 ${
+        className={`fixed bg-gray-900/40 z-10 w-screen h-screen top-0 left-0 ${
           isOpen ? "inline-block" : "hidden"
         }`}
       >

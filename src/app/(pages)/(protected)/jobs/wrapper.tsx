@@ -26,7 +26,7 @@ export default function Wrapper() {
       <hr />
 
       <main className="flex-auto overflow-y-scroll">
-        <h2 className="text-2xl text-[#656B9F] mt-2">My Jobs</h2>
+        <h2 className="text-2xl text-slate-500 mt-2">My Jobs</h2>
 
         <JobList
           title="In progress"

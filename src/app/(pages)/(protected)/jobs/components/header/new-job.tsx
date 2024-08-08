@@ -10,7 +10,7 @@ function NewJob() {
       trigger={(open) => (
         <CotopiaButton
           // onClick={() => setIsModalOpen(true)}
-          className="flex bg-[#1B5BFF]"
+          className="flex bg-blue-600"
         >
           <span>
             <Plus size={20} />

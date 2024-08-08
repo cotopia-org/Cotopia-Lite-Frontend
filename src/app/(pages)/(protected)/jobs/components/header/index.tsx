@@ -8,7 +8,7 @@ function JobHeader() {
   return (
     <header className="pt-6 pb-2 bg-white flex justify-between sticky top-0 left-0">
       <CotopiaButton
-        className="text-[#656B9F]"
+        className="text-slate-600"
         startIcon={<ChevronLeft />}
         variant={"ghost"}
       >

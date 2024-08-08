@@ -15,17 +15,20 @@ function Tags() {
   );
 
   return (
-    <DetailsSection
-      title="Tags"
-      actions={<NewTag tagsList={tags} handleDelete={handleDelete} />}
-      content={
-        <div className="flex gap-2">
-          {tags.map((t) => (
-            <TagItem key={t} title={t} handleDelete={handleDelete} />
-          ))}
-        </div>
-      }
-    />
+    <>
+      <DetailsSection
+        title="Tags"
+        actions={<NewTag tagsList={tags} handleDelete={handleDelete} />}
+        content={
+          <div className="flex gap-2">
+            {tags.map((t) => (
+              <TagItem key={t} title={t} handleDelete={handleDelete} />
+            ))}
+          </div>
+        }
+      />
+      <hr className="my-2" />
+    </>
   );
 }
 

@@ -4,14 +4,17 @@ import TimeStamp from "../job-list/job-info/time-stamp";
 
 function DueDate() {
   return (
-    <DetailsSection
-      title="Due Date"
-      content={
-        <div className="flex">
-          <TimeStamp date={new Date()} />
-        </div>
-      }
-    />
+    <>
+      <DetailsSection
+        title="Due Date"
+        content={
+          <div className="flex">
+            <TimeStamp date={new Date()} />
+          </div>
+        }
+      />
+      <hr className="my-2" />
+    </>
   );
 }
 

@@ -1,6 +1,4 @@
-import CotopiaPopover from "@/components/shared-ui/c-popover";
-import { cn } from "@/lib/utils";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode } from "react";
 
 type Props = {
   title: string;
@@ -15,10 +13,7 @@ function DetailsSection({ title, content, actions = null }: Props) {
         <p className="mb-2">{title}</p>
         {actions}
       </div>
-
       {content}
-
-      <hr className="my-[10px]" />
     </>
   );
 }
