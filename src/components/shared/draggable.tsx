@@ -1,10 +1,9 @@
 "use client";
 import Draggable from "react-draggable";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { useScreen } from "@/hooks/use-screen";
 import { useRoomContext } from "./room/room-context";
 
-type Props = {
+export type DraggableProps = {
   children: ReactNode;
   onDragging?: (position: { x: number; y: number }) => void;
   onStartDragging?: () => void;
@@ -39,7 +38,7 @@ export default function DraggableComponent({
   hasTransition = false,
   positionOffset,
   bounds,
-}: Props) {
+}: DraggableProps) {
   const { sidebar } = useRoomContext();
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -138,8 +137,6 @@ export default function DraggableComponent({
 
     if (onDragEnd) onDragEnd(newPosition);
   };
-
-  const { height, width } = useScreen();
 
   let defaultClassName = "fixed";
 

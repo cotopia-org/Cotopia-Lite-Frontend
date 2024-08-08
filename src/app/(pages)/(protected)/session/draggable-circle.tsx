@@ -1,6 +1,5 @@
 "use client";
 
-import DraggableComponent from "@/components/shared/draggable";
 import React, { useEffect, useState } from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
@@ -27,14 +26,12 @@ import SessionWrapper from "./wrapper";
 import { useUserTile } from ".";
 import { useProfile, useSocket } from "../protected-wrapper";
 import { UserMinimalType } from "@/types/user";
-import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
-import { Tooltip } from "@/components/ui/tooltip";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
-import { useScreen } from "@/hooks/use-screen";
+import DraggableRoom from "@/components/shared/room/components/draggable-room";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -149,7 +146,7 @@ const ParticipantTile = React.forwardRef<
 
   const isMyUser = user?.username === livekitIdentity;
 
-  const { room, videoState, audioState } = useRoomContext();
+  const { room, videoState } = useRoomContext();
   const participants = room?.participants;
 
   const updatedMyUser = participants?.find((x) => x.username === user.username);
@@ -209,7 +206,7 @@ const ParticipantTile = React.forwardRef<
 
   if (!isMuted && isMyUser) showAvatar = false;
 
-  if (!videoState) showAvatar = true;
+  // if (!videoState) showAvatar = true;
 
   return (
     <CotopiaTooltip title={userFullName}>
@@ -331,21 +328,8 @@ export default function DraggableCircle() {
     200, 200,
   ]; //200 is default position , change in the feature
 
-  const { height, width } = useScreen();
-
-  const [leftDashboardColWidth, setLeftDashboardColWidth] = useState(0);
-  useEffect(() => {
-    const leftDashboardWidth = document.getElementById("dashboard-left-col");
-
-    if (!leftDashboardWidth) return;
-
-    setLeftDashboardColWidth(leftDashboardWidth.getBoundingClientRect().width);
-  }, []);
-
-  const finalWidth = width + leftDashboardColWidth;
-
   return (
-    <DraggableComponent
+    <DraggableRoom
       onDragEnd={(position) => {
         handleUpdateCoordinates(position);
         setIsDragging(false);
@@ -356,20 +340,10 @@ export default function DraggableCircle() {
       hasTransition={!isMyUser}
       x={coordsUser?.[0]}
       y={coordsUser?.[1]}
-      positionOffset={{
-        x: (-1 * finalWidth) / 2,
-        y: (-1 * height) / 2,
-      }}
-      bounds={{
-        top: 0,
-        left: leftDashboardColWidth ?? 0,
-        right: finalWidth,
-        bottom: height,
-      }}
     >
       <SessionWrapper>
         <ParticipantTile isDragging={isDragging} />
       </SessionWrapper>
-    </DraggableComponent>
+    </DraggableRoom>
   );
 }

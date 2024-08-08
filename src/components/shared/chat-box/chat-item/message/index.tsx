@@ -48,7 +48,11 @@ export default function Message({ item }: Props) {
   }, [stateMessage, isVisible]);
 
   return (
-    <div className='text-wrap mb-3 w-full' dir='auto'>
+    <div
+      className='text-wrap mb-3 w-full'
+      dir='auto'
+      style={{ overflow: "anywhere" }}
+    >
       <Linkify
         componentDecorator={(
           decoratedHref: string,

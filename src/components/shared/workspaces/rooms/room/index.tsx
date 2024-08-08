@@ -22,16 +22,20 @@ export default function WorkspaceRoom({
 
   const isSelected = selected_room_id ? room?.id === selected_room_id : false;
 
+  console.log("room", room);
+
   return (
-    <CotopiaButton
-      onClick={joinRoomHandler}
-      className='!justify-start !text-left'
-      variant={isSelected ? "default" : "ghost"}
-    >
-      <div>
-        <Cast className='mr-2' size={16} />
-      </div>
-      {room.title}
-    </CotopiaButton>
+    <div className='flex flex-col gap-y-4'>
+      <CotopiaButton
+        onClick={joinRoomHandler}
+        className='!justify-start !text-left'
+        variant={isSelected ? "default" : "ghost"}
+      >
+        <div>
+          <Cast className='mr-2' size={16} />
+        </div>
+        {room.title}
+      </CotopiaButton>
+    </div>
   );
 }
