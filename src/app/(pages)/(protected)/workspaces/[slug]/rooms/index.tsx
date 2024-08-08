@@ -6,6 +6,7 @@ import { WorkspaceRoomShortType, WorkspaceRoomType } from "@/types/room";
 import { FetchDataType } from "@/lib/axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSocket } from "../../../protected-wrapper";
 
 type Props = {
   workspace_id: string;
@@ -14,9 +15,9 @@ type Props = {
 export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
   const { room_id } = useParams();
 
-  const { data, isLoading } = useApi<FetchDataType<WorkspaceRoomShortType[]>>(
-    `/workspaces/${workspace_id}/rooms`
-  );
+  const { data, isLoading, mutate } = useApi<
+    FetchDataType<WorkspaceRoomShortType[]>
+  >(`/workspaces/${workspace_id}/rooms`);
   const items = !!data ? data?.data : [];
 
   const [rooms, setRooms] = useState<WorkspaceRoomShortType[]>([]);
@@ -24,11 +25,15 @@ export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
     setRooms(items);
   }, [items]);
 
+  useSocket("roomUpdated", (data) => {
+    mutate();
+  });
+
   const handleAddRoom = (room: WorkspaceRoomShortType) =>
     setRooms((prev) => [...prev, room]);
 
   let content = (
-    <div className='flex flex-col gap-y-4'>
+    <div className='flex flex-col'>
       <WorkspaceRooms
         workspace_id={+workspace_id}
         rooms={rooms}

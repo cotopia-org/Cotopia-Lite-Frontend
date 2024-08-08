@@ -26,6 +26,7 @@ export type WorkspaceRoomShortType = {
   logo: null | AttachmentFileType;
   title: string;
   unseens: number;
+  participants: UserMinimalType[];
 };
 
 export type WorkspaceRoomJoinType = RoomJoinType;

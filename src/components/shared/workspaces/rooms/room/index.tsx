@@ -1,4 +1,5 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
+import Avatars from "@/components/shared/avatars";
 import { WorkspaceRoomShortType } from "@/types/room";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -21,21 +22,33 @@ export default function WorkspaceRoom({
   };
 
   const isSelected = selected_room_id ? room?.id === selected_room_id : false;
+  const participants = room?.participants ?? [];
 
-  console.log("room", room);
+  let clss = "!justify-start !text-left";
+  if (isSelected) clss += ` !bg-black/10 !text-black`;
+
+  const avatarParitipants = participants
+    .filter((y) => y?.avatar?.url !== undefined)
+    .map((x) => ({
+      title: x.name,
+      src: x.avatar?.url as string,
+    }));
 
   return (
-    <div className='flex flex-col gap-y-4'>
+    <div className='flex flex-col gap-y-2'>
       <CotopiaButton
         onClick={joinRoomHandler}
-        className='!justify-start !text-left'
+        className={clss}
         variant={isSelected ? "default" : "ghost"}
+        startIcon={<Cast className='mr-2' size={16} />}
       >
-        <div>
-          <Cast className='mr-2' size={16} />
-        </div>
         {room.title}
       </CotopiaButton>
+      {avatarParitipants.length > 0 && (
+        <div className='pb-4'>
+          <Avatars items={avatarParitipants} />
+        </div>
+      )}
     </div>
   );
 }
