@@ -1,5 +1,7 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import useQueryParams from "@/hooks/use-query-params";
 import { WorkspaceRoomType } from "@/types/room";
+import { useParams } from "next/navigation";
 import React, {
   createContext,
   ReactNode,
@@ -20,6 +22,7 @@ const RoomCtx = createContext<{
   room?: WorkspaceRoomType;
   room_id?: string;
   workspace_id?: string;
+  livekit_token?: string;
   openSidebar: (node: ReactNode) => void;
   updateUserCoords: (
     username: string,
@@ -32,6 +35,7 @@ const RoomCtx = createContext<{
   changePermissionState: (key: "video" | "audio", newValue: boolean) => void;
 }>({
   room: undefined,
+  livekit_token: undefined,
   room_id: undefined,
   workspace_id: undefined,
   sidebar: undefined,
@@ -52,6 +56,9 @@ export default function RoomContext({
   onRoomUpdated,
   workspace_id,
 }: Props) {
+  const { query } = useQueryParams();
+  const livekit_token = query?.token ?? undefined;
+
   const [permissionState, setPermissionState] = useState({
     audio: true,
     video: true,
@@ -150,6 +157,7 @@ export default function RoomContext({
         audioState: permissionState.audio,
         videoState: permissionState.video,
         changePermissionState,
+        livekit_token: (livekit_token as string) ?? undefined,
       }}
     >
       {children}

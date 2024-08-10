@@ -7,6 +7,7 @@ import RoomInner from "./room-inner";
 import { WorkspaceRoomType } from "@/types/room";
 import { useState } from "react";
 import CheckPermissions from "./check-permissions";
+import LiveKitConnectionStatus from "./connection-status";
 
 type Props = {
   token: string;
@@ -90,6 +91,7 @@ export default function RoomHolder({
         },
       }}
     >
+      <LiveKitConnectionStatus />
       <RoomInner />
     </LiveKitRoom>
   );

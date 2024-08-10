@@ -1,13 +1,12 @@
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
-import { Tooltip } from "@radix-ui/react-tooltip";
 
 type Props = {
   items: { title: string; src: string }[];
 };
 export default function Avatars({ items }: Props) {
   return (
-    <div className='flex flex-row gap-x-1 items-center'>
+    <div className='flex flex-row gap-1 items-center flex-wrap'>
       {items.map((item, key) => (
         <CotopiaTooltip title={item.title} key={key}>
           <CotopiaAvatar

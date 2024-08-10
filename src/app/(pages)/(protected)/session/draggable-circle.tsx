@@ -32,6 +32,7 @@ import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import DraggableRoom from "@/components/shared/room/components/draggable-room";
+import { __VARS } from "@/app/const/vars";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -309,7 +310,9 @@ export default function DraggableCircle() {
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
     socket?.emit("updateCoordinates", {
       room_id: room?.id,
-      coordinates: `${position.x},${position.y}`,
+      coordinates: `${position.x ?? __VARS.defaultPositionOfUserX},${
+        position.y ?? __VARS.defaultPositionOfUserY
+      }`,
       username: livekitIdentity,
     });
   };
@@ -325,8 +328,9 @@ export default function DraggableCircle() {
   );
 
   const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
-    200, 200,
-  ]; //200 is default position , change in the feature
+    __VARS.defaultPositionOfUserX,
+    __VARS.defaultPositionOfUserY,
+  ];
 
   return (
     <DraggableRoom
