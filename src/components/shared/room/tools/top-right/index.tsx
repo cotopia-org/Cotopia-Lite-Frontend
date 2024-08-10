@@ -10,7 +10,7 @@ export default function TopRightTools() {
     <div className='flex flex-row items-center gap-x-2'>
       <TimeTrackingButtonTool />
       <InviteButtonTool />
-      <MeetButtonTool />
+      {/* <MeetButtonTool /> */}
       <UserActionsGroup />
       <ChatActionsGroup />
     </div>
