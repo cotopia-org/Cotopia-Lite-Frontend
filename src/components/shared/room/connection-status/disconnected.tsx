@@ -8,8 +8,12 @@ import { __VARS } from "@/app/const/vars";
 import { useRoomContext as CotopiaRoomContext } from "../room-context";
 import { useRoomContext } from "@livekit/components-react";
 import { useEffect } from "react";
+import socket from "@/lib/socket";
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 
 export default function Disconnected() {
+  const { token: userToken } = useProfile();
+
   const room = useRoomContext();
 
   const { livekit_token } = CotopiaRoomContext();
@@ -19,6 +23,7 @@ export default function Disconnected() {
     if (!__VARS.serverUrl) return;
 
     room.connect(__VARS.serverUrl, livekit_token);
+    if (userToken) socket.connect(__VARS.socketUrl, userToken);
   };
 
   useEffect(() => {
