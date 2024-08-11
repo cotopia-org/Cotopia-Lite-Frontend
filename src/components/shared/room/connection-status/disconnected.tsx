@@ -7,6 +7,7 @@ import useKeyPress from "@/hooks/use-key-press";
 import { __VARS } from "@/app/const/vars";
 import { useRoomContext as CotopiaRoomContext } from "../room-context";
 import { useRoomContext } from "@livekit/components-react";
+import { useEffect } from "react";
 
 export default function Disconnected() {
   const room = useRoomContext();
@@ -20,7 +21,15 @@ export default function Disconnected() {
     room.connect(__VARS.serverUrl, livekit_token);
   };
 
-  useKeyPress("Escape", onReload);
+  useEffect(() => {
+    const timeout = setInterval(() => {
+      onReload();
+    }, 2000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
 
   return (
     <div className='flex flex-col gap-y-4 !bg-background p-4 rounded-lg w-[400px] max-w-full py-8'>
