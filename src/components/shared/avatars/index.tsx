@@ -12,7 +12,7 @@ export default function Avatars({ items }: Props) {
           <CotopiaAvatar
             className='w-8 h-8'
             src={item.src}
-            title={item.title}
+            title={item.title ? item?.title?.[0] : undefined}
           />
         </CotopiaTooltip>
       ))}

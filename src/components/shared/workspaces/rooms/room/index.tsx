@@ -27,12 +27,10 @@ export default function WorkspaceRoom({
   let clss = "!justify-start !text-left";
   if (isSelected) clss += ` !bg-black/10 !text-black`;
 
-  const avatarParitipants = participants
-    .filter((y) => y?.avatar?.url !== undefined)
-    .map((x) => ({
-      title: x.name,
-      src: x.avatar?.url as string,
-    }));
+  const avatarParitipants = participants.map((x) => ({
+    title: x.name,
+    src: x.avatar?.url as string,
+  }));
 
   return (
     <div className='flex flex-col gap-y-2'>

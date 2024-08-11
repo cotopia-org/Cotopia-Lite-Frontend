@@ -47,7 +47,7 @@ export default function RoomSpatialWrapper({
   }, [socket, room_id]);
 
   return (
-    <div className='overflow-hidden max-h-screen'>
+    <div className='max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}

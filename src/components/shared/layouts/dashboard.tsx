@@ -54,7 +54,7 @@ export default function DashboardLayoutMaker({
         )}
 
         <div className={middleContentClass}>
-          <div className='max-w-full mx-auto px-4 md:px-0'>
+          <div className='w-full mx-auto px-4 md:px-0'>
             {!!children && children}
           </div>
         </div>
