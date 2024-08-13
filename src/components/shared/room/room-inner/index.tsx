@@ -23,8 +23,8 @@ export default function RoomInner() {
     <>
       <InitRoom />
       <div className={mainRoomHolderClss}>
-        <div className='w-full h-full relative flex items-center justify-center'>
-          <Background />
+        <div className='w-full h-full relative'>
+          {/* <Background /> */}
           <Toolbar
             topLeft={<TopLeftTools />}
             topRight={<TopRightTools />}

@@ -1,62 +1,66 @@
-import React, { useState } from "react";
-import { Stage, Layer, Rect, Image } from "react-konva";
-import { KonvaEventObject } from "konva/lib/Node";
-import { Stage as StageType } from "konva/lib/Stage";
+// Canvas.tsx
+import React, { useEffect, useRef } from "react";
+import { Stage, Layer, Rect, Circle, Text, Image } from "react-konva";
+import CanvasAvatar from "./avatar";
+import Konva from "konva";
 import useImage from "use-image";
-import { useRoomContext } from "../room/room-context";
 
-const CanvasBoard: React.FC = () => {
-  const [stageScale, setStageScale] = useState(1);
-  const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
+const Canvas: React.FC = () => {
+  const stageRef = useRef<Konva.Stage>(null);
+  const isDragging = useRef<boolean>(false);
+  const lastPos = useRef<{ x: number; y: number } | null>(null);
 
-  const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
-    e.evt.preventDefault();
-    const scaleBy = 1.05;
-    const stage = e.target.getStage() as StageType;
-    const oldScale = stage.scaleX();
-    const pointer = stage.getPointerPosition();
-    if (!pointer) return;
-
-    const mousePointTo = {
-      x: (pointer.x - stage.x()) / oldScale,
-      y: (pointer.y - stage.y()) / oldScale,
-    };
-
-    // Reverse the scaling logic
-    const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-    setStageScale(newScale < 0.7 ? 0.7 : newScale);
-    setStagePosition({
-      x: pointer.x - mousePointTo.x * newScale,
-      y: pointer.y - mousePointTo.y * newScale,
-    });
+  const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (stageRef.current) {
+      isDragging.current = true;
+      lastPos.current = stageRef.current.getPointerPosition();
+    }
   };
 
-  const { room } = useRoomContext();
+  const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (isDragging.current && stageRef.current) {
+      const stage = stageRef.current;
+      const pointerPos = stage.getPointerPosition();
+      if (lastPos.current && pointerPos) {
+        const dx = pointerPos?.x - lastPos.current.x;
+        const dy = pointerPos?.y - lastPos.current.y;
+        stage.position({
+          x: stage.x() + dx!,
+          y: stage.y() + dy!,
+        });
+        stage.batchDraw();
+        lastPos.current = pointerPos;
+      }
+    }
+  };
 
-  const [image] = useImage(
-    room?.background?.url ?? `/assets/backgrounds/bg-sample.webp`
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const [imgBack] = useImage(
+    "https://lite.cotopia.social/_next/image?url=%2Fassets%2Fmock%2Fgallery%2Ftemplate%2Fspatial-5.png&w=3840&q=75"
   );
 
   return (
     <Stage
-      // width={window.innerWidth}
-      // height={window.innerHeight}
-      draggable
-      scaleX={stageScale}
-      scaleY={stageScale}
-      x={stagePosition.x}
-      y={stagePosition.y}
-      onWheel={handleWheel}
-      style={{ backgroundColor: "#f0f0f0" }}
-      // Set the virtual canvas size to 3000x3000 pixels
-      width={3000}
-      height={3000}
+      width={1920}
+      height={1080}
+      ref={stageRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      draggable={false}
+      style={{
+        backgroundColor: "#eeeeee",
+      }}
     >
       <Layer>
-        <Rect x={50} y={100} width={200} height={200} fill='red' draggable />
+        <Image image={imgBack} x={0} y={0} width={3000} height={3000} />
+        <CanvasAvatar />
       </Layer>
     </Stage>
   );
 };
 
-export default CanvasBoard;
+export default Canvas;

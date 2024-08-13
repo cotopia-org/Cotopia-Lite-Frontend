@@ -28,6 +28,7 @@
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^3.6.0",
     "formik": "^2.4.6",
+    "html2canvas": "^1.4.1",
     "konva": "^9.3.14",
     "linkify-it": "^5.0.0",
     "livekit-client": "^2.1.5",
