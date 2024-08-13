@@ -19,6 +19,8 @@ export default function RoomSpatialWrapper({
 }: Props) {
   const [room, setRoom] = useState<WorkspaceRoomType>();
 
+  const [socketConnected, setSocketConnected] = useState(true);
+
   const socket = useSocket();
 
   useEffect(() => {
@@ -45,6 +47,30 @@ export default function RoomSpatialWrapper({
       socket.off("joinedInRoom");
     };
   }, [socket, room_id]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onConnect = () => {
+      setSocketConnected(true);
+    };
+
+    const onDisconnect = () => {
+      setSocketConnected(false);
+    };
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, [socket]);
+
+  console.log("socketConnected", socketConnected);
+
+  if (!socketConnected) return;
 
   return (
     <div className='overflow-hidden max-h-screen'>
