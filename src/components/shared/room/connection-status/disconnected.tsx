@@ -11,6 +11,7 @@ import socket from "@/lib/socket";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { WorkspaceRoomJoinType } from "@/types/room";
+import { playSoundEffect } from "@/lib/sound-effects";
 
 export default function Disconnected() {
   const { token: userToken } = useProfile();
@@ -23,18 +24,23 @@ export default function Disconnected() {
     if (!livekit_token) return;
     if (!__VARS.serverUrl) return;
 
-    room.connect(__VARS.serverUrl, livekit_token);
-    if (userToken) socket.connect(__VARS.socketUrl, userToken);
-
-    await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-      `/rooms/${room_id}/join`
-    );
+    if (userToken) {
+      //Join to livekit
+      room.connect(__VARS.serverUrl, livekit_token);
+      //Join to backend socket
+      socket.connect(__VARS.socketUrl, userToken);
+      await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+        `/rooms/${room_id}/join`
+      );
+    }
   };
 
   useEffect(() => {
     const timeout = setInterval(() => {
       onReload();
     }, 2000);
+
+    playSoundEffect("userGotClosed");
 
     return () => {
       clearTimeout(timeout);

@@ -4,6 +4,7 @@ import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import RoomHolder from "@/components/shared/room";
 import RoomWrapper from "@/components/shared/room/wrapper";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
+import { playSoundEffect } from "@/lib/sound-effects";
 import { WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
 
@@ -68,7 +69,13 @@ export default function RoomSpatialWrapper({
     };
   }, [socket]);
 
-  console.log("socketConnected", socketConnected);
+  useEffect(() => {
+    if (!socketConnected) {
+      playSoundEffect("userGotClosed");
+    } else {
+      playSoundEffect("joined");
+    }
+  }, [socketConnected]);
 
   if (!socketConnected) return;
 

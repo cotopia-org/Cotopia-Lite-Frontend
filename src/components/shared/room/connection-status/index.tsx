@@ -3,6 +3,7 @@ import { RoomEvent } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
 import CModal from "@/components/shared-ui/c-modal";
 import Disconnected from "./disconnected";
+import { playSoundEffect } from "@/lib/sound-effects";
 
 function LiveKitConnectionStatus() {
   const [connectionStatus, setConnectionStatus] =

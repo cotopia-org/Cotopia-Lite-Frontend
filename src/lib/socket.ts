@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
+import { playSoundEffect } from "./sound-effects";
 
 class SocketService {
   public socket: Socket | null = null;
