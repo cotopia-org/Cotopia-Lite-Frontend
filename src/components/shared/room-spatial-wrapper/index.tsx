@@ -6,10 +6,9 @@ import RoomWrapper from "@/components/shared/room/wrapper";
 import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
 import ModalDisconnected from "../room/connection-status/modal-disconnected";
-import { useRouter } from "next/navigation";
 import useNetworkStatus from "@/hooks/use-net";
 
 type Props = {
@@ -34,42 +33,12 @@ export default function RoomSpatialWrapper({
 
   const socket = useSocket();
 
-  const router = useRouter();
-
-  const handleJoin = async () => {
-    if (isOnline === false) {
-      return;
-    }
-
-    const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-      `/rooms/${room_id}/join`
-    );
-
-    //Join user to the room by socket request
-    if (socket) socket.emit("joinedRoom", room_id);
-
-    const livekitToken = res.data.data.token; //Getting livekit token from joinObject
-
-    playSoundEffect("joined");
-
-    setIsReconnecting(false);
-
-    if (livekitToken) {
-      router.push(
-        `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
-      );
-      return;
-    }
-  };
-
   const handleConnectToSocket = () => {
     if (!socket) return;
 
     if (!room_id) return;
 
     setIsReconnecting(true);
-
-    handleJoin();
   };
 
   const fetchRoom = () => {

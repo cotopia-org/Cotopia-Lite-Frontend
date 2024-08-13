@@ -44,34 +44,9 @@ export default function CheckPermissions({ onChecked }: Props) {
   }, []);
 
   const router = useRouter();
-  const { startLoading, stopLoading, isLoading } = useLoading();
   const handleJoin = async () => {
-    startLoading();
-
-    const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-      `/rooms/${room_id}/join`
-    );
-
-    //Join user to the room by socket request
-    if (socket) socket.emit("joinedRoom", room_id);
-
-    const livekitToken = res.data.data.token; //Getting livekit token from joinObject
-
-    playSoundEffect("joined");
-
-    if (livekitToken) {
-      router.push(
-        `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
-      );
-      if (onChecked) onChecked();
-      stopLoading();
-      return;
-    }
-
-    //It means we don't have livekit token
-    toast.error(`Livekit token doesn't exist!`);
-
-    stopLoading();
+    router.push(`/workspaces/${workspace_id}/rooms/${room_id}`);
+    if (onChecked) onChecked();
   };
 
   return (
@@ -79,11 +54,7 @@ export default function CheckPermissions({ onChecked }: Props) {
       <div className='w-full'>
         <Video />
       </div>
-      <CotopiaButton
-        loading={isLoading}
-        onClick={handleJoin}
-        className='bg-blue-500 min-w-[100px]'
-      >
+      <CotopiaButton onClick={handleJoin} className='bg-blue-500 min-w-[100px]'>
         Join Now
       </CotopiaButton>
     </div>

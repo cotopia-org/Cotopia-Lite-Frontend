@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Background from "../backgrounds/background";
 import Toolbar from "../toolbar";
 import TopRightTools from "../tools/top-right";
@@ -14,10 +14,14 @@ import TopLeftTools from "../tools/top-left";
 import InitRoom from "./init-room";
 
 export default function RoomInner() {
-  const { sidebar } = useRoomContext();
+  const { sidebar, joinRoom } = useRoomContext();
 
   let mainRoomHolderClss = "main-room-holder w-full h-screen";
   if (sidebar) mainRoomHolderClss += " pr-[376px]";
+
+  useEffect(() => {
+    joinRoom();
+  }, []);
 
   return (
     <>

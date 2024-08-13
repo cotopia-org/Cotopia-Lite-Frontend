@@ -1,7 +1,9 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import useQueryParams from "@/hooks/use-query-params";
-import { WorkspaceRoomType } from "@/types/room";
-import { useParams } from "next/navigation";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
+import { playSoundEffect } from "@/lib/sound-effects";
+import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { useParams, useRouter } from "next/navigation";
 import React, {
   createContext,
   ReactNode,
@@ -33,6 +35,7 @@ const RoomCtx = createContext<{
   videoState: boolean;
   audioState: boolean;
   changePermissionState: (key: "video" | "audio", newValue: boolean) => void;
+  joinRoom: () => void;
 }>({
   room: undefined,
   livekit_token: undefined,
@@ -45,6 +48,7 @@ const RoomCtx = createContext<{
   audioState: false,
   videoState: false,
   changePermissionState: (key, newValue) => {},
+  joinRoom: () => {},
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -58,6 +62,30 @@ export default function RoomContext({
 }: Props) {
   const { query } = useQueryParams();
   const livekit_token = query?.token ?? undefined;
+
+  const socket = useSocket();
+
+  const router = useRouter();
+
+  const handleJoinRoom = async () => {
+    const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+      `/rooms/${room_id}/join`
+    );
+
+    //Join user to the room by socket request
+    if (socket) socket.emit("joinedRoom", room_id);
+
+    const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+
+    playSoundEffect("joined");
+
+    if (livekitToken) {
+      router.push(
+        `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
+      );
+      return;
+    }
+  };
 
   const [permissionState, setPermissionState] = useState({
     audio: true,
@@ -158,6 +186,7 @@ export default function RoomContext({
         videoState: permissionState.video,
         changePermissionState,
         livekit_token: (livekit_token as string) ?? undefined,
+        joinRoom: handleJoinRoom,
       }}
     >
       {children}
