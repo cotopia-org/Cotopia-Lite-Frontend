@@ -3,7 +3,7 @@ import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, {
   createContext,
   ReactNode,

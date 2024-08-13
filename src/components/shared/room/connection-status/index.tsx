@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ConnectionState, RoomEvent } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
-import CModal from "@/components/shared-ui/c-modal";
-import Disconnected from "./disconnected";
 import { __VARS } from "@/app/const/vars";
 import useQueryParams from "@/hooks/use-query-params";
 import ModalDisconnected from "./modal-disconnected";

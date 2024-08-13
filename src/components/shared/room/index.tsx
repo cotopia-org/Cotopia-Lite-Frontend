@@ -2,19 +2,30 @@
 
 import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
-import RoomContext, { useRoomContext } from "./room-context";
+import RoomContext from "./room-context";
 import RoomInner from "./room-inner";
 import { WorkspaceRoomType } from "@/types/room";
 import { createContext, useContext, useEffect, useState } from "react";
-import CheckPermissions from "./check-permissions";
 import LiveKitConnectionStatus from "./connection-status";
+import CheckPermissions2, { useMediaPermissions } from "./check-permissions-2";
 
-export type RoomState = "retrying" | "connected" | "not-connected";
+type MediaPermission = {
+  audio: boolean;
+  video: boolean;
+};
+
+const DEFAULT_MEDIA_PERMISSIONS = {
+  audio: true,
+  video: true,
+};
 
 const RoomHolderContext = createContext<{
-  state?: RoomState;
-  changeRoomState: (state: RoomState) => void;
-}>({ state: "not-connected", changeRoomState: (state) => {} });
+  mediaPermissions: MediaPermission;
+  changeMediaPermission: (perms: MediaPermission) => void;
+}>({
+  mediaPermissions: DEFAULT_MEDIA_PERMISSIONS,
+  changeMediaPermission: (perms) => {},
+});
 
 export const useRoomHolder = () => useContext(RoomHolderContext);
 
@@ -35,21 +46,28 @@ export default function RoomHolder({
   onRoomUpdated,
   isReConnecting,
 }: Props) {
-  const [state, setState] = useState<RoomState>("not-connected");
+  const [currentMediaPermissions, setCurrentMediaPermissions] = useState<{
+    audio: boolean;
+    video: boolean;
+  }>({ audio: false, video: false });
 
-  const changeRoomState = (state: RoomState) => {
-    setState(state);
+  const mediaPermissions = useMediaPermissions();
+  useEffect(() => {
+    if (mediaPermissions) {
+      setCurrentMediaPermissions(mediaPermissions);
+    }
+  }, [mediaPermissions]);
+
+  const changeMediaPermission = (state: MediaPermission) => {
+    setCurrentMediaPermissions(state);
+    localStorage.setItem("media-permission", JSON.stringify(state));
   };
 
   const [permissionChecked, setPermissionChecked] = useState(false);
 
-  useEffect(() => {
-    if (state === "connected") setPermissionChecked(true);
-  }, [state]);
-
   let content = (
     <LiveKitRoom
-      video
+      video={currentMediaPermissions?.video ?? false}
       audio
       token={token}
       serverUrl={__VARS.serverUrl}
@@ -97,8 +115,8 @@ export default function RoomHolder({
           deviceId: "",
           facingMode: "user",
           resolution: {
-            width: 1280,
-            height: 720,
+            width: 94,
+            height: 94,
             frameRate: 30,
           },
         },
@@ -118,10 +136,14 @@ export default function RoomHolder({
   );
 
   if (permissionChecked === false && !isReConnecting)
-    content = <CheckPermissions onChecked={() => setPermissionChecked(true)} />;
+    content = (
+      <CheckPermissions2 onChecked={() => setPermissionChecked(true)} />
+    );
 
   return (
-    <RoomHolderContext.Provider value={{ changeRoomState, state }}>
+    <RoomHolderContext.Provider
+      value={{ changeMediaPermission, mediaPermissions }}
+    >
       <RoomContext
         room={room}
         room_id={room_id}

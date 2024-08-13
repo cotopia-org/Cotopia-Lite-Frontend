@@ -4,8 +4,11 @@ import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Mic, MicOff } from "lucide-react";
 import { useRoomContext } from "../../../room-context";
+import { useRoomHolder } from "../../..";
 
 export default function VoiceButtonTool() {
+  const { mediaPermissions, changeMediaPermission } = useRoomHolder();
+
   const { changePermissionState } = useRoomContext();
 
   const { localParticipant } = useLocalParticipant();
@@ -16,7 +19,7 @@ export default function VoiceButtonTool() {
 
   const track = voiceTrack?.track;
 
-  const isMuted = voiceTrack?.isMuted;
+  const isMuted = voiceTrack?.isMuted ?? true;
 
   const toggleMute = async () => {
     if (!track) {
@@ -26,9 +29,18 @@ export default function VoiceButtonTool() {
     if (track.isMuted) {
       track.unmute();
       changePermissionState("audio", true);
+      changeMediaPermission({
+        ...mediaPermissions,
+        audio: true,
+      });
     } else {
       track.mute();
+      track.stop();
       changePermissionState("audio", false);
+      changeMediaPermission({
+        ...mediaPermissions,
+        audio: false,
+      });
     }
   };
 
