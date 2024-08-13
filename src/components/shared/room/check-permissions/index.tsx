@@ -1,5 +1,5 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Video from "./video";
 import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
@@ -7,13 +7,15 @@ import { WorkspaceRoomJoinType } from "@/types/room";
 import { useRoomContext } from "../room-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useRoomHolder } from "..";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { playSoundEffect } from "@/lib/sound-effects";
 
 type Props = {
   onChecked: () => void;
+  joinLoading?: boolean;
 };
 export default function CheckPermissions({ onChecked }: Props) {
-  const { changeRoomState, state } = useRoomHolder();
+  const socket = useSocket();
 
   const { room_id, workspace_id } = useRoomContext();
 
@@ -44,15 +46,18 @@ export default function CheckPermissions({ onChecked }: Props) {
   const router = useRouter();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const handleJoin = async () => {
-    changeRoomState("connected");
-
     startLoading();
 
     const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
       `/rooms/${room_id}/join`
     );
 
+    //Join user to the room by socket request
+    if (socket) socket.emit("joinedRoom", room_id);
+
     const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+
+    playSoundEffect("joined");
 
     if (livekitToken) {
       router.push(
@@ -71,7 +76,6 @@ export default function CheckPermissions({ onChecked }: Props) {
 
   return (
     <div className='w-[564px] max-w-full mx-auto my-16 flex flex-col items-center gap-y-4 '>
-      {state}
       <div className='w-full'>
         <Video />
       </div>

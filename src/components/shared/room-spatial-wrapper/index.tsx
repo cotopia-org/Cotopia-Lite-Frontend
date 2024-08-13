@@ -3,10 +3,14 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import RoomHolder from "@/components/shared/room";
 import RoomWrapper from "@/components/shared/room/wrapper";
+import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
+import ModalDisconnected from "../room/connection-status/modal-disconnected";
+import { useRouter } from "next/navigation";
+import useNetworkStatus from "@/hooks/use-net";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -18,39 +22,83 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
+  const [isReConnecting, setIsReconnecting] = useState(false);
+
+  const { isOnline } = useNetworkStatus();
+
+  const { isLoading, startLoading, stopLoading } = useLoading();
+
   const [room, setRoom] = useState<WorkspaceRoomType>();
 
   const [socketConnected, setSocketConnected] = useState(true);
 
   const socket = useSocket();
 
-  useEffect(() => {
+  const router = useRouter();
+
+  const handleJoin = async () => {
+    if (isOnline === false) {
+      return;
+    }
+
+    const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+      `/rooms/${room_id}/join`
+    );
+
+    //Join user to the room by socket request
+    if (socket) socket.emit("joinedRoom", room_id);
+
+    const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+
+    playSoundEffect("joined");
+
+    setIsReconnecting(false);
+
+    if (livekitToken) {
+      router.push(
+        `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
+      );
+      return;
+    }
+  };
+
+  const handleConnectToSocket = () => {
     if (!socket) return;
 
     if (!room_id) return;
 
-    socket.emit("joinedRoom", room_id);
+    setIsReconnecting(true);
 
-    socket.on("joined", () => {
-      socket.emit("joinedRoom", room_id);
-    });
+    handleJoin();
+  };
+
+  const fetchRoom = () => {
+    startLoading();
+    axiosInstance
+      .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
+      .then(async (res) => {
+        setRoom(res?.data?.data);
+        stopLoading();
+      })
+      .catch((err) => {
+        stopLoading();
+      });
+  };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    if (!isOnline) return;
 
     socket.on("joinedInRoom", () => {
-      axiosInstance
-        .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
-        .then(async (res) => {
-          setRoom(res?.data?.data);
-          await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-            `/rooms/${room_id}/join`
-          );
-        });
+      if (isLoading) return;
+      fetchRoom();
     });
 
     return () => {
-      socket.off("joined");
       socket.off("joinedInRoom");
     };
-  }, [socket, room_id]);
+  }, [socket, room_id, isLoading, isOnline]);
 
   useEffect(() => {
     if (!socket) return;
@@ -75,10 +123,11 @@ export default function RoomSpatialWrapper({
   useEffect(() => {
     if (!socketConnected) {
       playSoundEffect("userGotClosed");
-    } else {
-      playSoundEffect("joined");
     }
   }, [socketConnected]);
+
+  if (socketConnected === false)
+    return <ModalDisconnected onReTry={handleConnectToSocket} />;
 
   return (
     <div className='overflow-hidden max-h-screen'>
@@ -89,7 +138,7 @@ export default function RoomSpatialWrapper({
           onRoomUpdated={setRoom}
           room_id={room_id}
           workspace_id={workspace_id}
-          socketConnected={socketConnected}
+          isReConnecting={isReConnecting}
         />
       </RoomWrapper>
     </div>

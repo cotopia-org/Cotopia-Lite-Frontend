@@ -24,7 +24,7 @@ type Props = {
   room_id: string;
   room?: WorkspaceRoomType;
   onRoomUpdated?: (item: WorkspaceRoomType) => void;
-  socketConnected?: boolean;
+  isReConnecting?: boolean;
 };
 
 export default function RoomHolder({
@@ -33,7 +33,7 @@ export default function RoomHolder({
   room_id,
   room,
   onRoomUpdated,
-  socketConnected,
+  isReConnecting,
 }: Props) {
   const [state, setState] = useState<RoomState>("not-connected");
 
@@ -117,22 +117,19 @@ export default function RoomHolder({
     </LiveKitRoom>
   );
 
-  if (permissionChecked === false)
+  if (permissionChecked === false && !isReConnecting)
     content = <CheckPermissions onChecked={() => setPermissionChecked(true)} />;
 
   return (
     <RoomHolderContext.Provider value={{ changeRoomState, state }}>
-      {socketConnected ? (
-        <RoomContext
-          room={room}
-          room_id={room_id}
-          onRoomUpdated={onRoomUpdated}
-          workspace_id={workspace_id}
-        >
-          {state}
-          {content}
-        </RoomContext>
-      ) : null}
+      <RoomContext
+        room={room}
+        room_id={room_id}
+        onRoomUpdated={onRoomUpdated}
+        workspace_id={workspace_id}
+      >
+        {content}
+      </RoomContext>
     </RoomHolderContext.Provider>
   );
 }
