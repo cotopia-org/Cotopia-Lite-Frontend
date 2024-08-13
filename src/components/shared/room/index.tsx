@@ -2,12 +2,21 @@
 
 import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
-import RoomContext from "./room-context";
+import RoomContext, { useRoomContext } from "./room-context";
 import RoomInner from "./room-inner";
 import { WorkspaceRoomType } from "@/types/room";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import CheckPermissions from "./check-permissions";
 import LiveKitConnectionStatus from "./connection-status";
+
+export type RoomState = "retrying" | "connected" | "not-connected";
+
+const RoomHolderContext = createContext<{
+  state?: RoomState;
+  changeRoomState: (state: RoomState) => void;
+}>({ state: "not-connected", changeRoomState: (state) => {} });
+
+export const useRoomHolder = () => useContext(RoomHolderContext);
 
 type Props = {
   token: string;
@@ -15,6 +24,7 @@ type Props = {
   room_id: string;
   room?: WorkspaceRoomType;
   onRoomUpdated?: (item: WorkspaceRoomType) => void;
+  socketConnected?: boolean;
 };
 
 export default function RoomHolder({
@@ -23,8 +33,19 @@ export default function RoomHolder({
   room_id,
   room,
   onRoomUpdated,
+  socketConnected,
 }: Props) {
+  const [state, setState] = useState<RoomState>("not-connected");
+
+  const changeRoomState = (state: RoomState) => {
+    setState(state);
+  };
+
   const [permissionChecked, setPermissionChecked] = useState(false);
+
+  useEffect(() => {
+    if (state === "connected") setPermissionChecked(true);
+  }, [state]);
 
   let content = (
     <LiveKitRoom
@@ -100,13 +121,18 @@ export default function RoomHolder({
     content = <CheckPermissions onChecked={() => setPermissionChecked(true)} />;
 
   return (
-    <RoomContext
-      room={room}
-      room_id={room_id}
-      onRoomUpdated={onRoomUpdated}
-      workspace_id={workspace_id}
-    >
-      {content}
-    </RoomContext>
+    <RoomHolderContext.Provider value={{ changeRoomState, state }}>
+      {socketConnected ? (
+        <RoomContext
+          room={room}
+          room_id={room_id}
+          onRoomUpdated={onRoomUpdated}
+          workspace_id={workspace_id}
+        >
+          {state}
+          {content}
+        </RoomContext>
+      ) : null}
+    </RoomHolderContext.Provider>
   );
 }

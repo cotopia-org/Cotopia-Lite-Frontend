@@ -7,11 +7,14 @@ import { WorkspaceRoomJoinType } from "@/types/room";
 import { useRoomContext } from "../room-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useRoomHolder } from "..";
 
 type Props = {
   onChecked: () => void;
 };
 export default function CheckPermissions({ onChecked }: Props) {
+  const { changeRoomState, state } = useRoomHolder();
+
   const { room_id, workspace_id } = useRoomContext();
 
   const [audioPermission, setAudioPermission] = useState<boolean>(false);
@@ -41,6 +44,8 @@ export default function CheckPermissions({ onChecked }: Props) {
   const router = useRouter();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const handleJoin = async () => {
+    changeRoomState("connected");
+
     startLoading();
 
     const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
@@ -66,6 +71,7 @@ export default function CheckPermissions({ onChecked }: Props) {
 
   return (
     <div className='w-[564px] max-w-full mx-auto my-16 flex flex-col items-center gap-y-4 '>
+      {state}
       <div className='w-full'>
         <Video />
       </div>

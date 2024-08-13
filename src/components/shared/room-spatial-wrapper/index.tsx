@@ -5,7 +5,7 @@ import RoomHolder from "@/components/shared/room";
 import RoomWrapper from "@/components/shared/room/wrapper";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -38,8 +38,11 @@ export default function RoomSpatialWrapper({
     socket.on("joinedInRoom", () => {
       axiosInstance
         .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${room_id}`)
-        .then((res) => {
+        .then(async (res) => {
           setRoom(res?.data?.data);
+          await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+            `/rooms/${room_id}/join`
+          );
         });
     });
 
@@ -77,8 +80,6 @@ export default function RoomSpatialWrapper({
     }
   }, [socketConnected]);
 
-  if (!socketConnected) return;
-
   return (
     <div className='overflow-hidden max-h-screen'>
       <RoomWrapper>
@@ -88,6 +89,7 @@ export default function RoomSpatialWrapper({
           onRoomUpdated={setRoom}
           room_id={room_id}
           workspace_id={workspace_id}
+          socketConnected={socketConnected}
         />
       </RoomWrapper>
     </div>
