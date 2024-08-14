@@ -1,26 +1,26 @@
-import FullLoading from "@/components/shared/full-loading";
-import { useRoomContext } from "@/components/shared/room/room-context";
-import { useApi } from "@/hooks/swr";
-import { FetchDataType } from "@/lib/axios";
-import { UserMinimalType } from "@/types/user";
-import React from "react";
-import UserCard from "./card";
-import NotFound from "@/components/shared/layouts/not-found";
-import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
-import UserList from "@/components/shared/user-selector/list";
+import FullLoading from "@/components/shared/full-loading"
+import { useRoomContext } from "@/components/shared/room/room-context"
+import { useApi } from "@/hooks/swr"
+import { FetchDataType } from "@/lib/axios"
+import { UserMinimalType } from "@/types/user"
+import React from "react"
+import UserCard from "./card"
+import NotFound from "@/components/shared/layouts/not-found"
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
+import UserList from "@/components/shared/user-selector/list"
 
 type Props = {
-  search?: string;
-  onSelect: (item: UserMinimalType) => void;
-  showNotFound?: boolean;
-};
+  search?: string
+  onSelect: (item: UserMinimalType) => void
+  showNotFound?: boolean
+}
 
 export default function Users({
   search,
   onSelect,
   showNotFound = true,
 }: Props) {
-  const { user } = useProfile();
+  const { user } = useProfile()
 
   const { data, isLoading } = useApi<FetchDataType<UserMinimalType[]>>(
     `/users/search`,
@@ -32,22 +32,22 @@ export default function Users({
       key: `/users/search/${search}`,
       isFetch: search !== "",
     }
-  );
-  const users = data !== undefined ? data?.data : [];
+  )
+  const users = data !== undefined ? data?.data : []
 
-  if (isLoading) return <FullLoading />;
+  if (isLoading) return <FullLoading className="py-2" />
 
-  let finalUsers = [...users];
+  let finalUsers = [...users]
 
   // if (search)
   //   finalUsers = finalUsers.filter(
   //     (x) => x.name?.includes(search) || x?.username?.includes(search)
   //   );
 
-  finalUsers = finalUsers.filter((x) => x.id !== user?.id);
+  finalUsers = finalUsers.filter((x) => x.id !== user?.id)
 
   if (finalUsers.length === 0 && showNotFound)
-    return <NotFound title='No users found!' />;
+    return <NotFound title="No users found!" />
 
-  return <UserList items={finalUsers} onPick={onSelect} />;
+  return <UserList items={finalUsers} onPick={onSelect} />
 }
