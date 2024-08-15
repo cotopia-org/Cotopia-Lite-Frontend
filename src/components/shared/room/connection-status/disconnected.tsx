@@ -1,39 +1,21 @@
 "use client";
 
 import NotFound from "../../layouts/not-found";
-import { RotateCcw, Unlink } from "lucide-react";
-import CotopiaButton from "@/components/shared-ui/c-button";
+import { Unlink } from "lucide-react";
 import { __VARS } from "@/app/const/vars";
-import { useRoomContext as CotopiaRoomContext } from "../room-context";
-import { useRoomContext } from "@livekit/components-react";
 import { useEffect } from "react";
-import socket from "@/lib/socket";
-import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
-import axiosInstance, { FetchDataType } from "@/lib/axios";
-import { WorkspaceRoomJoinType } from "@/types/room";
+export type DisconnectLayoutProps = {
+  onReTry?: () => void;
+};
 
-export default function Disconnected() {
-  const { token: userToken } = useProfile();
-
-  const room = useRoomContext();
-
-  const { livekit_token, room_id } = CotopiaRoomContext();
-
-  const onReload = async () => {
-    if (!livekit_token) return;
-    if (!__VARS.serverUrl) return;
-
-    room.connect(__VARS.serverUrl, livekit_token);
-    if (userToken) socket.connect(__VARS.socketUrl, userToken);
-
-    await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-      `/rooms/${room_id}/join`
-    );
+export default function Disconnected({ onReTry }: DisconnectLayoutProps) {
+  const onReloadHandler = async () => {
+    if (onReTry) onReTry();
   };
 
   useEffect(() => {
     const timeout = setInterval(() => {
-      onReload();
+      onReloadHandler();
     }, 2000);
 
     return () => {
@@ -45,17 +27,17 @@ export default function Disconnected() {
     <div className='flex flex-col gap-y-4 !bg-background p-4 rounded-lg w-[400px] max-w-full py-8'>
       <NotFound
         title='You disconnected'
-        desc='To connect again, please reload the page.'
+        desc='Check your connection status!'
         icon={<Unlink />}
-        afterDesc={
-          <CotopiaButton
-            onClick={onReload}
-            className='w-[100px]'
-            startIcon={<RotateCcw size={16} />}
-          >
-            Reconnect
-          </CotopiaButton>
-        }
+        // afterDesc={
+        //   <CotopiaButton
+        //     onClick={onReloadHandler}
+        //     className='w-[100px]'
+        //     startIcon={<RotateCcw size={16} />}
+        //   >
+        //     Reconnect
+        //   </CotopiaButton>
+        // }
       />
     </div>
   );

@@ -9,10 +9,6 @@ export default function VideoControl() {
 
   const { videoState, changePermissionState } = useRoomContext();
 
-  let clss = "!bg-destructive !text-white";
-
-  if (videoState === false) clss = "text-black border bg-white";
-
   const toggleVideo = () => {
     if (videoState) {
       stopVideoStream();
@@ -22,6 +18,10 @@ export default function VideoControl() {
       changePermissionState("video", true);
     }
   };
+
+  let clss = "!bg-destructive !text-white";
+
+  if (videoState === false) clss = "text-black border bg-white";
 
   return (
     <CotopiaIconButton
