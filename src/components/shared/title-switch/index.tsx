@@ -1,5 +1,6 @@
 import { Switch } from "@/components/ui/switch";
-import { PrimitiveButtonProps } from "@radix-ui/react-dialog";
+
+type PrimitiveButtonProps = any;
 
 type Props = PrimitiveButtonProps & {
   title: string;
