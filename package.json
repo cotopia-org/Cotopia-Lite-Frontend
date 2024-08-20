@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./development.sh",
+    "dev": "next dev -p 3636",
     "build": "next build",
     "start": "./production.sh",
     "lint": "next lint",
@@ -13,6 +13,7 @@
     "@livekit/components-react": "^2.3.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.0.4",
+    "@radix-ui/react-context-menu": "^2.2.1",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-popover": "^1.1.1",
     "@radix-ui/react-progress": "^1.1.0",
