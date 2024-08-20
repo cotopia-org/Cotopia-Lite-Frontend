@@ -11,17 +11,13 @@ import { DirectType } from "@/types/direct"
 type Props = {
   search?: string
   onSelect: (item: DirectType) => void
+  directs: DirectType[]
 }
 
-export default function Directs({ search, onSelect }: Props) {
+export default function Directs({ search, onSelect, directs }: Props) {
   const { user } = useProfile()
 
-  const { data, isLoading } =
-    useApi<FetchDataType<DirectType[]>>(`/users/directs`)
-
-  const directs = data !== undefined ? data?.data : []
-
-  if (isLoading || data === undefined) return <FullLoading />
+  console.log(directs, "DIRECTS")
 
   let finalDirects = [...directs]
 
@@ -31,7 +27,6 @@ export default function Directs({ search, onSelect }: Props) {
         .map((x) => x.username)
         .join(" ")
       const allParticipantsName = x.participants.map((x) => x.name).join(" ")
-
       return (
         new RegExp(search, "i").test(`/${allParticipantsUsername}/`) ||
         new RegExp(search, "i").test(`/${allParticipantsName}/`)

@@ -1,7 +1,6 @@
-import React, { FormEvent, LegacyRef, ReactNode, useRef } from "react"
+import React, { FormEvent, ReactNode, useRef } from "react"
 import EmojiButton from "./emoji"
 import SendButton from "./send"
-import { Input } from "@/components/ui/input"
 
 type Props = {
   onAdd: (message: string) => void
@@ -33,7 +32,6 @@ export default function ChatUserInput({
   const handleSubmitForm = (e: FormEvent<HTMLFormElement>) => {
     e.stopPropagation()
     e.preventDefault()
-
     handleAddMessage()
   }
 

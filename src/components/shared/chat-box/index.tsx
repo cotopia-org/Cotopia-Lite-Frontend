@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useReachTop } from "@/hooks/use-reach-top"
 import useBus from "use-bus"
 import { _BUS } from "@/app/const/bus"
+import NotFound from "../layouts/not-found"
 
 type Props = {
   items: ChatItemType[]
@@ -133,12 +134,12 @@ export default function ChatBox({
       return
     }
 
-    if (diff < 200) {
+    if (diff < 1000) {
       loadMoreMessages()
     }
   }, [diff, fetchNewMessage])
 
-  if (items.length === 0) return
+  if (items.length === 0) return <NotFound title="No messages found!" />
 
   return (
     <>

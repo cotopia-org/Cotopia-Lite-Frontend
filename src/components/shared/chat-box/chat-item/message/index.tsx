@@ -16,6 +16,7 @@ export default function Message({ item }: Props) {
   const divRef = useRef<HTMLDivElement>(null)
 
   const [isVisible, setIsVisible] = useState(false)
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -52,7 +53,7 @@ export default function Message({ item }: Props) {
     <div
       className="text-wrap mb-3 w-full"
       dir="auto"
-      style={{ overflowWrap: "break-word" }}
+      style={{ overflow: "anywhere" }}
       ref={divRef}
     >
       <Linkify
