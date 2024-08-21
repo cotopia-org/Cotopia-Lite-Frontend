@@ -8,6 +8,8 @@ import DashboardMenus, { DashboardMenuItemType } from "./components/menus";
 import { Clock, Star } from "lucide-react";
 import DashboardLayoutMaker from "@/components/shared/layouts/dashboard";
 import { UserType } from "@/types/user";
+import CreateWorkspaceButton from "./workspaces/components/create/button";
+import DashbordDirects from "./components/directs";
 
 type Props = {
   children: ReactNode;
@@ -23,6 +25,7 @@ const ITEMS: DashboardMenuItemType[] = [
     title: "My Workspaces",
     icon: <Star />,
     href: `/workspaces`,
+    showByDefault: true,
     children: [
       {
         title: "Recent workspaces",
@@ -31,6 +34,7 @@ const ITEMS: DashboardMenuItemType[] = [
       {
         title: "All workspaces",
         href: "/workspaces/all",
+        after: <CreateWorkspaceButton />,
       },
     ],
   },
@@ -50,6 +54,8 @@ export default async function layout({ children }: Props) {
       <DashboardLayoutMaker
         header={<Header />}
         leftSidebar={<DashboardMenus items={ITEMS} className='gap-y-2' />}
+        rightSidebar={<DashbordDirects />}
+        className='px-4'
       >
         {children}
       </DashboardLayoutMaker>

@@ -1,57 +1,52 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
-import useLoading from "@/hooks/use-loading";
-import axiosInstance, { FetchDataType } from "@/lib/axios";
-import { WorkspaceRoomJoinType, WorkspaceRoomShortType } from "@/types/room";
+import Avatars from "@/components/shared/avatars";
+import { WorkspaceRoomShortType } from "@/types/room";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 type Props = {
   room: WorkspaceRoomShortType;
   workspace_id: number;
+  selected_room_id?: number;
 };
 
-export default function WorkspaceRoom({ workspace_id, room }: Props) {
+export default function WorkspaceRoom({
+  workspace_id,
+  room,
+  selected_room_id,
+}: Props) {
   const router = useRouter();
 
-  const { startLoading, stopLoading, isLoading } = useLoading();
-
   const joinRoomHandler = async () => {
-    startLoading();
-    try {
-      const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-        `/rooms/${room.id}/join`
-      );
-
-      const livekitToken = res.data.data.token; //Getting livekit token from joinObject
-
-      if (livekitToken) {
-        router.push(
-          `/workspaces/${workspace_id}/rooms/${room.id}?token=${livekitToken}`
-        );
-        return;
-      }
-
-      //It means we don't have livekit token
-      toast.error(`Livekit token doesn't exist!`);
-
-      stopLoading();
-    } catch (e) {
-      stopLoading();
-    }
+    router.push(`/workspaces/${workspace_id}/rooms/${room.id}`);
   };
 
+  const isSelected = selected_room_id ? room?.id === selected_room_id : false;
+  const participants = room?.participants ?? [];
+
+  let clss = "!justify-start !text-left";
+  if (isSelected) clss += ` !bg-black/10 !text-black`;
+
+  const avatarParitipants = participants.map((x) => ({
+    title: x.name,
+    src: x.avatar?.url as string,
+  }));
+
   return (
-    <CotopiaButton
-      onClick={joinRoomHandler}
-      disabled={isLoading}
-      className='!justify-start !text-left'
-      variant={"ghost"}
-    >
-      <div>
-        <Cast className='mr-2' size={16} />
-      </div>
-      {room.title}
-    </CotopiaButton>
+    <div className='flex flex-col gap-y-2'>
+      <CotopiaButton
+        onClick={joinRoomHandler}
+        className={clss}
+        variant={isSelected ? "default" : "ghost"}
+        startIcon={<Cast className='mr-2' size={16} />}
+      >
+        {room.title}
+      </CotopiaButton>
+      {avatarParitipants.length > 0 && (
+        <div className='pb-4'>
+          <Avatars items={avatarParitipants} />
+        </div>
+      )}
+    </div>
   );
 }

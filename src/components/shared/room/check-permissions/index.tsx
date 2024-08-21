@@ -1,12 +1,24 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Video from "./video";
-import PermissionControls from "./controls";
+import useLoading from "@/hooks/use-loading";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
+import { WorkspaceRoomJoinType } from "@/types/room";
+import { useRoomContext } from "../room-context";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { playSoundEffect } from "@/lib/sound-effects";
 
 type Props = {
   onChecked: () => void;
+  joinLoading?: boolean;
 };
 export default function CheckPermissions({ onChecked }: Props) {
+  const socket = useSocket();
+
+  const { room_id, workspace_id } = useRoomContext();
+
   const [audioPermission, setAudioPermission] = useState<boolean>(false);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
 
@@ -31,13 +43,18 @@ export default function CheckPermissions({ onChecked }: Props) {
     getPermissions();
   }, []);
 
+  const router = useRouter();
+  const handleJoin = async () => {
+    router.push(`/workspaces/${workspace_id}/rooms/${room_id}`);
+    if (onChecked) onChecked();
+  };
+
   return (
-    <div className='w-[564px] max-w-full mx-auto my-16 flex flex-col items-center gap-y-4'>
+    <div className='w-[564px] max-w-full mx-auto my-16 flex flex-col items-center gap-y-4 '>
       <div className='w-full'>
         <Video />
-        <PermissionControls />
       </div>
-      <CotopiaButton onClick={onChecked} className='bg-blue-500 min-w-[100px]'>
+      <CotopiaButton onClick={handleJoin} className='bg-blue-500 min-w-[100px]'>
         Join Now
       </CotopiaButton>
     </div>

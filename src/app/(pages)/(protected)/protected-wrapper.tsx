@@ -19,8 +19,13 @@ type Props = {
   user: UserType;
 };
 
-const ProfileContext = createContext<{ user: UserType; socketState?: Socket }>({
+const ProfileContext = createContext<{
+  user: UserType;
+  token?: string;
+  socketState?: Socket;
+}>({
   user: {} as any,
+  token: undefined,
   socketState: undefined,
 });
 
@@ -69,13 +74,11 @@ export default function ProtectedWrapper({ children, token, user }: Props) {
     };
   }, [token]);
 
-  const handleUpdateUser = (user: UserType) => {};
-
   //Show nothing if token is not set
   if (!tokenSet) return;
 
   return (
-    <ProfileContext.Provider value={{ user, socketState }}>
+    <ProfileContext.Provider value={{ user, socketState, token }}>
       {children}
     </ProfileContext.Provider>
   );

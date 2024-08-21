@@ -4,7 +4,7 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import DashboardMenus, { DashboardMenuItemType } from ".";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Circle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   item: DashboardMenuItemType;
@@ -13,6 +13,9 @@ type Props = {
 
 export default function DashboardMenuItem({ item, isChild = false }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (item?.showByDefault !== undefined) setIsOpen(item.showByDefault);
+  }, [item?.showByDefault]);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -65,6 +68,11 @@ export default function DashboardMenuItem({ item, isChild = false }: Props) {
             items={item.children as DashboardMenuItemType[]}
             isChild
           />
+        </div>
+      )}
+      {!!item?.after && (
+        <div className='flex flex-col w-full pt-2 mt-2 border-t'>
+          {item.after}
         </div>
       )}
     </div>

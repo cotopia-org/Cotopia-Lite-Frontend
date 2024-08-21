@@ -9,4 +9,6 @@ export const __VARS = {
   forgetPasswordPage: `/auth/forget-password`,
   signOutApiPage: `/api/auth/sign-out`,
   voiceAreaRadius: 200,
+  defaultPositionOfUserX: 400,
+  defaultPositionOfUserY: 400,
 };

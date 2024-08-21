@@ -8,6 +8,7 @@ import { Expand, Maximize2, Minimize, Minimize2, X } from "lucide-react";
 import { useState } from "react";
 import { dispatch } from "use-bus";
 import { useRoomContext } from "../../room-context";
+import DraggableRoom from "../draggable-room";
 
 type Props = {
   track: TrackReference;
@@ -82,8 +83,8 @@ export default function ScreenShareCard({ track }: Props) {
   return isFullScreen ? (
     content
   ) : (
-    <DraggableComponent x={200} y={200}>
+    <DraggableRoom x={400} y={200}>
       {content}
-    </DraggableComponent>
+    </DraggableRoom>
   );
 }

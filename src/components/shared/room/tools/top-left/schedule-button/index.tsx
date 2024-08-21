@@ -29,7 +29,7 @@ export default function ScheduleButton() {
 
   let buttonText = "Schedule";
 
-  if (calendars.length > 0) buttonText = "Draw up a schedule";
+  if (calendars.length > 0) buttonText = "Schedule";
 
   return (
     <PopupBox

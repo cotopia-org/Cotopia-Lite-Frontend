@@ -1,3 +1,4 @@
+import useKeyPress from "@/hooks/use-key-press";
 import { ReactNode, useRef, useState } from "react";
 
 type Props = {
@@ -17,6 +18,8 @@ export default function PopupBox({ trigger, children, className }: Props) {
     setIsOpen(false);
     setTriggerPosition(undefined);
   };
+
+  useKeyPress("Escape", handleClose);
 
   const [triggerPosition, setTriggerPosition] = useState<{
     top: number;

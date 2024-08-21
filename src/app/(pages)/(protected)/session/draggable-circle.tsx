@@ -1,6 +1,5 @@
 "use client";
 
-import DraggableComponent from "@/components/shared/draggable";
 import React, { useEffect, useState } from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
@@ -27,13 +26,13 @@ import SessionWrapper from "./wrapper";
 import { useUserTile } from ".";
 import { useProfile, useSocket } from "../protected-wrapper";
 import { UserMinimalType } from "@/types/user";
-import axiosInstance from "@/lib/axios";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
-import { Tooltip } from "@/components/ui/tooltip";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
+import DraggableRoom from "@/components/shared/room/components/draggable-room";
+import { __VARS } from "@/app/const/vars";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -148,7 +147,7 @@ const ParticipantTile = React.forwardRef<
 
   const isMyUser = user?.username === livekitIdentity;
 
-  const { room, videoState, audioState } = useRoomContext();
+  const { room, videoState } = useRoomContext();
   const participants = room?.participants;
 
   const updatedMyUser = participants?.find((x) => x.username === user.username);
@@ -208,7 +207,7 @@ const ParticipantTile = React.forwardRef<
 
   if (!isMuted && isMyUser) showAvatar = false;
 
-  if (!videoState) showAvatar = true;
+  // if (!videoState) showAvatar = true;
 
   return (
     <CotopiaTooltip title={userFullName}>
@@ -311,7 +310,9 @@ export default function DraggableCircle() {
   const handleUpdateCoordinates = (position: { x: number; y: number }) => {
     socket?.emit("updateCoordinates", {
       room_id: room?.id,
-      coordinates: `${position.x},${position.y}`,
+      coordinates: `${position.x ?? __VARS.defaultPositionOfUserX},${
+        position.y ?? __VARS.defaultPositionOfUserY
+      }`,
       username: livekitIdentity,
     });
   };
@@ -327,11 +328,12 @@ export default function DraggableCircle() {
   );
 
   const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
-    200, 200,
-  ]; //200 is default position , change in the feature
+    __VARS.defaultPositionOfUserX,
+    __VARS.defaultPositionOfUserY,
+  ];
 
   return (
-    <DraggableComponent
+    <DraggableRoom
       onDragEnd={(position) => {
         handleUpdateCoordinates(position);
         setIsDragging(false);
@@ -346,6 +348,6 @@ export default function DraggableCircle() {
       <SessionWrapper>
         <ParticipantTile isDragging={isDragging} />
       </SessionWrapper>
-    </DraggableComponent>
+    </DraggableRoom>
   );
 }

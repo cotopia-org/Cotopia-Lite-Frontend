@@ -1,10 +1,9 @@
 "use client";
 import Draggable from "react-draggable";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { useScreen } from "@/hooks/use-screen";
 import { useRoomContext } from "./room/room-context";
 
-type Props = {
+export type DraggableProps = {
   children: ReactNode;
   onDragging?: (position: { x: number; y: number }) => void;
   onStartDragging?: () => void;
@@ -13,6 +12,16 @@ type Props = {
   y?: number;
   disabled?: boolean;
   hasTransition?: boolean;
+  positionOffset?: {
+    x: number;
+    y: number;
+  };
+  bounds?: {
+    top: number;
+    left: number;
+    right: number;
+    bottom: number;
+  };
 };
 
 const DEFAULT_X = 0;
@@ -27,7 +36,9 @@ export default function DraggableComponent({
   y,
   disabled = false,
   hasTransition = false,
-}: Props) {
+  positionOffset,
+  bounds,
+}: DraggableProps) {
   const { sidebar } = useRoomContext();
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -63,6 +74,9 @@ export default function DraggableComponent({
 
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
+
+    if (y < (bounds?.top ?? 0)) y = bounds?.top ?? 0;
+    if (x < (bounds?.left ?? 0)) x = bounds?.left ?? 0;
 
     if (sidebar) {
       x = x + 188;
@@ -104,6 +118,9 @@ export default function DraggableComponent({
     x = diffX > 0 ? x - finalDiffX : x + finalDiffX;
     y = diffY > 0 ? y - finalDiffY : y + finalDiffY;
 
+    if (y < (bounds?.top ?? 0)) y = bounds?.top ?? 0;
+    if (x < (bounds?.left ?? 0)) x = bounds?.left ?? 0;
+
     if (sidebar) {
       x = x + 188;
     }
@@ -121,29 +138,19 @@ export default function DraggableComponent({
     if (onDragEnd) onDragEnd(newPosition);
   };
 
-  const { height, width } = useScreen();
-
   let defaultClassName = "fixed";
 
   if (hasTransition) defaultClassName += ` transition-all`;
 
   return (
     <Draggable
-      positionOffset={{
-        x: (-1 * width) / 2,
-        y: (-1 * height) / 2,
-      }}
+      positionOffset={positionOffset}
       position={position}
       onStop={hanldeDragEnd}
       onStart={handleDragStart}
       onDrag={handleDragging}
       disabled={disabled}
-      bounds={{
-        top: 0,
-        left: 0,
-        right: width,
-        bottom: height,
-      }}
+      bounds={bounds}
       defaultClassName={defaultClassName}
     >
       <div ref={divRef}>{children}</div>

@@ -1,10 +1,10 @@
 import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import React, { useEffect } from "react";
-import { useRoomContext } from "../../room-context";
+import { useRoomHolder } from "../..";
 
 export default function VideoInit() {
-  const { videoState } = useRoomContext();
+  const { mediaPermissions } = useRoomHolder();
 
   const { localParticipant } = useLocalParticipant();
 
@@ -17,12 +17,13 @@ export default function VideoInit() {
       return;
     }
 
-    if (videoState === true) {
+    if (mediaPermissions?.video === true) {
       track.unmute();
     } else {
       track.mute();
+      track.stop();
     }
-  }, [videoState, track]);
+  }, [mediaPermissions?.video, track]);
 
   return null;
 }
