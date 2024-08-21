@@ -5,7 +5,7 @@ import { useRoomSpatialContext } from "@/app/(pages)/(protected)/room/spatial/ro
 
 export default function UserChatsSettingsButtonTool() {
   // const { openSidebar, closeSidebar, sidebar } = useRoomContext();
-  const {openSidebar ,setOpenSidebar} = useRoomSpatialContext();
+  const {setOpenSidebar} = useRoomSpatialContext();
 
   const handleOpenChat = () => {
     // if (sidebar) {

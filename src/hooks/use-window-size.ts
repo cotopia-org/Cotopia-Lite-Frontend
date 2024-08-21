@@ -1,27 +1,35 @@
 'use client';
 
+import { useRoomSpatialContext } from '@/app/(pages)/(protected)/room/spatial/room-spatial-wrapper';
 import { useState, useEffect } from 'react';
 
-const useWindowSize = () => {
-  const [windowSize, setWindowSize] = useState<{ windowWidth: number }>({ windowWidth: 0 });
+const useWindowSize = (elementId?: string) => {
+  const [windowSize, setWindowSize] = useState<{ windowWidth: number, windowHeight: number }>({
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+  });
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({ windowWidth: window.innerWidth });
+    const updateSize = () => {
+      if (elementId) {
+        const element = document.getElementById(elementId) as HTMLElement;
+        if (element) {
+          setWindowSize({ windowWidth: element.clientWidth, windowHeight: element.clientHeight });
+        }
+      } else {
+        setWindowSize({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+      }
     };
 
-    // Set the initial width when loading the component
-    setWindowSize({ windowWidth: window.innerWidth });
+    // Update size initially
+    updateSize();
 
-    // Add a listener to resize the window
-    window.addEventListener('resize', handleResize);
+    // Add resize listener
+    window.addEventListener('resize', updateSize);
 
-    // Removing the listener when the component is unloaded
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-
-  }, []);
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', updateSize);
+  }, [elementId]); // Ensure `openSidebar` is correctly triggering updates if needed
 
   return { windowSize };
 };
