@@ -1,27 +1,12 @@
 "use client";
 
+import { RoomSpatialContextType } from "@/types/room-spatial-context";
 import React, {
   ReactNode,
   useContext,
   useState,
   createContext,
-  Dispatch,
-  SetStateAction,
 } from "react";
-
-interface RoomSpatialContextType {
-  drawColor: string;
-  setDrawColor: Dispatch<SetStateAction<string>>;
-  drawMode: boolean;
-  setDrawMode: Dispatch<SetStateAction<boolean>>;
-  fontSize: number;
-  setFontSize: Dispatch<SetStateAction<number>>;
-  eraserMode: boolean;
-  setEraserMode: Dispatch<SetStateAction<boolean>>;
-  openSidebar: boolean;
-  setOpenSidebar: Dispatch<SetStateAction<boolean>>;
-  clear: () => void;
-}
 
 const RoomSpatialContext = createContext<RoomSpatialContextType | undefined>(
   undefined
