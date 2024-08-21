@@ -3,11 +3,20 @@ import RoomIcon from "../../../room-icon";
 import { useRoomSpatialContext } from "../../../../../room-spatial-wrapper";
 
 export default function EraserIcon() {
-  const { setEraserMode } = useRoomSpatialContext();
+  const { setEraserMode , eraserMode , setDrawColor , drawColor} = useRoomSpatialContext();
+
+  function handlerEraser() {
+    if(eraserMode) {
+      setEraserMode(prevState => false)
+      setDrawColor(drawColor)
+    } else {
+      setEraserMode(prevState => true)
+    }
+  }
 
   return (
     <RoomIcon
-      icon={<Eraser onClick={() => setEraserMode((prevState) => !prevState)} />}
+      icon={<Eraser onClick={handlerEraser} />}
     />
   );
 }

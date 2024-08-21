@@ -12,19 +12,26 @@ export default function RoomDraw() {
 
   function drawLine({ prevPoint, currentPoint, ctx, eraserMode }: Draw) {
     const { x: currentX, y: currentY } = currentPoint;
-    const color = eraserMode ? "#191b29" : drawColor;
-    const lineWidth = eraserMode ? 20 : fontSize ? fontSize : 5;
+    const lineWidth = eraserMode ? 20 : (fontSize ? fontSize : 5);
+    
+    if (eraserMode) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.strokeStyle = "rgba(0,0,0,1)"; 
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = drawColor;
+    }
 
     let startPoint = prevPoint ?? currentPoint;
+
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = color;
     ctx.moveTo(startPoint.x, startPoint.y);
     ctx.lineTo(currentX, currentY);
     ctx.stroke();
 
     if (!eraserMode) {
-      ctx.fillStyle = color;
+      ctx.fillStyle = drawColor;
       ctx.beginPath();
       ctx.arc(startPoint.x, startPoint.y, 2, 0, 2 * Math.PI);
       ctx.fill();

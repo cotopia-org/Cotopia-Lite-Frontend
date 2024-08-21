@@ -13,7 +13,7 @@ export default function RoomSpatialContent() {
   return (
     <>
       {openSidebar && (
-        <div className="bg-black fixed right-0 w-[350px] h-screen">
+        <div className="bg-black fixed right-0 w-[350px] h-screen z-50">
           <RoomSidebar>
             <RoomSettings />
           </RoomSidebar>
@@ -21,7 +21,7 @@ export default function RoomSpatialContent() {
       )}
 
       <div
-        className={`${openSidebar ? "col-span-9" : "col-span-12"} relative`}
+        className={`${openSidebar ? "col-span-9" : "col-span-12"} relative z-40`}
         id="room-spatial-content"
       >
         <Header />

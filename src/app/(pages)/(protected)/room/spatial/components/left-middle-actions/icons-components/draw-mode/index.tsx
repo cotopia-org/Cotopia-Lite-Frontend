@@ -5,6 +5,7 @@ import EraserIcon from "./eraser";
 import FontSizeIcon from "./font-size";
 import CloseDrawMode from "./close";
 import TrashIcon from "./trash";
+import ScreenshotButton from "./camera";
 
 export default function DrawModeIcons() {
   return (
@@ -12,7 +13,8 @@ export default function DrawModeIcons() {
       <ColorIcon />
       <FontSizeIcon />
       <EraserIcon />
-      <TrashIcon/>
+      <ScreenshotButton/>
+      <TrashIcon />
       <CloseDrawMode />
     </>
   );
