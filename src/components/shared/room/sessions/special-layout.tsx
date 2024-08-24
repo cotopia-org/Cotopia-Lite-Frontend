@@ -58,7 +58,7 @@ const SpcialLayout = ({ tracks, children }: Props) => {
     </>
   );
 
-  return <div>{content}</div>;
+  return <>{content}</>;
 };
 
 export default SpcialLayout;

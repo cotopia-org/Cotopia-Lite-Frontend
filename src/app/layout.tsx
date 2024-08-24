@@ -1,5 +1,6 @@
 import { Toaster } from "sonner";
 import "./globals.css";
+import "@xyflow/react/dist/style.css";
 import { Viewport } from "next";
 
 export const viewport: Viewport = {

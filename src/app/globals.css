@@ -83,3 +83,7 @@
     -webkit-transform:rotateY(180deg);  
     -moz-transform:rotateY(180deg); 
 }
+
+.react-flow__node {
+  transition: 0.03s all;
+}

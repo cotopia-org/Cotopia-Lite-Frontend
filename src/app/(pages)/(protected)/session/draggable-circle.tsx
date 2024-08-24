@@ -31,7 +31,6 @@ import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
-import DraggableRoom from "@/components/shared/room/components/draggable-room";
 import { __VARS } from "@/app/const/vars";
 
 function ParticipantContextIfNeeded(
@@ -93,7 +92,7 @@ function TrackRefContextIfNeeded(
   );
 }
 
-const ParticipantTile = React.forwardRef<
+export const ParticipantTile = React.forwardRef<
   HTMLDivElement,
   ParticipantTileProps & { isDragging: boolean }
 >(function ParticipantTile(
@@ -138,16 +137,20 @@ const ParticipantTile = React.forwardRef<
 
   const { isMuted } = useTrackMutedIndicator(trackRef);
 
+  const { draggable } = useUserTile();
+
   const isSpeaking = trackReference?.participant?.isSpeaking;
 
   let clss =
-    "relative user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+    "relative z-[10] user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
+
+  if (!draggable) clss += ` cursor-default pointer-events-none`;
 
   const { user } = useProfile();
 
   const isMyUser = user?.username === livekitIdentity;
 
-  const { room, videoState } = useRoomContext();
+  const { room } = useRoomContext();
   const participants = room?.participants;
 
   const updatedMyUser = participants?.find((x) => x.username === user.username);
@@ -248,13 +251,20 @@ const ParticipantTile = React.forwardRef<
 
 const DEFAULT_TILE_POSITION = [0, 0];
 
-export default function DraggableCircle() {
+type Props = {
+  defaultIsDragging: boolean;
+};
+
+export default function DraggableCircle({ defaultIsDragging }: Props) {
   const socket = useSocket();
 
   const [isDragging, setIsDragging] = useState(false);
   const handleStartDragging = () => {
     setIsDragging(true);
   };
+  useEffect(() => {
+    if (defaultIsDragging !== undefined) setIsDragging(defaultIsDragging);
+  }, [defaultIsDragging]);
 
   const { room, updateUserCoords } = useRoomContext();
 
@@ -333,21 +343,25 @@ export default function DraggableCircle() {
   ];
 
   return (
-    <DraggableRoom
-      onDragEnd={(position) => {
-        handleUpdateCoordinates(position);
-        setIsDragging(false);
-      }}
-      onDragging={handleUpdateLocalCoords}
-      onStartDragging={handleStartDragging}
-      disabled={!isMyUser}
-      hasTransition={!isMyUser}
-      x={coordsUser?.[0]}
-      y={coordsUser?.[1]}
-    >
-      <SessionWrapper>
-        <ParticipantTile isDragging={isDragging} />
-      </SessionWrapper>
-    </DraggableRoom>
+    <SessionWrapper>
+      <ParticipantTile trackRef={track as any} isDragging={isDragging} />
+    </SessionWrapper>
   );
+
+  // return (
+  //   <DraggableRoom
+  //     onDragEnd={(position) => {
+  //       handleUpdateCoordinates(position);
+  //       setIsDragging(false);
+  //     }}
+  //     onDragging={handleUpdateLocalCoords}
+  //     onStartDragging={handleStartDragging}
+  //     disabled={!isMyUser}
+  //     hasTransition={!isMyUser}
+  //     x={coordsUser?.[0]}
+  //     y={coordsUser?.[1]}
+  //   >
+
+  //   </DraggableRoom>
+  // );
 }
