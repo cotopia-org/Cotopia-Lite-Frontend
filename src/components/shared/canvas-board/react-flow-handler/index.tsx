@@ -84,8 +84,6 @@ export default function ReactFlowHandler({ tracks }: Props) {
       const livekitIdentity = (node?.data?.track as TrackReferenceOrPlaceholder)
         ?.participant.identity;
 
-      updateUserCoords(livekitIdentity, node.position);
-
       socket.emit("updateCoordinates", {
         room_id: room?.id,
         coordinates: `${node.position.x},${node.position.y}`,
@@ -113,6 +111,8 @@ export default function ReactFlowHandler({ tracks }: Props) {
           return x;
         })
       );
+
+      updateUserCoords(livekitIdentity, node.position);
     }
   };
 
