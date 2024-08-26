@@ -22,8 +22,18 @@ export default function DirectChatBox({
 }: Props) {
   const { user: myAccount } = useProfile()
 
+  let clss = " min-h-[calc(100%-60px)]"
+
+  if (messages.length < 4) {
+    clss = " min-h-[calc(100%-20px)]"
+  }
+
+  if (messages.length === 0) {
+    clss += " flex items-center justify-center"
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-224px)]">
+    <div className="flex flex-col h-full">
       <div className="flex flex-row items-center gap-1">
         <CotopiaIconButton className="text-black/60" onClick={onBack}>
           <ChevronLeft />
@@ -33,8 +43,12 @@ export default function DirectChatBox({
           <strong className="ml-1">{`${getUserFullname(user)}`}</strong>
         </p>
       </div>
-      <div className="relative h-full flex flex-col justify-between pt-8">
-        <ChatBox items={messages} observer_user_id={myAccount?.id} />
+      <div className="relative h-full flex gap-y-2 flex-col justify-between pt-8">
+        <ChatBox
+          className={clss}
+          items={messages}
+          observer_user_id={myAccount?.id}
+        />
         <ChatUserInput onAdd={onAdd} />
       </div>
     </div>

@@ -21,7 +21,6 @@ const ReplyedMessageInfo = ({
   messageId,
 }: Props) => {
   const selectInfoHandler = useCallback(() => {
-    dispatch({ type: _BUS.scrollToTargetMessage, payload: messageId })
     if (onSelect) onSelect()
   }, [onSelect])
 

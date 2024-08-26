@@ -62,5 +62,11 @@ export const useChat = () => {
     )
     return res?.data?.data
   }
-  return { sendToRoom, sendToDirect, seenMessage, editMessage }
+  const deleteMessage = async (messageId: number | string) => {
+    let res = await axiosInstance.delete<FetchDataType<MessageType>>(
+      `/messages/${messageId}`
+    )
+    return res?.data?.data
+  }
+  return { sendToRoom, sendToDirect, seenMessage, editMessage, deleteMessage }
 }

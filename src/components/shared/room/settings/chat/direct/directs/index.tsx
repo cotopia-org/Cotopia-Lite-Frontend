@@ -17,8 +17,6 @@ type Props = {
 export default function Directs({ search, onSelect, directs }: Props) {
   const { user } = useProfile()
 
-  console.log(directs, "DIRECTS")
-
   let finalDirects = [...directs]
 
   if (search)
@@ -37,16 +35,21 @@ export default function Directs({ search, onSelect, directs }: Props) {
 
   return (
     <div className="flex flex-col gap-y-4">
-      {finalDirects.map((item, key) => (
-        <UserCard
-          key={key}
-          user={
-            item.participants.find((x) => x.id !== user?.id) as UserMinimalType
-          }
-          latestMessage={"hello"}
-          onClick={() => onSelect(item)}
-        />
-      ))}
+      {finalDirects.map((item, key) => {
+        let lastMessage = item.last_message
+        return (
+          <UserCard
+            key={key}
+            user={
+              item.participants.find(
+                (x) => x.id !== user?.id
+              ) as UserMinimalType
+            }
+            latestMessage={lastMessage}
+            onClick={() => onSelect(item)}
+          />
+        )
+      })}
     </div>
   )
 }

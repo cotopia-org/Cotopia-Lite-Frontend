@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react"
 import { useReachTop } from "@/hooks/use-reach-top"
 import useBus from "use-bus"
 import { _BUS } from "@/app/const/bus"
+
 import NotFound from "../layouts/not-found"
+import FullLoading from "../full-loading"
 
 type Props = {
   items: ChatItemType[]
@@ -12,11 +14,13 @@ type Props = {
   onLoadMessage?: () => void
   fetchNewMessage?: boolean
   isFetching?: boolean
+  className?: string
 }
 export default function ChatBox({
   items = [],
   observer_user_id,
   onLoadMessage,
+  className = "",
   fetchNewMessage,
   isFetching,
 }: Props) {
@@ -28,60 +32,59 @@ export default function ChatBox({
   const [boxScrollHeight, setBoxScrollHeight] = useState(0)
   const [scrollDirection, setScrollDirection] = useState<"top" | "down">("top")
 
-  useEffect(() => {
-    if (!boxRef.current) return
+  const isFirst = useRef(true)
 
-    const handleWheel = (event: WheelEvent) => {
-      if (event.deltaY < 0) {
-        setScrollDirection("top")
-      } else {
-        setScrollDirection("down")
-      }
-    }
+  // useEffect(() => {
+  //   if (!boxRef.current) return
 
-    boxRef.current.addEventListener("wheel", handleWheel)
+  //   const handleWheel = (event: WheelEvent) => {
+  //     console.log(event.deltaY, "Y")
+  //     if (event.deltaY < 0) {
+  //       setScrollDirection("top")
+  //     } else {
+  //       setScrollDirection("down")
+  //     }
+  //   }
 
-    return () => {
-      boxRef.current?.removeEventListener("wheel", handleWheel)
-    }
-  }, [boxRef?.current])
+  //   boxRef.current.addEventListener("wheel", handleWheel)
 
-  useEffect(() => {
-    if (!boxRef?.current) return
-    if (!isGetNewMessages) return
-  }, [items?.length, boxRef?.current])
+  //   return () => {
+  //     boxRef.current?.removeEventListener("wheel", handleWheel)
+  //   }
+  // }, [boxRef?.current])
 
-  useBus(
-    _BUS.scrollEndChatBox,
-    () => {
-      if (!boxRef.current) return
+  // useEffect(() => {
+  //   if (!boxRef?.current) return
+  //   if (!isGetNewMessages) return
+  // }, [items?.length, boxRef?.current])
 
-      const scrollHeight = boxRef.current.scrollHeight
-      const boxHeight = boxRef.current.clientHeight
+  // useBus(
+  //   _BUS.scrollEndChatBox,
+  //   (data) => {
+  //     if (!boxRef.current) return
 
-      setBoxHasScroll(scrollHeight > boxHeight)
+  //     const scrollHeight = boxRef.current.scrollHeight
+  //     const boxHeight = boxRef.current.clientHeight
 
-      boxRef.current.scrollTo({
-        top: scrollHeight,
-      })
-    },
-    [boxRef.current]
-  )
+  //     boxRef.current?.scrollTo({
+  //       top: scrollHeight,
+  //     })
+  //   },
+  //   [boxRef?.current]
+  // )
 
   useBus(
     _BUS.scrollToTopNewChatMessages,
     () => {
       setTimeout(() => {
         if (!boxRef.current) return
-        const previousScrollHeight = boxScrollHeight
-        const newScrollHeight = boxRef?.current?.scrollHeight
         boxRef.current.scrollTo({
-          top: newScrollHeight - previousScrollHeight,
+          top: boxRef.current.offsetTop + 500,
           behavior: "instant",
         })
       }, 100)
     },
-    [boxRef.current, boxScrollHeight]
+    []
   )
   useBus(
     _BUS.scrollToTargetMessage,
@@ -111,12 +114,9 @@ export default function ChatBox({
   )
 
   let clss =
-    "relative flex flex-col gap-y-4 h-full max-h-full overflow-y-auto pb-8 px-2"
+    "relative flex flex-col gap-y-4 max-h-full overflow-y-auto pb-8 px-2"
 
-  const { reachTop: isReachTop } = useReachTop(boxRef?.current)
-  const { reachTop: isReachTopToFetchChats, diff } = useReachTop(
-    boxRef?.current
-  )
+  const { reachTop: isReachTop, diff } = useReachTop(boxRef?.current)
 
   const loadMoreMessages = () => {
     if (!boxRef.current) return
@@ -124,6 +124,10 @@ export default function ChatBox({
 
     if (onLoadMessage) {
       setBoxScrollHeight(boxRef?.current.scrollHeight)
+      if (isFirst.current === true) {
+        isFirst.current = false
+        return
+      }
       onLoadMessage()
       setIsGetNewMessages(true)
     }
@@ -134,12 +138,31 @@ export default function ChatBox({
       return
     }
 
-    if (diff < 1000) {
+    if (diff < 200) {
       loadMoreMessages()
     }
   }, [diff, fetchNewMessage])
 
-  if (items.length === 0) return <NotFound title="No messages found!" />
+  let content = (
+    <>
+      {items.map((chat, key) => (
+        <></>
+        // <ChatItem
+        //   items={items}
+        //   item={chat}
+        //   observer_user_id={observer_user_id}
+        //   key={key}
+        // />
+      ))}
+    </>
+  )
+
+  useEffect(() => {
+    if (boxRef?.current) {
+      boxRef.current.scrollTo({ top: boxRef.current.scrollHeight })
+    }
+  }, [boxRef?.current])
+  if (items.length === 0) content = <NotFound title="No messages found!" />
 
   return (
     <>
@@ -147,7 +170,7 @@ export default function ChatBox({
         <div className="absolute top-[32px] left-0 h-[32px] z-10 bg-gradient-to-b from-white to-transparent w-full flex"></div>
       )}
       <div
-        className={clss}
+        className={`${clss} ${className}`}
         ref={(xref) => {
           if (xref === null) return
 
@@ -155,13 +178,7 @@ export default function ChatBox({
         }}
       >
         <div className="flex flex-col-reverse w-full gap-y-4" dir="auto">
-          {items.map((chat, key) => (
-            <ChatItem
-              item={chat}
-              observer_user_id={observer_user_id}
-              key={key}
-            />
-          ))}
+          {content}
         </div>
       </div>
     </>

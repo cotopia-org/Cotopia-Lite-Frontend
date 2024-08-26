@@ -20,7 +20,7 @@ const SearchInputShower = ({ onChange, content }: Props) => {
 
   const searchContent = (content: ReactNode) => {
     return (
-      <div className="rounded-md shadow-md z-[2] bg-white w-full absolute right-0 left-0 top-full mt-2">
+      <div className="rounded-md shadow-md z-[3] bg-white w-full absolute right-0 left-0 top-full mt-2">
         {content}
       </div>
     )

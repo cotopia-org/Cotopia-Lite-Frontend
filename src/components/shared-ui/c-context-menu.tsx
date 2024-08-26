@@ -54,7 +54,7 @@ const ContextItemWrapper = ({
     if (!!item.linkEl) return item.linkEl(itemRef.current as ReactNode)
   }
   return (
-    <ContextMenuItem onClick={clickItemHandler} ref={itemRef} className={clss}>
+    <ContextMenuItem onSelect={clickItemHandler} ref={itemRef} className={clss}>
       {title}
       {iconContent}
     </ContextMenuItem>

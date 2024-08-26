@@ -4,53 +4,101 @@ import TheirMessage from "./their-message"
 import CotopiaContextMenu, {
   ContextItemType,
 } from "@/components/shared-ui/c-context-menu"
-import { Reply, Pencil } from "lucide-react"
+import { Reply, Pencil, Trash2 } from "lucide-react"
 import colors from "tailwindcss/colors"
 import MessageBox from "./message/MessageBox"
-import { useChatCtx } from "@/context/chat-context"
+import TargetMessageAction from "./TargetMessageAction"
+import { _BUS } from "@/app/const/bus"
+import { forwardRef, useState } from "react"
+import DeleteMessageAction from "./my-message/DeleteMessageAction"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 
 type Props = {
   item: ChatItemType
   observer_user_id?: number
+  onFlagSelect: () => void
 }
-export default function ChatItem({ item, observer_user_id }: Props) {
-  const { changeBulk } = useChatCtx()
+const ChatItem = forwardRef(
+  ({ item, observer_user_id, onFlagSelect }: Props, ref: any) => {
+    const { changeBulk } = useChatRoomCtx()
 
-  const isMyMessage = item.user?.id === observer_user_id
+    const [deleteAnchor, setDeleteAnchor] = useState<boolean>(false)
 
-  let menuItems: ContextItemType[] = [
-    {
-      title: "reply",
-      className: "cursor-pointer",
-      onClick: () => changeBulk({ message: item, type: "reply" }),
-      icon: <Reply color={colors.black} size={14} />,
-    },
-  ]
+    let targetMessage = item.reply_to
 
-  if (isMyMessage) {
-    menuItems = [
+    const isMyMessage = item.user?.id === observer_user_id
+
+    let replyedNode = undefined
+
+    if (!!targetMessage) {
+      replyedNode = (
+        <TargetMessageAction
+          className="!m-0"
+          onSelect={onFlagSelect}
+          title={targetMessage.user.username}
+          description={targetMessage.text}
+        />
+      )
+    }
+
+    let menuItems: ContextItemType[] = [
       {
-        title: "edit",
-        onClick: () => changeBulk({ message: item, type: "edit" }),
+        title: "reply",
         className: "cursor-pointer",
-        hasDivider: true,
-        icon: <Pencil color={colors.black} size={14} />,
+        onClick: () => changeBulk({ targetMessage: item, flag: "reply" }),
+        icon: <Reply color={colors.black} size={14} />,
       },
-      ...menuItems,
     ]
+
+    if (isMyMessage) {
+      menuItems = [
+        {
+          title: "edit",
+          onClick: () => changeBulk({ targetMessage: item, flag: "edit" }),
+          className: "cursor-pointer",
+          hasDivider: true,
+          icon: <Pencil color={colors.black} size={14} />,
+        },
+        {
+          title: "delete",
+          className: "cursor-pointer text-red-700 hover:!text-red-700",
+          linkEl: (el) => setDeleteAnchor(true),
+          hasDivider: true,
+          icon: <Trash2 color={colors.red[700]} size={14} />,
+        },
+        ...menuItems,
+      ]
+    }
+
+    let content = (
+      <CotopiaContextMenu
+        width={150}
+        items={menuItems}
+        trigger={
+          <MessageBox
+            ref={ref}
+            beforeNode={replyedNode}
+            item={item}
+            isMine={isMyMessage}
+          />
+        }
+      />
+    )
+
+    return isMyMessage ? (
+      <MyMessage>
+        {(deleteAnchor && (
+          <DeleteMessageAction
+            onClose={() => setDeleteAnchor(false)}
+            message={item}
+          />
+        )) ||
+          null}
+        {content}
+      </MyMessage>
+    ) : (
+      <TheirMessage>{content}</TheirMessage>
+    )
   }
-
-  let content = (
-    <CotopiaContextMenu
-      width={150}
-      items={menuItems}
-      trigger={<MessageBox item={item} isAvatarVisible={isMyMessage} />}
-    />
-  )
-
-  return isMyMessage ? (
-    <MyMessage>{content}</MyMessage>
-  ) : (
-    <TheirMessage>{content}</TheirMessage>
-  )
-}
+)
+export default ChatItem

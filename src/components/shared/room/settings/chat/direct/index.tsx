@@ -74,7 +74,6 @@ export default function UserChatDirect() {
           />
         )}
       </div>
-      {/* <div>xx</div> */}
     </>
   )
 
@@ -102,7 +101,7 @@ export default function UserChatDirect() {
   }
 
   return (
-    <div className="relative h-full flex flex-col justify-between">
+    <div className="relative h-full flex flex-col justify-between pt-4">
       {content}
     </div>
   )

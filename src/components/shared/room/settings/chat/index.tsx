@@ -3,27 +3,37 @@ import React from "react"
 import UserChatRoom from "./room"
 import UserChatDirect from "./direct"
 import TabRoomTitle from "./room-title"
-import ChatContextProvider from "@/context/chat-context"
+import ChatRoomCtxProvider, {
+  RoomSoocketType,
+} from "@/context/chat-room-context"
+import { useRoomContext } from "../../room-context"
 
 export default function UserChat() {
+  const { room_id } = useRoomContext()
+
   return (
-    <ChatContextProvider>
-      <CTabs
-        defaultValue="room"
-        className="w-full mt-4 [&_.tab-holder]:justify-center [&_.tab-content]:h-[calc(100vh-164px)]"
-        items={[
-          {
-            title: <TabRoomTitle />,
-            value: "room",
-            content: <UserChatRoom />,
-          },
-          {
-            title: "Direct",
-            value: "direct",
-            content: <UserChatDirect />,
-          },
-        ]}
-      />
-    </ChatContextProvider>
+    <CTabs
+      defaultValue="room"
+      className="w-full mt-4 [&_.tab-holder]:justify-center [&_.tab-content]:h-[calc(100vh-200px)]"
+      items={[
+        {
+          title: <TabRoomTitle />,
+          value: "room",
+          content: (
+            <ChatRoomCtxProvider
+              endpoint={`/rooms/${room_id}/messages`}
+              type={RoomSoocketType.room}
+            >
+              <UserChatRoom />
+            </ChatRoomCtxProvider>
+          ),
+        },
+        {
+          title: "Direct",
+          value: "direct",
+          content: <UserChatDirect />,
+        },
+      ]}
+    />
   )
 }

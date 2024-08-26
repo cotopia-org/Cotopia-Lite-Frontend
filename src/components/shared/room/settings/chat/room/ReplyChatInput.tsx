@@ -3,7 +3,7 @@
 import { _BUS } from "@/app/const/bus"
 import ReplyedMessageInfo from "@/components/shared/chat-box/chat-item/TargetMessageAction/ReplyMessageInfo"
 import ChatUserInput from "@/components/shared/chat-box/user-input"
-import { useChatCtx } from "@/context/chat-context"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 import { ChatItemType } from "@/types/chat"
 
 interface Props {
@@ -14,10 +14,10 @@ interface Props {
 const ReplyChatInput = ({ message, onAdd }: Props) => {
   const { text, user, id } = message
 
-  const { changeBulk } = useChatCtx()
+  const { changeBulk } = useChatRoomCtx()
 
   const closeReplyHandler = () => {
-    changeBulk({ message: null, type: undefined })
+    changeBulk({ targetMessage: null, flag: undefined })
   }
 
   const selectedMessageNode = (

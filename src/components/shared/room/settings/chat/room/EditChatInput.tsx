@@ -1,10 +1,9 @@
 "use client"
 
 import { _BUS } from "@/app/const/bus"
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
 import EditMessageInfo from "@/components/shared/chat-box/chat-item/TargetMessageAction/EditMessageInfo"
 import ChatUserInput from "@/components/shared/chat-box/user-input"
-import { useChatCtx } from "@/context/chat-context"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 import { ChatItemType } from "@/types/chat"
 
 interface Props {
@@ -15,10 +14,10 @@ interface Props {
 const EditChatInput = ({ message, onAdd }: Props) => {
   const { text, id } = message
 
-  const { changeBulk } = useChatCtx()
+  const { changeBulk } = useChatRoomCtx()
 
   const closeReplyHandler = () => {
-    changeBulk({ message: null, type: undefined })
+    changeBulk({ targetMessage: null, flag: undefined })
   }
 
   const selectedMessageNode = (

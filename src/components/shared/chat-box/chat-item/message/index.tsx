@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react"
 import Linkify from "react-linkify"
 
 type Props = {
+  isMine: boolean
   item: ChatItemType
 }
-export default function Message({ item }: Props) {
+export default function Message({ item, isMine }: Props) {
   const [stateMessage, setStateMessage] = useState(item)
 
   useEffect(() => {
@@ -39,21 +40,21 @@ export default function Message({ item }: Props) {
   const { seenMessage } = useChat()
 
   useEffect(() => {
-    if (isVisible && stateMessage?.seen === false) {
-      seenMessage(stateMessage?.id).then((res) => {
-        setStateMessage({
-          ...stateMessage,
-          seen: true,
-        })
-      })
+    if (isVisible && stateMessage?.seen === false && !isMine) {
+      // seenMessage(stateMessage?.id).then((res) => {
+      //   setStateMessage({
+      //     ...stateMessage,
+      //     seen: true,
+      //   })
+      // })
     }
-  }, [stateMessage, isVisible])
+  }, [stateMessage, isVisible, isMine])
 
   return (
     <div
       className="text-wrap mb-3 w-full"
       dir="auto"
-      style={{ overflow: "anywhere" }}
+      style={{ overflowWrap: "break-word" }}
       ref={divRef}
     >
       <Linkify
