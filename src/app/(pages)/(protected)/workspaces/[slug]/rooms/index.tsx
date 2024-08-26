@@ -15,17 +15,20 @@ type Props = {
 export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
   const { room_id } = useParams();
 
+  const [rooms, setRooms] = useState<WorkspaceRoomShortType[]>([]);
+
   const { data, isLoading, mutate } = useApi<
     FetchDataType<WorkspaceRoomShortType[]>
-  >(`/workspaces/${workspace_id}/rooms`);
+  >(`/workspaces/${workspace_id}/rooms`, {
+    isFetch: rooms.length === 0,
+  });
   const items = !!data ? data?.data : [];
 
-  const [rooms, setRooms] = useState<WorkspaceRoomShortType[]>([]);
   useEffect(() => {
     if (items.length > 0) setRooms(items);
   }, [items]);
 
-  useSocket("roomUpdated", (data) => {
+  useSocket("workspaceRoomUpdated", (data) => {
     const room: WorkspaceRoomShortType = data;
     setRooms((prev) =>
       prev.map((prevRoom) => {
