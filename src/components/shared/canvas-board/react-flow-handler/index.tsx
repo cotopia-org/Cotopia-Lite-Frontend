@@ -23,6 +23,7 @@ import { useRoomContext } from "../../room/room-context";
 import UserNode from "../user";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { convertCoordinateString } from "@/lib/utils";
+// import { useCanvas } from "..";
 
 type Props = {
   tracks: TrackReferenceOrPlaceholder[];
@@ -32,7 +33,9 @@ const nodeTypes = {
   userNode: UserNode,
 };
 
-export default function ReactFlowHandler({ tracks }: Props) {
+function ReactFlowHandler({ tracks }: Props) {
+  // const { handleChangeViewport } = useCanvas();
+
   const [viewPort, setViewPort] = useState<Viewport>();
 
   const [rf, setRf] = useState<ReactFlowInstance>();
@@ -147,8 +150,8 @@ export default function ReactFlowHandler({ tracks }: Props) {
 
   // Define the bounds: (minX, minY) and (maxX, maxY)
   const nodeExtent: any = [
-    [60, 60],
-    [3000, 2340],
+    [160, 160],
+    [2700, 1880],
   ];
 
   const onNodesChange: OnNodesChange = useCallback(
@@ -156,29 +159,26 @@ export default function ReactFlowHandler({ tracks }: Props) {
     [setNodes]
   );
 
-  const onMoveEnd = useCallback((_: any, a: any) => {
-    const { x, y, zoom } = a;
+  // const onMoveEnd = useCallback((_: any, a: any) => {
+  //   const { x, y, zoom } = a;
 
-    // Ensure that the position stays within the 3000x3000 bounds
-    const maxPosition = 2300;
-    const minPosition = -maxPosition + window.innerWidth;
+  //   // Ensure that the position stays within the 3000x3000 bounds
+  //   const maxPosition = 3400 * zoom;
+  //   const minPosition = -1 * maxPosition + window.innerWidth;
 
-    let newX = Math.max(minPosition, Math.min(x, 0));
-    let newY = Math.max(minPosition, Math.min(y, 0));
+  //   let newX = Math.max(minPosition, Math.min(x, 0));
+  //   let newY = Math.max(minPosition, Math.min(y, 0));
 
-    if (newX !== x || newY !== y) {
-      setViewPort({ x: newX, y: newY, zoom });
-    }
-  }, []);
+  //   if (newX !== x || newY !== y) {
+  //     setViewPort({ x: newX, y: newY, zoom });
+  //   }
+  // }, []);
 
   return (
     <ReactFlow
       style={{ width: "100%", height: "100%" }}
       nodeExtent={nodeExtent}
       nodesDraggable={true}
-      onNodeDrag={(x, a) => {
-        console.log("a", a);
-      }}
       onNodeDragStop={onNodeDragStop}
       onNodesChange={onNodesChange}
       panOnDrag={true}
@@ -189,7 +189,7 @@ export default function ReactFlowHandler({ tracks }: Props) {
       onInit={setRf}
       viewport={viewPort}
       onViewportChange={setViewPort}
-      onMove={onMoveEnd}
+      // onMove={onMoveEnd}
       fitView
     >
       <MiniMap />
@@ -197,3 +197,5 @@ export default function ReactFlowHandler({ tracks }: Props) {
     </ReactFlow>
   );
 }
+
+export default ReactFlowHandler;
