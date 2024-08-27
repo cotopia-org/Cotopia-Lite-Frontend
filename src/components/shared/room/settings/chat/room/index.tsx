@@ -1,15 +1,15 @@
-import ChatUserInput from "@/components/shared/chat-box/user-input"
-import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
-import FullLoading from "@/components/shared/full-loading"
-import { _BUS } from "@/app/const/bus"
-import EditChatInput from "./EditChatInput"
-import ReplyChatInput from "./ReplyChatInput"
-import NotFound from "@/components/shared/layouts/not-found"
-import NewChatBox from "@/components/shared/chat-box/NewChatBox"
-import { useChatRoomCtx } from "@/context/chat-room-context"
+import ChatUserInput from "@/components/shared/chat-box/user-input";
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import FullLoading from "@/components/shared/full-loading";
+import { _BUS } from "@/app/const/bus";
+import EditChatInput from "./EditChatInput";
+import ReplyChatInput from "./ReplyChatInput";
+import NotFound from "@/components/shared/layouts/not-found";
+import NewChatBox from "@/components/shared/chat-box/NewChatBox";
+import { useChatRoomCtx } from "@/context/chat-room-context";
 
 export default function UserChatRoom() {
-  const { user } = useProfile()
+  const { user } = useProfile();
 
   const {
     loading,
@@ -19,47 +19,48 @@ export default function UserChatRoom() {
     onAddMessage,
     onEditMessage,
     onReplyMessage,
-  } = useChatRoomCtx()
+  } = useChatRoomCtx();
 
-  let chatInputNode = <ChatUserInput onAdd={onAddMessage} />
+  let chatInputNode = <ChatUserInput onAdd={onAddMessage} />;
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (
       <EditChatInput message={targetMessage} onAdd={onEditMessage} />
-    )
+    );
   }
 
   if (flag === "reply" && targetMessage) {
     chatInputNode = (
       <ReplyChatInput message={targetMessage} onAdd={onReplyMessage} />
-    )
+    );
   }
-  let content = null
+  let content = null;
 
-  let chatBxClss = "min-h-[calc(100%-30px)]"
+  let chatBxClss = "min-h-[calc(100%-30px)]";
 
   if (messages?.length === 0) {
-    chatBxClss += " items-center justify-center"
+    chatBxClss += " items-center justify-center";
   }
 
   if (messages && messages?.length > 0) {
     content = (
       <>
         <NewChatBox
-          className="min-h-[calc(100%-60px)] items-center justify-center"
+          className='min-h-[calc(100%-60px)] items-center justify-center'
           observer_user_id={user?.id}
         />
         {chatInputNode}
       </>
-    )
+    );
   }
 
-  if (messages?.length === 0) content = <NotFound title="Messages not found!" />
-  if (loading) content = <FullLoading />
+  if (messages?.length === 0)
+    content = <NotFound title='Messages not found!' />;
+  if (loading) content = <FullLoading />;
 
   return (
-    <div className="relative h-full flex flex-col gap-y-1 justify-between pt-8">
+    <div className='relative h-full flex flex-col gap-y-1 justify-between pt-8'>
       {content}
     </div>
-  )
+  );
 }
