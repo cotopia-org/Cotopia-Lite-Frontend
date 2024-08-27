@@ -1,18 +1,33 @@
 import { ChatItemType } from "@/types/chat"
-import ChatItem from "./chat-item"
-import { UIEvent, memo, useCallback, useEffect, useRef, useState } from "react"
+import {
+  UIEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import { _BUS } from "@/app/const/bus"
-import NotFound from "../layouts/not-found"
 import useBus from "use-bus"
-import { FetchMessageType, useChatRoomCtx } from "@/context/chat-room-context"
+import {
+  FetchMessageType,
+  UPPER_LIMIT_PAGE,
+  useChatRoomCtx,
+} from "@/context/chat-room-context"
 import { ChevronDown } from "lucide-react"
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
 import { toast } from "sonner"
 import { __VARS } from "@/app/const/vars"
-import { useAppSelector } from "@/store/redux/store"
+import { useAppDispatch, useAppSelector } from "@/store/redux/store"
 import { getMiddleIndex } from "@/lib/utils"
-import FullLoading from "../full-loading"
+import ChatItem from "../chat-item"
+import NotFound from "../../layouts/not-found"
+import FullLoading from "../../full-loading"
+import RowItem from "./RowItem"
+import { getInitMessages } from "@/store/redux/slices/room-slice"
+import { useRoomContext } from "../../room/room-context"
 
 type Props = {
   observer_user_id?: number
@@ -21,28 +36,8 @@ type Props = {
 
 export const SCROLL_THRESHOLD = 200
 
-const RowItem = ({
-  item,
-  observerId,
-  onFetchMessages,
-}: {
-  item: ChatItemType
-  observerId?: number
-  onFetchMessages?: () => Promise<void>
-}) => {
-  const chatRef = useRef<HTMLDialogElement>()
-
-  return (
-    <ChatItem
-      // onFlagSelect={onFetchMessages}
-      ref={chatRef}
-      item={item}
-      observer_user_id={observerId}
-    />
-  )
-}
 function NewChatBox({ observer_user_id, className = "" }: Props) {
-  let clss = "max-h-full"
+  let clss = ""
   const {
     messages,
     loadMoreMessages: onLoadMessage,
@@ -50,14 +45,18 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
     upperLimit,
     downLimit,
     flag,
+
     changeBulk,
     changeKey,
   } = useChatRoomCtx()
+
+  const { room_id } = useRoomContext()
 
   const prevFetchRef = useRef<boolean>(true)
   const nextFetchRef = useRef<boolean>(true)
   const totalLength = __VARS.defaultPerPage * __VARS.pagesLimitDiff
 
+  const appDispatch = useAppDispatch()
   const [showGotoBottom, setShowGotoBottom] = useState(false)
 
   const { nextLoading, prevLoading } = useAppSelector(
@@ -77,7 +76,16 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
   const [isFirst, setIsFirst] = useState(true)
 
-  const backToMessageHandler = useCallback(() => {
+  const backToBottom = (type: "smooth" | "instant" = "smooth") => {
+    if (scrollerRef?.current)
+      virtousoRef.current?.scrollTo({
+        top:
+          scrollerRef.current?.scrollHeight + scrollerRef.current?.clientHeight,
+        behavior: type,
+      })
+  }
+
+  const backToMessageHandler = useCallback(async () => {
     if (!!originMessage && flag === "reply") {
       const findedIndex = finalMsg.findIndex(
         (msg) => msg.id === originMessage.id
@@ -85,22 +93,28 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       if (findedIndex >= 0) {
         virtousoRef.current?.scrollToIndex({
           index: findedIndex,
-          align: "start",
-          behavior: "auto",
+          align: "end",
+          behavior: "smooth",
         })
         changeBulk({ flag: undefined, originMessage: undefined })
       } else {
         toast.error("Origin message not found")
       }
+    } else if (downLimit > 1) {
+      if (room_id === undefined) return
+      await appDispatch(
+        getInitMessages({
+          has_loading: false,
+          room_id: room_id,
+          upper_limit: UPPER_LIMIT_PAGE,
+        })
+      )
+      backToBottom("instant")
     } else {
-      virtousoRef.current?.scrollToIndex({
-        index: finalMsg.length - 1,
-        align: "start",
-        behavior: "auto",
-      })
-      setShowGotoBottom(false)
+      backToBottom()
     }
-  }, [finalMsg, originMessage, showGotoBottom])
+    setShowGotoBottom(false)
+  }, [finalMsg, originMessage, downLimit, room_id, showGotoBottom])
 
   let backToFromNode = null
 
@@ -151,15 +165,17 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   useBus(
     _BUS.scrollEndChatBox,
     (data) => {
-      if (!scrollerRef.current) return
-      virtousoRef.current?.scrollToIndex({
-        index: (messages as ChatItemType[])?.length - 1,
-      })
+      setTimeout(() => {
+        if (!scrollerRef.current) return
+        scrollerRef.current.scrollTo({
+          top: scrollerRef.current.scrollHeight,
+          behavior: "instant",
+        })
+      }, 200)
     },
-    [scrollerRef?.current, messages]
+    [scrollerRef?.current]
   )
 
-  console.log(showGotoBottom, "SHOWGO")
   const focusOnFlagHandler = useCallback(
     async (message: ChatItemType) => {
       if (!scrollerRef.current) return
@@ -228,8 +244,8 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
       const elementRect = element.getBoundingClientRect()
       //check is scroll getting top of the chat box
-      if (element.scrollTop === 0) {
-        if (prevFetchRef) {
+      if (element.scrollTop <= 0) {
+        if (nextFetchRef.current) {
           nextFetchRef.current = false
           loadMoreMessages(FetchMessageType.Next, topIndex)
         }
@@ -241,6 +257,9 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
       if (bottomFetchingTreshold > 0) {
         setShowGotoBottom((crt) => (!!crt ? crt : true))
+      }
+      if (bottomFetchingTreshold <= 0) {
+        setShowGotoBottom(false)
       }
 
       if (bottomFetchingTreshold <= 0 && downLimit > 1) {
@@ -270,7 +289,6 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       }}
       initialTopMostItemIndex={startMessageIndex}
       data={finalMsg}
-      totalCount={finalMsg.length}
       components={{
         Footer: () => loadingNode(prevLoading),
         Header: () => loadingNode(nextLoading),
@@ -296,4 +314,4 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   )
 }
 
-export default NewChatBox
+export default memo(NewChatBox)

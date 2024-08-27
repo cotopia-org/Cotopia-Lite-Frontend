@@ -31,6 +31,7 @@ const EditChatInput = ({ message, onAdd }: Props) => {
 
   return (
     <ChatUserInput
+      isReplyState
       defaultValue={message.text}
       onAdd={onAdd}
       beforeNode={selectedMessageNode}

@@ -60,13 +60,11 @@ const MessageBox = forwardRef(
               className="flex flex-row items-center gap-x-2"
               style={{ overflowWrap: "anywhere" }}
             >
-              {!isMine && (
-                <Avatar
-                  src={item?.user?.avatar?.url}
-                  className="w-5 h-5"
-                  title={getUserFullname(item?.user)?.[0]}
-                />
-              )}
+              <Avatar
+                src={item?.user?.avatar?.url}
+                className="w-5 h-5"
+                title={getUserFullname(item?.user)?.[0]}
+              />
               <Username username={item.user.username} />
             </div>
             {beforeNode && beforeNode}

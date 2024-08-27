@@ -33,12 +33,14 @@ export const getInitMessages = createAsyncThunk(
   async ({
     room_id,
     upper_limit,
+    has_loading = false,
   }: {
     room_id: string
+    has_loading: boolean
     upper_limit: number
   }) => {
     //calculate per page base on upper limit
-    let perPage = __VARS.defaultPerPage * upper_limit
+    let perPage = (__VARS.defaultPerPage / 2) * upper_limit
     const res = await axiosInstance.get(
       urlWithQueryParams(`/rooms/${room_id}/messages`, {
         page: 1,
@@ -47,7 +49,7 @@ export const getInitMessages = createAsyncThunk(
     )
     const data = res?.data
     const messages: ChatItemType[] = (!!data && data?.data) || []
-    return { messages, upper_limit, room_id }
+    return { messages, upper_limit, room_id, has_loading }
   }
 )
 
@@ -68,6 +70,7 @@ export const getNextMessages = createAsyncThunk(
       const res = await axiosInstance.get(
         urlWithQueryParams(`/rooms/${room_id}/messages`, {
           page: newUpperLimit,
+          perPage: __VARS.defaultPerPage,
         })
       )
       const data = res?.data
@@ -106,6 +109,7 @@ export const getPrevMessages = createAsyncThunk(
       const res = await axiosInstance.get(
         urlWithQueryParams(`/rooms/${room_id}/messages`, {
           page: newDownLimit,
+          perPage: __VARS.defaultPerPage,
         })
       )
       const data = res?.data
@@ -129,12 +133,17 @@ const roomSlice = createSlice({
   reducers: {
     updateMessages: (
       state,
-      action: PayloadAction<{ message: ChatItemType; roomId: string | number }>
+      action: PayloadAction<{
+        message: ChatItemType
+        roomId: string | number
+        type?: "static" | "socket"
+      }>
     ) => {
-      if (!state.chatRoom) return state
+      if (!state.chatRoom) return
 
       const message = action.payload.message
       const roomId = action.payload.roomId
+      const changeType = action?.payload?.type
 
       const prevMessages = state.chatRoom[roomId].messages ?? []
 
@@ -145,9 +154,31 @@ const roomSlice = createSlice({
 
       if (foundIndex > -1) {
         newMessages[foundIndex] = message
-      } else {
+      } else if (changeType && foundIndex <= -1) {
         newMessages = [message, ...prevMessages]
+      } else {
+        //Badge on nav button should be handle here
       }
+      return {
+        ...state,
+        chatRoom: {
+          ...state.chatRoom,
+          [roomId]: {
+            ...state.chatRoom[roomId],
+            messages: newMessages,
+          },
+        },
+      }
+    },
+    removeMessage: (
+      state,
+      action: PayloadAction<{ message: ChatItemType }>
+    ) => {
+      const message = action.payload.message
+      const roomId = action.payload.message.room_id
+      if (!state.chatRoom || roomId === undefined) return
+      const prevMessages = state.chatRoom[roomId].messages ?? []
+      let newMessages = prevMessages.filter((msg) => msg.id !== message.id)
       return {
         ...state,
         chatRoom: {
@@ -164,7 +195,12 @@ const roomSlice = createSlice({
     //ADD_INIT_MESSAGES
     builder
       .addCase(getInitMessages.pending, (state, action) => {
-        state.loading = true
+        const meta = action.meta
+        if (meta.arg.has_loading) {
+          state.loading = true
+        } else {
+          state.loading = false
+        }
       })
       .addCase(getInitMessages.rejected, (state, action) => {
         state.loading = false
@@ -207,7 +243,10 @@ const roomSlice = createSlice({
             const room = rooms?.[roomId]
             //prev messages
             const prevMessages = [...(room?.messages ?? [])]
-            const updatedMessages = [...prevMessages.slice(10), ...newMessages]
+            const updatedMessages = [
+              ...prevMessages.slice(__VARS.defaultPerPage),
+              ...newMessages,
+            ]
             return {
               ...state,
               nextLoading: false,
@@ -264,6 +303,9 @@ const roomSlice = createSlice({
   },
 })
 
-export const { updateMessages } = roomSlice.actions
+export const {
+  updateMessages: updateMessagesAction,
+  removeMessage: removeMessageAction,
+} = roomSlice.actions
 
 export default roomSlice.reducer

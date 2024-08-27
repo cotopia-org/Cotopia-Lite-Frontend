@@ -1,6 +1,7 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
 import { _BUS } from "@/app/const/bus"
 import { __VARS } from "@/app/const/vars"
+import { useRef } from "react"
 import { useRoomContext } from "@/components/shared/room/room-context"
 import { useChat } from "@/hooks/chat/use-chat"
 
@@ -9,7 +10,7 @@ import {
   getInitMessages,
   getNextMessages,
   getPrevMessages,
-  updateMessages,
+  updateMessagesAction,
 } from "@/store/redux/slices/room-slice"
 import { useAppDispatch, useAppSelector } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
@@ -47,6 +48,7 @@ type InitCtxType = {
   onAddMessage: (text: string) => void
   onReplyMessage: (text: string) => void
   onEditMessage: (text: string) => void
+  ref: any
   changeKey: (value: { key: string; value: any }) => void
   changeBulk: (values: { [key: string]: any }) => void
 }
@@ -61,6 +63,7 @@ const initCtx: InitCtxType = {
   targetMessage: undefined,
   originMessage: undefined,
   loading: false,
+  ref: undefined,
   flag: undefined,
   moveToFlag: false,
   backFromFlag: false,
@@ -117,7 +120,7 @@ const reducer = (state: InitStateType, action: ActionTypes) => {
   }
 }
 
-const UPPER_LIMIT_PAGE = __VARS.pagesLimitDiff
+export const UPPER_LIMIT_PAGE = __VARS.pagesLimitDiff
 const DOWN_LIMIT_PAGE = 1
 
 const ChatRoomCtxProvider = ({
@@ -129,6 +132,7 @@ const ChatRoomCtxProvider = ({
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  const ref = useRef<any>()
   const appDispatch = useAppDispatch()
 
   const { chatRoom, loading } = useAppSelector((state) => state.roomSlice)
@@ -161,6 +165,7 @@ const ChatRoomCtxProvider = ({
       if (!room_id || !isFirstFetch) return
       appDispatch(
         getInitMessages({
+          has_loading: true,
           room_id: room_id,
           upper_limit: UPPER_LIMIT_PAGE,
         })
@@ -188,19 +193,43 @@ const ChatRoomCtxProvider = ({
   )
 
   const updateMessagesHandler = useCallback((chat: ChatItemType) => {
-    appDispatch(updateMessages({ message: chat, roomId: room_id }))
+    appDispatch(updateMessagesAction({ message: chat, roomId: room_id }))
   }, [])
+
+  useEffect(() => {
+    if (down_limit === 1) {
+      busDispatch(_BUS.scrollEndChatBox)
+    }
+  }, [down_limit, messages?.length])
 
   const addMessageHandler = useCallback(
     async (text: string) => {
       if (!room_id) return
       try {
-        const message = await sendToRoom(text, room_id)
-        if (message) updateMessagesHandler(message)
-        busDispatch(_BUS.scrollEndChatBox)
+        const message = (await sendToRoom(text, room_id)) as ChatItemType
+        if (down_limit === 1) {
+          appDispatch(
+            updateMessagesAction({ message, roomId: room_id, type: "static" })
+          )
+        } else {
+          await appDispatch(
+            getInitMessages({
+              has_loading: false,
+              room_id: room_id,
+              upper_limit: UPPER_LIMIT_PAGE,
+            })
+          )
+          busDispatch(_BUS.scrollEndChatBox)
+        }
       } catch (e) {}
     },
-    [room_id, updateMessagesHandler, busDispatch]
+    [
+      appDispatch,
+      updateMessagesAction,
+      room_id,
+      down_limit,
+      state?.targetMessage,
+    ]
   )
 
   const editMessageHandler = useCallback(
@@ -226,12 +255,36 @@ const ChatRoomCtxProvider = ({
         payload: { targetMessage: undefined, flag: undefined },
       })
       try {
-        const message = await sendToRoom(text, room_id, state.targetMessage.id)
-        if (message) updateMessagesHandler(message)
-        busDispatch(_BUS.scrollEndChatBox)
+        const message = (await sendToRoom(
+          text,
+          room_id,
+          state.targetMessage.id
+        )) as ChatItemType
+
+        if (down_limit === 1) {
+          appDispatch(
+            updateMessagesAction({ message, roomId: room_id, type: "static" })
+          )
+        } else {
+          await appDispatch(
+            getInitMessages({
+              has_loading: false,
+              room_id: room_id,
+              upper_limit: UPPER_LIMIT_PAGE,
+            })
+          )
+          busDispatch(_BUS.scrollEndChatBox)
+        }
       } catch (error) {}
     },
-    [updateMessagesHandler, room_id, state.targetMessage, busDispatch]
+    [
+      busDispatch,
+      appDispatch,
+      updateMessagesAction,
+      room_id,
+      down_limit,
+      state?.targetMessage,
+    ]
   )
 
   const changeStateHandler = (value: { key: string; value: any }) => {
@@ -256,6 +309,7 @@ const ChatRoomCtxProvider = ({
         env: environment,
         loading: loading || chatRoom === undefined,
         flag: state.flag,
+        ref,
         upperLimit: upper_limit,
         downLimit: down_limit,
         moveToFlag: state.moveToFlag,

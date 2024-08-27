@@ -6,7 +6,6 @@ import TabRoomTitle from "./room-title"
 import ChatRoomCtxProvider, {
   RoomEnvironmentType,
 } from "@/context/chat-room-context"
-import { useRoomContext } from "../../room-context"
 
 export default function UserChat() {
   return (

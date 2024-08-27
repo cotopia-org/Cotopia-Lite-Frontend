@@ -4,6 +4,7 @@ export const _BUS = {
   someoneStartTalking: "SOMEONE_START_TALKING",
   someoneStopTalking: "SOMEONE_STOP_TALKING",
   scrollEndChatBox: "SCROLL_END_CHATBOX",
+  scrollMessageToEnd: "SCROLL_MSG_TO_END",
   backToOriginMessage: "BACK_TO_ORIGIN_MESSAGE",
   scrollToTopNewChatMessages: "SCROLL_TO_TOP_NEW_CHAT_MESSAGES",
   scrollToTargetMessage: "SCROLL_TO_TARGET_MESSAGE",
