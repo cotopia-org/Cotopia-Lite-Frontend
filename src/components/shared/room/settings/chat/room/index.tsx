@@ -46,7 +46,7 @@ export default function UserChatRoom() {
     content = (
       <>
         <NewChatBox
-          className="min-h-[calc(100%-80px)] items-center justify-center"
+          className="min-h-[calc(100%-60px)] items-center justify-center"
           observer_user_id={user?.id}
         />
         {chatInputNode}
@@ -58,7 +58,7 @@ export default function UserChatRoom() {
   if (loading) content = <FullLoading />
 
   return (
-    <div className="relative h-full flex flex-col gap-y-2 justify-between pt-8">
+    <div className="relative h-full flex flex-col gap-y-1 justify-between pt-8">
       {content}
     </div>
   )

@@ -4,13 +4,11 @@ import UserChatRoom from "./room"
 import UserChatDirect from "./direct"
 import TabRoomTitle from "./room-title"
 import ChatRoomCtxProvider, {
-  RoomSoocketType,
+  RoomEnvironmentType,
 } from "@/context/chat-room-context"
 import { useRoomContext } from "../../room-context"
 
 export default function UserChat() {
-  const { room_id } = useRoomContext()
-
   return (
     <CTabs
       defaultValue="room"
@@ -20,10 +18,7 @@ export default function UserChat() {
           title: <TabRoomTitle />,
           value: "room",
           content: (
-            <ChatRoomCtxProvider
-              endpoint={`/rooms/${room_id}/messages`}
-              type={RoomSoocketType.room}
-            >
+            <ChatRoomCtxProvider environment={RoomEnvironmentType.room}>
               <UserChatRoom />
             </ChatRoomCtxProvider>
           ),

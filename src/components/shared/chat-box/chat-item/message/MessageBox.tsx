@@ -12,14 +12,23 @@ import { ReactNode, forwardRef } from "react"
 
 interface Props {
   isMine: boolean
+  fullWidth?: boolean
   item: ChatItemType
   beforeNode?: ReactNode
 }
 
 const MessageBox = forwardRef(
-  ({ item, isMine, beforeNode }: Props, ref: any) => {
+  ({ item, isMine, beforeNode, fullWidth = false }: Props, ref: any) => {
     const isMessageEdited = !!item.is_edited
     const isMessageSeen = !!item.seen
+
+    let messageBoxClss =
+      "message-box relative flex flex-row items-center gap-x-4 p-2 rounded-lg"
+
+    if (fullWidth) messageBoxClss += " w-full"
+    if (!fullWidth) messageBoxClss += " w-[200px]"
+    if (isMine) messageBoxClss += " !bg-blue-500/10"
+    if (!isMine) messageBoxClss += " !bg-black/5"
 
     let footerClss = "flex w-full justify-end items-center"
 
@@ -27,8 +36,7 @@ const MessageBox = forwardRef(
     let editLable = null
 
     if (isMessageEdited) {
-      footerClss += " !justify-between"
-      editLable = <span className="text-xs text-black/50">Edited</span>
+      editLable = <span className="text-xs text-gray-600">Edited</span>
     }
 
     if (isMine) {
@@ -46,27 +54,31 @@ const MessageBox = forwardRef(
         data-id={`${item.id}`}
         className="chat-item overflow-hidden relative flex flex-row my-2 items-start gap-x-2 select-text"
       >
-        {!isMine && (
-          <Avatar
-            src={item?.user?.avatar?.url}
-            title={getUserFullname(item?.user)?.[0]}
-          />
-        )}
-        <div className="message-box relative flex flex-row items-center gap-x-4 p-2  rounded-lg bg-black/5 w-[200px] max-w-full">
-          <div className="flex flex-col gap-y-1 w-full">
+        <div className={messageBoxClss}>
+          <div className="flex flex-col gap-y-2 w-full">
             <div
-              className="flex flex-row items-center gap-x-1"
+              className="flex flex-row items-center gap-x-2"
               style={{ overflowWrap: "anywhere" }}
             >
+              {!isMine && (
+                <Avatar
+                  src={item?.user?.avatar?.url}
+                  className="w-5 h-5"
+                  title={getUserFullname(item?.user)?.[0]}
+                />
+              )}
               <Username username={item.user.username} />
             </div>
             {beforeNode && beforeNode}
             <Message isMine={isMine} item={item} />
             <div className={footerClss}>
-              {editLable}
-              <div className="flex items-center gap-x-1">
-                <Time time={item.created_at} />
-                {seenModeNode}
+              {/**Reactions view should be here */}
+              <div className="flex items-center gap-x-2">
+                {editLable}
+                <div className="flex items-center gap-x-1">
+                  <Time time={item.created_at} />
+                  {seenModeNode}
+                </div>
               </div>
             </div>
           </div>

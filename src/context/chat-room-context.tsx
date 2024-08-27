@@ -1,10 +1,17 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
 import { _BUS } from "@/app/const/bus"
+import { __VARS } from "@/app/const/vars"
 import { useRoomContext } from "@/components/shared/room/room-context"
 import { useChat } from "@/hooks/chat/use-chat"
-import useLoading from "@/hooks/use-loading"
-import axiosInstance from "@/lib/axios"
-import { urlWithQueryParams } from "@/lib/utils"
+
+import {
+  RoomDetailsType,
+  getInitMessages,
+  getNextMessages,
+  getPrevMessages,
+  updateMessages,
+} from "@/store/redux/slices/room-slice"
+import { useAppDispatch, useAppSelector } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
 import { MessageType } from "@/types/message"
 import {
@@ -20,16 +27,23 @@ import { dispatch as busDispatch } from "use-bus"
 
 export type FlagType = "edit" | "reply" | "pin"
 
+export enum FetchMessageType {
+  "Prev" = 1,
+  "Next" = 2,
+}
+
 type InitCtxType = {
+  env: RoomEnvironmentType
   messages: ChatItemType[] | undefined
   targetMessage: ChatItemType | undefined
   originMessage: ChatItemType | undefined
   flag: FlagType | undefined
-  messagesPage: number
   moveToFlag: boolean
   backFromFlag: boolean
   loading: boolean
-  loadMoreMessages: (page?: number) => Promise<ChatItemType[] | undefined>
+  upperLimit: number
+  downLimit: number
+  loadMoreMessages: (type: FetchMessageType, page?: number) => Promise<void>
   onAddMessage: (text: string) => void
   onReplyMessage: (text: string) => void
   onEditMessage: (text: string) => void
@@ -37,7 +51,12 @@ type InitCtxType = {
   changeBulk: (values: { [key: string]: any }) => void
 }
 
+export enum RoomEnvironmentType {
+  "room" = "roomMessages",
+  "direct" = "directMessages",
+}
 const initCtx: InitCtxType = {
+  env: RoomEnvironmentType.room,
   messages: [],
   targetMessage: undefined,
   originMessage: undefined,
@@ -45,24 +64,19 @@ const initCtx: InitCtxType = {
   flag: undefined,
   moveToFlag: false,
   backFromFlag: false,
-  messagesPage: 1,
   onAddMessage: () => {},
+  upperLimit: __VARS.pagesLimitDiff,
+  downLimit: 1,
   onEditMessage: () => {},
   onReplyMessage: () => {},
   changeKey: (value) => {},
-  changeBulk(values) {},
-  loadMoreMessages: (page?: number) => new Promise((resolve, reject) => {}),
+  changeBulk: (values) => {},
+  loadMoreMessages: () => new Promise<void>((resolve, reject) => {}),
 }
 
 const ChatRoomCtx = createContext(initCtx)
 
-export enum RoomSoocketType {
-  "room" = "roomMessages",
-  "direct" = "directMessages",
-}
-
 type InitStateType = {
-  messages: ChatItemType[] | undefined
   moveToFlag: boolean
   backFromFlag: boolean
   page: number
@@ -72,7 +86,6 @@ type InitStateType = {
 }
 
 const initialState: InitStateType = {
-  messages: undefined,
   page: 1,
   moveToFlag: false,
   backFromFlag: false,
@@ -104,85 +117,79 @@ const reducer = (state: InitStateType, action: ActionTypes) => {
   }
 }
 
+const UPPER_LIMIT_PAGE = __VARS.pagesLimitDiff
+const DOWN_LIMIT_PAGE = 1
+
 const ChatRoomCtxProvider = ({
   children,
-  endpoint,
-  type,
+  environment,
 }: {
   children: ReactNode
-  endpoint: string
-  type: RoomSoocketType
+  environment: RoomEnvironmentType
 }) => {
-  const { isLoading, startLoading, stopLoading } = useLoading()
-
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  const appDispatch = useAppDispatch()
+
+  const { chatRoom, loading } = useAppSelector((state) => state.roomSlice)
+
   const { room_id } = useRoomContext()
+
   const { sendToRoom, editMessage } = useChat()
 
-  const getMessages = async (defaultPage: number = state.page) => {
-    try {
-      const res = await axiosInstance.get(
-        urlWithQueryParams(endpoint, { page: defaultPage })
-      )
-      const data = res?.data
-      const items: ChatItemType[] = !!data ? data?.data : []
-      dispatch({
-        type: "CHANGE_KEY",
-        payload: { key: "page", value: state.page + 1 },
-      })
-      return items
-    } catch (error) {}
+  if (!room_id) return null
+
+  let selectedRoom: RoomDetailsType | undefined = undefined
+
+  //collect all chat room ids
+  const roomIds = chatRoom ? Object.keys(chatRoom) : []
+  //check is room exist or not
+  if (roomIds.includes(room_id)) {
+    selectedRoom = chatRoom?.[room_id]
   }
+
+  const upper_limit = selectedRoom?.upper_limit ?? UPPER_LIMIT_PAGE
+
+  const down_limit = selectedRoom?.down_limit ?? DOWN_LIMIT_PAGE
+
+  const isFirstFetch = selectedRoom === undefined
+
+  const messages = selectedRoom?.messages ?? []
 
   useEffect(() => {
     const firstFetchMessages = async () => {
-      startLoading()
-      const items = await getMessages()
-      dispatch({
-        type: "CHANGE_KEY",
-        payload: { key: "messages", value: items },
-      })
-      stopLoading()
+      if (!room_id || !isFirstFetch) return
+      appDispatch(
+        getInitMessages({
+          room_id: room_id,
+          upper_limit: UPPER_LIMIT_PAGE,
+        })
+      )
     }
 
     firstFetchMessages()
-  }, [])
+  }, [isFirstFetch])
 
-  const loadMoreMessages = async (page?: number) => {
-    try {
-      const items = await getMessages(page)
-      const prevMessages = state.messages as ChatItemType[]
-      const newMessages = [...prevMessages, ...(items as ChatItemType[])]
-      dispatch({
-        type: "CHANGE_KEY",
-        payload: { key: "messages", value: newMessages },
-      })
-      return items
-    } catch (error) {}
-  }
+  const loadMoreMessages = useCallback(
+    async (type: FetchMessageType, page?: number) => {
+      const objToSend = { room_id, upper_limit, down_limit }
+      if (!!page) objToSend["upper_limit"] = page
 
-  const updateMessagesHandler = useCallback(
-    (chat: ChatItemType) => {
-      const lastMsgs = [...(state.messages ?? [])]
-
-      const chatIds = lastMsgs.map((x) => x.id)
-      const foundIndex = chatIds.indexOf(chat.id)
-
-      let newMessages = [...lastMsgs]
-
-      if (foundIndex > -1) {
-        newMessages[foundIndex] = chat
-      } else {
-        newMessages = [chat, ...lastMsgs]
+      switch (type) {
+        case FetchMessageType.Next:
+          appDispatch(getNextMessages(objToSend))
+          break
+        case FetchMessageType.Prev:
+          appDispatch(getPrevMessages(objToSend))
+          break
       }
-      dispatch({
-        type: "CHANGE_KEY",
-        payload: { key: "messages", value: newMessages },
-      })
     },
-    [state.messages]
+    [upper_limit, down_limit]
   )
+
+  const updateMessagesHandler = useCallback((chat: ChatItemType) => {
+    appDispatch(updateMessages({ message: chat, roomId: room_id }))
+  }, [])
 
   const addMessageHandler = useCallback(
     async (text: string) => {
@@ -236,27 +243,27 @@ const ChatRoomCtxProvider = ({
   }
 
   useSocket(
-    type,
+    environment,
     (data: MessageType) => {
       updateMessagesHandler(data)
     },
     [addMessageHandler]
   )
 
-  const loading = state?.messages === undefined || isLoading
-
   return (
     <ChatRoomCtx.Provider
       value={{
-        loading,
+        env: environment,
+        loading: loading || chatRoom === undefined,
         flag: state.flag,
+        upperLimit: upper_limit,
+        downLimit: down_limit,
         moveToFlag: state.moveToFlag,
         backFromFlag: state.backFromFlag,
-        messagesPage: state.page,
         originMessage: state.originMessage,
         changeKey: changeStateHandler,
         changeBulk: changeBultHandler,
-        messages: state.messages,
+        messages,
         targetMessage: state.targetMessage,
         loadMoreMessages: loadMoreMessages,
         onAddMessage: addMessageHandler,

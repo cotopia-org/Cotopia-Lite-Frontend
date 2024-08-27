@@ -9,18 +9,21 @@ import colors from "tailwindcss/colors"
 import MessageBox from "./message/MessageBox"
 import TargetMessageAction from "./TargetMessageAction"
 import { _BUS } from "@/app/const/bus"
-import { forwardRef, useState } from "react"
+import { ReactNode, forwardRef, useState } from "react"
 import DeleteMessageAction from "./my-message/DeleteMessageAction"
-import { useChatRoomCtx } from "@/context/chat-room-context"
+import {
+  RoomEnvironmentType,
+  useChatRoomCtx,
+} from "@/context/chat-room-context"
 
 type Props = {
   item: ChatItemType
   observer_user_id?: number
-  onFlagSelect: () => void
+  onFlagSelect?: () => void
 }
 const ChatItem = forwardRef(
   ({ item, observer_user_id, onFlagSelect }: Props, ref: any) => {
-    const { changeBulk } = useChatRoomCtx()
+    const { changeBulk, env } = useChatRoomCtx()
 
     const [deleteAnchor, setDeleteAnchor] = useState<boolean>(false)
 
@@ -28,13 +31,15 @@ const ChatItem = forwardRef(
 
     const isMyMessage = item.user?.id === observer_user_id
 
+    const isRoomEnv = env === RoomEnvironmentType.room
+
     let replyedNode = undefined
 
     if (!!targetMessage) {
       replyedNode = (
         <TargetMessageAction
           className="!m-0"
-          onSelect={onFlagSelect}
+          // onSelect={onFlagSelect}
           title={targetMessage.user.username}
           description={targetMessage.text}
         />
@@ -76,6 +81,7 @@ const ChatItem = forwardRef(
         items={menuItems}
         trigger={
           <MessageBox
+            fullWidth={isRoomEnv}
             ref={ref}
             beforeNode={replyedNode}
             item={item}
@@ -85,8 +91,8 @@ const ChatItem = forwardRef(
       />
     )
 
-    return isMyMessage ? (
-      <MyMessage>
+    let messageNode = isMyMessage ? (
+      <>
         {(deleteAnchor && (
           <DeleteMessageAction
             onClose={() => setDeleteAnchor(false)}
@@ -95,10 +101,25 @@ const ChatItem = forwardRef(
         )) ||
           null}
         {content}
-      </MyMessage>
+      </>
     ) : (
-      <TheirMessage>{content}</TheirMessage>
+      <>{content}</>
     )
+
+    const directWrapper = (children: ReactNode) => {
+      return isMyMessage ? (
+        <MyMessage>{children}</MyMessage>
+      ) : (
+        <TheirMessage>{children}</TheirMessage>
+      )
+    }
+
+    switch (env) {
+      case RoomEnvironmentType.room:
+        return messageNode
+      case RoomEnvironmentType.direct:
+        return directWrapper(messageNode)
+    }
   }
 )
 export default ChatItem

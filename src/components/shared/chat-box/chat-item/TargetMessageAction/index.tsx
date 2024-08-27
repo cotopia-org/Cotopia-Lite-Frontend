@@ -4,7 +4,7 @@ import { X } from "lucide-react"
 import React, { MouseEvent, ReactNode, useCallback } from "react"
 
 interface Props {
-  onSelect: () => void
+  onSelect?: () => void
   onClose?: () => void
   title?: string
   description: string

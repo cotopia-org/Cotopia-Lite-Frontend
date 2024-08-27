@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useRef } from "react"
+import React, { FormEvent, ReactNode, useEffect, useRef } from "react"
 import EmojiButton from "./emoji"
 import SendButton from "./send"
 
