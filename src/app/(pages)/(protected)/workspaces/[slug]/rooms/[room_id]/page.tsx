@@ -1,5 +1,4 @@
 import RoomSpatial from "@/components/shared/room-spatial-wrapper";
-import { notFound } from "next/navigation";
 
 type Props = {
   searchParams: {

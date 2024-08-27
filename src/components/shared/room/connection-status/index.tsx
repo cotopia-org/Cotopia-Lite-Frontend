@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { RoomEvent } from "livekit-client";
+import { ConnectionState, RoomEvent } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
-import CModal from "@/components/shared-ui/c-modal";
-import Disconnected from "./disconnected";
+import { __VARS } from "@/app/const/vars";
+import useQueryParams from "@/hooks/use-query-params";
+import ModalDisconnected from "./modal-disconnected";
 
 function LiveKitConnectionStatus() {
+  const { query } = useQueryParams();
+  const livekit_token = query?.token;
+
   const [connectionStatus, setConnectionStatus] =
     useState<string>("Disconnected");
 
@@ -54,12 +58,16 @@ function LiveKitConnectionStatus() {
     };
   }, []);
 
+  const onReconnect = () => {
+    if (!__VARS.serverUrl) return;
+
+    if (room.state === ConnectionState.Connected) return;
+
+    room.connect(__VARS.serverUrl, livekit_token);
+  };
+
   if (connectionStatus == RoomEvent.Disconnected)
-    return (
-      <CModal className='flex flex-col items-center justify-center'>
-        <Disconnected />
-      </CModal>
-    );
+    return <ModalDisconnected onReTry={onReconnect} />;
 
   return null;
 }

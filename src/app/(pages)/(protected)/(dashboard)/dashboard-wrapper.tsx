@@ -2,7 +2,6 @@
 import { Socket } from "socket.io-client";
 
 import { __VARS } from "@/app/const/vars";
-import socket from "@/lib/socket";
 import React, {
   createContext,
   useContext,
@@ -10,7 +9,6 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
-  useEffect,
 } from "react";
 
 interface DashboardContextValue {

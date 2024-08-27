@@ -24,73 +24,89 @@ const VideoContext = createContext<{
 export const useVideoContext = () => useContext(VideoContext);
 
 export default function Video() {
-  const { videoState, changePermissionState } = useRoomContext();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoPermission, setVideoPermission] = useState<boolean>(false);
+  const [hasVideoAccess, setHasVideoAccess] = useState<boolean | null>(null);
+  const [hasAudioAccess, setHasAudioAccess] = useState<boolean | null>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  const { startLoading, stopLoading, isLoading } = useLoading();
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
 
-  const getPermissions = async () => {
-    startLoading();
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      setVideoPermission(true);
-      console.log("stream", stream);
-      setVideoStream(stream);
-      changePermissionState("video", true);
-    } catch (err) {
-      if (err instanceof DOMException) {
-        if (err.name === "NotAllowedError") {
-          setVideoPermission(false);
-        }
-      }
-    } finally {
-      stopLoading();
-    }
-  };
-
-  const stopVideoStream = () => {
-    if (videoStream) {
-      videoStream.getTracks().forEach((track) => track.stop());
-      setVideoStream(null);
-      setVideoPermission(false);
-      changePermissionState("video", false);
-      console.log("Video stream stopped");
-    } else {
-      console.log("No video stream to stop");
-    }
-  };
-
-  useEffect(() => {
-    if (videoState === true) {
-      getPermissions();
-    } else {
-      stopVideoStream();
-    }
-  }, [videoState]);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (videoRef.current && videoStream) {
       videoRef.current.srcObject = videoStream;
-      videoRef.current.play();
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null;
     }
   }, [videoStream]);
+
+  useEffect(() => {
+    checkMediaAccess();
+  }, []);
+
+  const checkMediaAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setHasVideoAccess(true);
+      setHasAudioAccess(true);
+      setVideoStream(stream);
+      setAudioStream(stream);
+    } catch (err) {
+      if (err instanceof DOMException) {
+        if (err.message.includes("video")) {
+          setHasVideoAccess(false);
+        }
+        if (err.message.includes("audio")) {
+          setHasAudioAccess(false);
+        }
+      }
+    }
+  };
+
+  const handleToggleVideo = () => {
+    if (videoStream) {
+      const videoTracks = videoStream.getVideoTracks();
+      videoTracks.forEach((track) => {
+        if (track.enabled) {
+          track.stop(); // Stop the track completely
+          setVideoStream(null); // Clear the video stream state
+        } else {
+          // Restart the video stream
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((newStream) => {
+              const newTrack = newStream.getVideoTracks()[0];
+              setVideoStream(newStream);
+              if (videoRef.current) {
+                videoRef.current.srcObject = newStream;
+              }
+            });
+        }
+      });
+    } else {
+      checkMediaAccess();
+    }
+  };
+
+  const handleToggleAudio = () => {
+    if (audioStream) {
+      const audioTracks = audioStream.getAudioTracks();
+      audioTracks.forEach((track) => (track.enabled = !track.enabled));
+    }
+  };
 
   let content = (
     <>
       <video
         ref={videoRef}
         autoPlay
+        playsInline
         className='mirror-video h-auto w-full max-h-[300px] object-cover'
       />
     </>
   );
 
-  if (videoPermission === false && videoState === true)
+  if (hasVideoAccess === false)
     content = (
       <div className='flex flex-col gap-y-2 items-center justify-center'>
         <strong className='text-xl'>
@@ -100,18 +116,22 @@ export default function Video() {
       </div>
     );
 
-  if (videoState === false)
+  if (videoStream === null)
     content = (
       <div className='flex flex-col gap-y-2 items-center justify-center'>
         <strong className='text-xl'>Camera is off</strong>
       </div>
     );
 
-  if (isLoading) content = <FullLoading />;
+  // if (isLoading) content = <FullLoading />;
 
   return (
     <VideoContext.Provider
-      value={{ videoStream, getPermissions, stopVideoStream }}
+      value={{
+        videoStream,
+        getPermissions: checkMediaAccess,
+        stopVideoStream: handleToggleVideo,
+      }}
     >
       <div className='w-full relative min-h-[300px] flex flex-col items-center justify-center bg-black/10 rounded-lg overflow-hidden'>
         {content}

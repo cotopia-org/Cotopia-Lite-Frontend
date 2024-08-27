@@ -9,6 +9,7 @@ import { useState } from "react";
 import { dispatch } from "use-bus";
 import { useRoomContext } from "../../room-context";
 import DraggableRoom from "../draggable-room";
+import useKeyPress from "@/hooks/use-key-press";
 
 type Props = {
   track: TrackReference;
@@ -44,6 +45,10 @@ export default function ScreenShareCard({ track }: Props) {
 
   const { meet } = doCirclesMeet(myTargetUser, targetUser);
 
+  const handleStopShareScreen = () => dispatch(_BUS.stopMyScreenSharing);
+
+  useKeyPress("Escape", handleStopShareScreen);
+
   if (!meet) return;
 
   const videoContent = <VideoTrack trackRef={track} />;
@@ -66,7 +71,7 @@ export default function ScreenShareCard({ track }: Props) {
         {!!myScreenShare && (
           <CotopiaIconButton
             className='text-black/60 z-10'
-            onClick={() => dispatch(_BUS.stopMyScreenSharing)}
+            onClick={handleStopShareScreen}
           >
             <X />
           </CotopiaIconButton>

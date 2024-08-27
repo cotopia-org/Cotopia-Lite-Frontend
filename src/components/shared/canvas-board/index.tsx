@@ -11,8 +11,7 @@ const Canvas: React.FC = () => {
     <div
       style={{
         width: "100%",
-        height: "100vh",
-        backgroundImage: `url(${room?.background?.url ?? ""})`,
+        height: "100%",
         backgroundSize: "cover", // or 'contain', 'auto', etc.
         backgroundPosition: "30% 0%",
         backgroundRepeat: "no-repeat",
