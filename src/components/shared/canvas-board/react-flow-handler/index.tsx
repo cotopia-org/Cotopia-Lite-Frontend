@@ -24,6 +24,8 @@ import UserNode from "../user";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { convertCoordinateString } from "@/lib/utils";
 import BackgroundNode from "../background";
+import { __VARS } from "@/app/const/vars";
+import NodesPreview from "../nodes-preview";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -36,8 +38,6 @@ const nodeTypes = {
 };
 
 function ReactFlowHandler({ tracks }: Props) {
-  // const { handleChangeViewport } = useCanvas();
-
   const [viewPort, setViewPort] = useState<Viewport>();
 
   const [rf, setRf] = useState<ReactFlowInstance>();
@@ -85,6 +85,9 @@ function ReactFlowHandler({ tracks }: Props) {
         type: "backgroundNode",
         draggable: false,
         data: {},
+        focusable: false,
+        deletable: false,
+        selectable: false,
       },
       ...participants.map((x, index) => {
         const targetUser = socketParticipants.find(
@@ -112,6 +115,8 @@ function ReactFlowHandler({ tracks }: Props) {
             isDragging: false,
           },
           position: { x: xcoord, y: ycoord },
+          parentId: "4214242141",
+          extent: "parent",
         };
 
         if (!isDraggable) object["draggable"] = false;
@@ -134,62 +139,18 @@ function ReactFlowHandler({ tracks }: Props) {
         username: livekitIdentity,
       });
 
-      setNodes((prev) =>
-        prev.map((x) => {
-          if (
-            (x.data?.track as any)?.participant?.identity === livekitIdentity
-          ) {
-            return {
-              ...x,
-              position: {
-                x: +node.position.x,
-                y: +node.position.y,
-              },
-              data: {
-                ...x?.data,
-                isDragging: false,
-              },
-            };
-          }
-
-          return x;
-        })
-      );
-
       updateUserCoords(livekitIdentity, node.position);
     }
   };
-
-  // Define the bounds: (minX, minY) and (maxX, maxY)
-  const nodeExtent: any = [
-    [160, 160],
-    [2700, 1880],
-  ];
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     [setNodes]
   );
 
-  // const onMoveEnd = useCallback((_: any, a: any) => {
-  //   const { x, y, zoom } = a;
-
-  //   // Ensure that the position stays within the 3000x3000 bounds
-  //   const maxPosition = 3400 * zoom;
-  //   const minPosition = -1 * maxPosition + window.innerWidth;
-
-  //   let newX = Math.max(minPosition, Math.min(x, 0));
-  //   let newY = Math.max(minPosition, Math.min(y, 0));
-
-  //   if (newX !== x || newY !== y) {
-  //     setViewPort({ x: newX, y: newY, zoom });
-  //   }
-  // }, []);
-
   return (
     <ReactFlow
       style={{ width: "100%", height: "100%" }}
-      nodeExtent={nodeExtent}
       nodesDraggable={true}
       onNodeDragStop={onNodeDragStop}
       onNodesChange={onNodesChange}
@@ -201,10 +162,13 @@ function ReactFlowHandler({ tracks }: Props) {
       onInit={setRf}
       viewport={viewPort}
       onViewportChange={setViewPort}
-      // onMove={onMoveEnd}
       fitView
-      // onPaneScroll={()}
     >
+      {!!viewPort && (
+        <div className='fixed top-4 right-4 z-[10]'>
+          <NodesPreview viewport={viewPort} nodes={nodes} />
+        </div>
+      )}
       <MiniMap />
       <Background />
     </ReactFlow>

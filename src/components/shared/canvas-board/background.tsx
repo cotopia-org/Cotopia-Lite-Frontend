@@ -8,11 +8,10 @@ export default function BackgroundNode() {
     <div
       className='flex flex-col pointer-events-none z-0'
       style={{
-        width: 3000,
-        height: 3000,
-        backgroundColor: "#eee",
-        background: `url(${room?.background?.url})`,
-        backgroundPosition: "cover",
+        width: 3840,
+        height: 2160,
+        backgroundImage: `url(${room?.background?.url})`,
+        backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}
     ></div>

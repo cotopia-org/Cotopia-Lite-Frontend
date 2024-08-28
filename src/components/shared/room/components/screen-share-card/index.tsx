@@ -85,11 +85,5 @@ export default function ScreenShareCard({ track }: Props) {
     </div>
   );
 
-  return isFullScreen ? (
-    content
-  ) : (
-    <DraggableRoom x={400} y={200}>
-      {content}
-    </DraggableRoom>
-  );
+  return content;
 }
