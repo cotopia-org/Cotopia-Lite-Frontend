@@ -47,7 +47,7 @@ export default function ScreenShareCard({ track }: Props) {
 
   const handleStopShareScreen = () => dispatch(_BUS.stopMyScreenSharing);
 
-  useKeyPress("Escape", handleStopShareScreen);
+  useKeyPress("Escape", () => setIsFullScreen(false));
 
   if (!meet) return;
 
