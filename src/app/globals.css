@@ -4,35 +4,35 @@
 
 @layer base {
   :root {
-    --background: #FFFFFF;
-    --foreground: #1C1C1E;
+    --background: #ffffff;
+    --foreground: #1c1c1e;
 
-    --primary-background: #EBF0FF;
+    --primary-background: #ebf0ff;
 
-    --card: #FFFFFF;
-    --card-foreground: #1C1C1E;
+    --card: #ffffff;
+    --card-foreground: #1c1c1e;
 
-    --popover: #FFFFFF;
-    --popover-foreground: #1C1C1E;
+    --popover: #ffffff;
+    --popover-foreground: #1c1c1e;
 
-    --primary: #1C1C1E;
+    --primary: #1c1c1e;
     --primary-foreground: #ffffff;
 
-    --secondary: #D1E8FF;
-    --secondary-foreground: #1C1C2D;
+    --secondary: #d1e8ff;
+    --secondary-foreground: #1c1c2d;
 
-    --muted: #D1E8FF;
+    --muted: #d1e8ff;
     --muted-foreground: #717882;
 
     --accent: rgba(209, 232, 255, 0.2);
-    --accent-foreground: #1C1C2D;
+    --accent-foreground: #1c1c2d;
 
-    --destructive: #F75255;
-    --destructive-foreground: #D1E8FF;
+    --destructive: #f75255;
+    --destructive-foreground: #d1e8ff;
 
-    --border: #E4EAF0;
-    --input: #E4EAF0;
-    --ring: #1C1C1E;
+    --border: #e4eaf0;
+    --input: #e4eaf0;
+    --ring: #1c1c1e;
 
     --radius: 8px;
   }
@@ -77,9 +77,30 @@
   }
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
 
-.user-circle .lk-participant-media-video , .mirror-video{
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 100vh;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 100vh;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.user-circle .lk-participant-media-video,
+.mirror-video {
   transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg);  
-    -moz-transform:rotateY(180deg); 
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
 }

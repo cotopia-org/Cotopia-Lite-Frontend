@@ -1,23 +1,23 @@
-import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import { getUserFullname } from "@/lib/utils";
-import { UserMinimalType, UserType } from "@/types/user";
+import CotopiaAvatar from "@/components/shared-ui/c-avatar"
+import { getUserFullname } from "@/lib/utils"
+import { UserMinimalType, UserType } from "@/types/user"
 
 type Props = {
-  item: UserMinimalType | UserType;
-  onPick?: (item: UserMinimalType) => void;
-  isSelected?: boolean;
-};
+  item: UserMinimalType | UserType
+  onPick?: (item: UserMinimalType) => void
+  isSelected?: boolean
+}
 
 export default function UserCardItem({ item, onPick, isSelected }: Props) {
-  const userFullname = getUserFullname(item);
-  const username = item?.username;
+  const userFullname = getUserFullname(item)
+  const username = item?.username
 
-  let clss = "flex flex-row items-center gap-x-4 px-4 py-2 cursor-pointer";
+  let clss = "flex flex-row items-center gap-x-4 px-4 py-2 cursor-pointer"
 
   if (isSelected) {
-    clss += ` bg-black/[.06] hover:bg-black/[.03]`;
+    clss += ` bg-black/[.06] hover:bg-black/[.03]`
   } else {
-    clss += ` hover:bg-black/[.03]`;
+    clss += ` hover:bg-black/[.03]`
   }
 
   return (
@@ -26,12 +26,12 @@ export default function UserCardItem({ item, onPick, isSelected }: Props) {
         src={item.avatar?.url ?? undefined}
         title={userFullname?.[0]}
       />
-      <div className='flex flex-col'>
+      <div className="flex flex-col">
         <strong>{userFullname}</strong>
-        <div className='flex flex-row items-center gap-x-2 text-black/40'>
+        <div className="flex flex-row items-center gap-x-2 text-black/40">
           <span>{username}</span>
         </div>
       </div>
     </div>
-  );
+  )
 }
