@@ -23,6 +23,7 @@ import { useRoomContext } from "../../room/room-context";
 import UserNode from "../user";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { convertCoordinateString } from "@/lib/utils";
+import BackgroundNode from "../background";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -31,6 +32,7 @@ type Props = {
 
 const nodeTypes = {
   userNode: UserNode,
+  backgroundNode: BackgroundNode,
 };
 
 function ReactFlowHandler({ tracks }: Props) {
@@ -73,8 +75,18 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const [nodes, setNodes] = useNodesState<Node>([]);
   useEffect(() => {
-    setNodes(
-      participants.map((x, index) => {
+    setNodes([
+      {
+        id: "4214242141",
+        position: {
+          x: 0,
+          y: 0,
+        },
+        type: "backgroundNode",
+        draggable: false,
+        data: {},
+      },
+      ...participants.map((x, index) => {
         const targetUser = socketParticipants.find(
           (a) => a.username === x.identity
         );
@@ -105,8 +117,8 @@ function ReactFlowHandler({ tracks }: Props) {
         if (!isDraggable) object["draggable"] = false;
 
         return object;
-      })
-    );
+      }),
+    ]);
   }, [participants, socketParticipants, tracks]);
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
@@ -191,6 +203,7 @@ function ReactFlowHandler({ tracks }: Props) {
       onViewportChange={setViewPort}
       // onMove={onMoveEnd}
       fitView
+      // onPaneScroll={()}
     >
       <MiniMap />
       <Background />

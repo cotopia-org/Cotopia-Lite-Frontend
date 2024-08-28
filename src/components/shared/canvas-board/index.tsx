@@ -25,9 +25,11 @@ const Canvas: React.FC = () => {
   // const { room } = useRoomContext();
 
   return (
-    <UserSessions>
-      {(tracks) => <ReactFlowHandler tracks={tracks} />}
-    </UserSessions>
+    <div className='w-[1920px] h-[1080px]'>
+      <UserSessions>
+        {(tracks) => <ReactFlowHandler tracks={tracks} />}
+      </UserSessions>
+    </div>
   );
 
   // return (
