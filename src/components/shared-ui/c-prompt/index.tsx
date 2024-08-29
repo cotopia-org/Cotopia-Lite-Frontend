@@ -1,42 +1,97 @@
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ReactNode, useState } from "react";
-import CotopiaPromptContent, { CotopiaPromptType } from "./content";
-import { _BUS } from "@/app/const/bus";
-import useBus from "use-bus";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { ReactNode, useState } from "react"
+import CotopiaPromptContent, { CotopiaPromptType } from "./content"
+import { _BUS } from "@/app/const/bus"
+import useBus from "use-bus"
 
-type Props = {
-  trigger: (open: () => void) => ReactNode;
-  afterDesc?: ReactNode;
-} & CotopiaPromptType;
-export default function CotopiaPrompt({ trigger, afterDesc, ...rest }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-  const handleOpen = () => setIsOpen(true);
+type WithPortalProps = {
+  isPortal?: true
+  trigger: (open: () => void) => ReactNode
+}
+
+type WithoutPortalProps = {
+  isPortal: false
+  trigger?: (open: () => void) => ReactNode
+}
+
+type RemaindPropTypes = {
+  afterDesc?: ReactNode
+  open?: boolean
+}
+
+type Props = RemaindPropTypes &
+  (WithPortalProps | WithoutPortalProps) &
+  PartiallyOptional<CotopiaPromptType, "onClose">
+export default function CotopiaPrompt({
+  trigger,
+  afterDesc,
+  open = false,
+  isPortal = true,
+  ...rest
+}: Props) {
+  const [isOpen, setIsOpen] = useState(open)
+
+  const handleOpen = () => setIsOpen(true)
 
   const handleClose = () => {
-    setIsOpen(false);
-    if (rest?.onClose) rest.onClose();
-  };
+    setIsOpen(false)
+    if (rest?.onClose) rest.onClose()
+  }
 
   const handleSubmit = () => {
-    if (rest?.onSubmit) rest.onSubmit();
-  };
+    if (rest?.onSubmit) rest.onSubmit()
+  }
 
   useBus(_BUS.closePrompt, () => {
-    handleClose();
-  });
+    handleClose()
+  })
+
+  let view = null
+
+  if (isPortal && !!trigger) {
+    view = (
+      <>
+        <DialogTrigger asChild>{trigger(handleOpen)}</DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] pt-12">
+          <CotopiaPromptContent
+            {...rest}
+            onSubmit={handleSubmit}
+            onClose={handleClose}
+            afterDesc={afterDesc}
+          />
+        </DialogContent>
+      </>
+    )
+  }
+
+  if (!isPortal) {
+    view = (
+      <>
+        {trigger ? (
+          <DialogTrigger asChild>{trigger(handleOpen)}</DialogTrigger>
+        ) : null}
+        <DialogOverlay onClick={handleClose} />
+        <div className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg">
+          <CotopiaPromptContent
+            {...rest}
+            onSubmit={handleSubmit}
+            onClose={handleClose}
+          />
+        </div>
+      </>
+    )
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{trigger(handleOpen)}</DialogTrigger>
-      <DialogContent className='sm:max-w-[425px] pt-12'>
-        <CotopiaPromptContent
-          {...rest}
-          onSubmit={handleSubmit}
-          onClose={handleClose}
-          afterDesc={afterDesc}
-        />
-      </DialogContent>
+      {view}
     </Dialog>
-  );
+  )
 }

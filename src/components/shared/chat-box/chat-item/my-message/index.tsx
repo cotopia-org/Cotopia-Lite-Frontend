@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode } from "react"
 
 type Props = {
-  children: ReactNode;
-};
+  children: ReactNode
+}
 export default function MyMessage({ children }: Props) {
-  return <div className='flex flex-col items-end w-full'>{children}</div>;
+  return <div className="flex flex-col items-end w-full">{children}</div>
 }

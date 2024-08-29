@@ -10,5 +10,7 @@ export const __VARS = {
   signOutApiPage: `/api/auth/sign-out`,
   voiceAreaRadius: 200,
   defaultPositionOfUserX: 400,
+  defaultPerPage: 20,
+  pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
-};
+}

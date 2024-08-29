@@ -1,12 +1,12 @@
-import moment from "moment";
+import moment from "moment"
 
 type Props = {
-  time: number;
-};
+  time: number
+}
 export default function Time({ time }: Props) {
   return (
-    <span className='text-gray-400 text-xs'>
+    <span className="text-gray-600 text-xs">
       {moment.unix(time).format("HH:mm a")}
     </span>
-  );
+  )
 }
