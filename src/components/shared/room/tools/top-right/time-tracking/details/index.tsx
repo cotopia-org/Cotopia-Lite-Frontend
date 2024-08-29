@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Rank from "./rank";
 import FullLoading from "@/components/shared/full-loading";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import BlurFade from "@/components/magicui/blur-fade";
 
 export default function TimeTrackingDetails() {
   const { user } = useProfile();
@@ -26,12 +27,18 @@ export default function TimeTrackingDetails() {
         .map((item, key) => {
           const isMe = item.user.id === user.id;
 
-          let clss = "flex flex-row items-center justify-between p-2";
+          let clss =
+            "flex flex-row items-center justify-between p-2 border-b last:border-0";
 
           if (isMe) clss += ` bg-sky-300`;
 
           return (
-            <div className={clss} key={key}>
+            <BlurFade
+              inView
+              className={clss}
+              key={key}
+              delay={0.05 + key * 0.05}
+            >
               <div className='flex flex-row items-center gap-x-2'>
                 <Rank rank={key + 1} />
                 <UserAvatar
@@ -51,13 +58,18 @@ export default function TimeTrackingDetails() {
                   </span>
                 )}
               </div>
-            </div>
+            </BlurFade>
           );
         })}
     </>
   );
 
-  if (isLoading || data === undefined) content = <FullLoading />;
+  if (isLoading || data === undefined)
+    content = (
+      <div className='py-4'>
+        <FullLoading />
+      </div>
+    );
 
   return (
     <ScrollArea className='h-72 flex flex-col gap-y-4 w-[260px]'>
