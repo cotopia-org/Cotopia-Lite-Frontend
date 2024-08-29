@@ -45,7 +45,7 @@ export default function TimeTrackingButtonTool() {
       {(style, open, close) => {
         return (
           <div
-            className='bg-white rounded-lg p-4 fixed mt-4 '
+            className='bg-white rounded-lg fixed mt-4'
             style={{ top: style.top, zIndex: style.zIndex }}
           >
             <TimeTrackingDetails />
