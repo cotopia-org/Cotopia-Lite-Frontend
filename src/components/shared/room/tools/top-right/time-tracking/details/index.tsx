@@ -32,6 +32,10 @@ export default function TimeTrackingDetails() {
 
           if (isMe) clss += ` bg-sky-300`;
 
+          const hasCount =
+            (item?.user?.status === "online" && item.user?.room_id !== null) ||
+            isMe;
+
           return (
             <BlurFade
               inView
@@ -48,8 +52,7 @@ export default function TimeTrackingDetails() {
                 <span className='text-xs'>{item.user?.name ?? "-"}</span>
               </div>
               <div>
-                {item?.user?.status === "online" &&
-                item.user?.room_id !== null ? (
+                {hasCount ? (
                   <Timer initialSeconds={item.sum_minutes * 60}>
                     {(time) => <strong className='text-xs'>{time}</strong>}
                   </Timer>

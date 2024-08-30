@@ -31,6 +31,10 @@ export default function Dashboard({ user, children, accessToken }: Props) {
 
   useEffect(() => {
     setSocketConnected(!!socket?.connected);
+
+    return () => {
+      socket?.emit("leaveRoom");
+    };
   }, [socket]);
 
   if (!socketConnected) return <FullLoading />;
