@@ -27,7 +27,7 @@ const PingShower: React.FC = () => {
 
   if (ping) {
     if (ping < 80) {
-      clss += ` text-success-500`;
+      clss += ` text-green-500`;
     } else if (ping < 140) {
       clss += ` text-blue-500`;
     } else if (ping < 200) {
