@@ -317,13 +317,8 @@ export default function DraggableCircle() {
     });
   };
 
-  const handleUpdateLocalCoords = async (position: {
-    x: number;
-    y: number;
-  }) => {
+  const handleUpdateLocalCoords = (position: { x: number; y: number }) => {
     updateUserCoords(user?.username, position);
-
-    handleUpdateCoordinates(position);
   };
 
   const isMyUser = user?.username === livekitIdentity;
@@ -343,7 +338,7 @@ export default function DraggableCircle() {
         handleUpdateCoordinates(position);
         setIsDragging(false);
       }}
-      // onDragging={handleUpdateLocalCoords}
+      onDragging={handleUpdateLocalCoords}
       onStartDragging={handleStartDragging}
       disabled={!isMyUser}
       hasTransition={!isMyUser}
