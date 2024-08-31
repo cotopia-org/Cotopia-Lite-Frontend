@@ -340,10 +340,10 @@ export default function DraggableCircle() {
   return (
     <DraggableRoom
       onDragEnd={(position) => {
-        // handleUpdateCoordinates(position);
+        handleUpdateCoordinates(position);
         setIsDragging(false);
       }}
-      onDragging={handleUpdateLocalCoords}
+      // onDragging={handleUpdateLocalCoords}
       onStartDragging={handleStartDragging}
       disabled={!isMyUser}
       hasTransition={!isMyUser}
