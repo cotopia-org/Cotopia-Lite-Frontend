@@ -1,5 +1,5 @@
 import React from "react";
-import { useRoomContext } from "../room/room-context";
+import { useRoomContext } from "../../room/room-context";
 
 export default function BackgroundNode() {
   const { room } = useRoomContext();

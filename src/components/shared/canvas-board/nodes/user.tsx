@@ -4,6 +4,8 @@ import UserSession from "@/app/(pages)/(protected)/session";
 const UserNode = (props: any) => {
   const { data, dragging } = props;
 
+  console.log("data?.track", data?.track);
+
   return (
     <UserSession
       track={data?.track}

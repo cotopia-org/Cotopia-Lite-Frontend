@@ -208,7 +208,8 @@ export const ParticipantTile = React.forwardRef<
     clss += ` bg-gray-600`;
   }
 
-  if (!isMuted && isMyUser) showAvatar = false;
+  if (!isMuted && trackRef?.source !== Track.Source.ScreenShare && isMyUser)
+    showAvatar = false;
 
   // if (!videoState) showAvatar = true;
 
@@ -256,95 +257,11 @@ type Props = {
 };
 
 export default function DraggableCircle({ defaultIsDragging }: Props) {
-  const socket = useSocket();
-
-  const [isDragging, setIsDragging] = useState(false);
-  const handleStartDragging = () => {
-    setIsDragging(true);
-  };
-  useEffect(() => {
-    if (defaultIsDragging !== undefined) setIsDragging(defaultIsDragging);
-  }, [defaultIsDragging]);
-
-  const { room, updateUserCoords } = useRoomContext();
-
-  const [participants, setParticipants] = useState<UserMinimalType[]>(
-    room ? room?.participants : []
-  );
-  useEffect(() => {
-    setParticipants(room?.participants ?? []);
-  }, [room?.participants]);
-
-  const { user } = useProfile();
   const { track } = useUserTile();
-
-  const livekitIdentity = track?.participant?.identity;
-
-  useSocket("userUpdated", (user: UserMinimalType) => {
-    let userCoordinates = user?.coordinates
-      ? user?.coordinates?.split(",")
-      : DEFAULT_TILE_POSITION;
-
-    userCoordinates = userCoordinates.map((x) => +x);
-
-    setParticipants((prev) => {
-      const prevParticpants = [...(prev ?? [])];
-
-      const participantIds = prev?.map((x) => x.id);
-
-      const foundIndex = participantIds?.findIndex((id) => id === user?.id);
-
-      if (foundIndex !== undefined && foundIndex > -1) {
-        const foundUser = prevParticpants[foundIndex];
-
-        const updatedUser: UserMinimalType = {
-          ...foundUser,
-          coordinates: user?.coordinates,
-        };
-
-        const userPosition = updatedUser.coordinates
-          ?.split(",")
-          ?.map((x) => +x) ?? [0, 0];
-
-        prevParticpants[foundIndex] = updatedUser;
-        updateUserCoords(foundUser.username, {
-          x: userPosition[0],
-          y: userPosition[1],
-        });
-      }
-
-      return prevParticpants;
-    });
-  });
-
-  const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    socket?.emit("updateCoordinates", {
-      room_id: room?.id,
-      coordinates: `${position.x ?? __VARS.defaultPositionOfUserX},${
-        position.y ?? __VARS.defaultPositionOfUserY
-      }`,
-      username: livekitIdentity,
-    });
-  };
-
-  const handleUpdateLocalCoords = (position: { x: number; y: number }) => {
-    updateUserCoords(user?.username, position);
-  };
-
-  const isMyUser = user?.username === livekitIdentity;
-
-  const positionUser = participants?.find(
-    (x) => x.username === livekitIdentity
-  );
-
-  const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
-    __VARS.defaultPositionOfUserX,
-    __VARS.defaultPositionOfUserY,
-  ];
 
   return (
     <SessionWrapper>
-      <ParticipantTile trackRef={track as any} isDragging={isDragging} />
+      <ParticipantTile trackRef={track as any} isDragging={defaultIsDragging} />
     </SessionWrapper>
   );
 

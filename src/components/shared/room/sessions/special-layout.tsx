@@ -41,11 +41,11 @@ const SpcialLayout = ({ tracks, children }: Props) => {
 
   let content = (
     <>
-      {finalTracks
+      {/* {finalTracks
         .filter((x) => x.source === Track.Source.ScreenShare)
         .map((track, key) => (
           <ScreenShareCard track={track as TrackReference} key={key} />
-        ))}
+        ))} */}
       {finalTracks
         .filter((x) => x.source !== Track.Source.ScreenShare)
         .map((track, key) => {

@@ -20,12 +20,14 @@ import {
   Viewport,
 } from "@xyflow/react";
 import { useRoomContext } from "../../room/room-context";
-import UserNode from "../user";
+import UserNode from "../nodes/user";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { convertCoordinateString } from "@/lib/utils";
-import BackgroundNode from "../background";
+import BackgroundNode from "../nodes/background";
 import { __VARS } from "@/app/const/vars";
 import NodesPreview from "../nodes-preview";
+import { Track } from "livekit-client";
+import ShareScreen from "../nodes/share-screen";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -35,6 +37,7 @@ type Props = {
 const nodeTypes = {
   userNode: UserNode,
   backgroundNode: BackgroundNode,
+  shareSreenCard: ShareScreen,
 };
 
 function ReactFlowHandler({ tracks }: Props) {
@@ -76,6 +79,29 @@ function ReactFlowHandler({ tracks }: Props) {
   const [nodes, setNodes] = useNodesState<Node>([]);
   useEffect(() => {
     setNodes([
+      ...tracks
+        ?.filter((x) => x.source === Track.Source.ScreenShare)
+        ?.map(
+          (x, i) =>
+            ({
+              id: "share-screen-" + i,
+              type: "shareSreenCard",
+              data: {
+                track: x,
+              },
+              position: {
+                x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
+                y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
+              },
+              parentId: "4214242141",
+              extent: "parent",
+            } as Node)
+        ),
+    ]);
+  }, [tracks]);
+
+  useEffect(() => {
+    setNodes([
       {
         id: "4214242141",
         position: {
@@ -94,15 +120,17 @@ function ReactFlowHandler({ tracks }: Props) {
           (a) => a.username === x.identity
         );
 
+        const rfUserId = "" + targetUser?.id;
+
         const coords = targetUser?.coordinates?.split(",");
 
-        let xcoord = coords?.[0] ?? 200;
-        let ycoord = coords?.[1] ?? 200;
+        let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
+        let ycoord = rf?.getNode(rfUserId)?.position.y ?? coords?.[1] ?? 200;
 
         if (typeof xcoord === "string") xcoord = +xcoord;
         if (typeof ycoord === "string") ycoord = +ycoord;
 
-        const track = tracks[index];
+        const track = tracks.find((a) => a.participant.identity === x.identity);
 
         const isDraggable = user?.username === track?.participant?.identity;
 
@@ -124,7 +152,7 @@ function ReactFlowHandler({ tracks }: Props) {
         return object;
       }),
     ]);
-  }, [participants, socketParticipants, tracks]);
+  }, [participants, socketParticipants]);
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
@@ -164,11 +192,11 @@ function ReactFlowHandler({ tracks }: Props) {
       onViewportChange={setViewPort}
       fitView
     >
-      {!!viewPort && (
+      {/* {!!viewPort && (
         <div className='fixed top-4 right-4 z-[10]'>
           <NodesPreview viewport={viewPort} nodes={nodes} />
         </div>
-      )}
+      )} */}
       <MiniMap />
       <Background />
     </ReactFlow>
