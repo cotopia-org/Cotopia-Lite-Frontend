@@ -317,12 +317,12 @@ export default function DraggableCircle() {
     });
   };
 
-  const handleUpdateLocalCoords = (position: { x: number; y: number }) => {
+  const handleUpdateLocalCoords = async (position: { x: number; y: number }) => {
 
 
 
 
-    updateUserCoords(user?.username, position);
+    await updateUserCoords(user?.username, position);
 
     socket?.emit("updateCoordinates", {
       room_id: room?.id,
