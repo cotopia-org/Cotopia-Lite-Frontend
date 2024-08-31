@@ -213,10 +213,10 @@ const ParticipantTile = React.forwardRef<
     <CotopiaTooltip title={userFullName}>
       <VoiceAreaHearing isDragging={isDragging} />
       <div className={clss}>
-        <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
+        <div className="relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center">
           {showAvatar && (
             <CotopiaAvatar
-              className='absolute top-0 left-0 w-full h-full z-[1]'
+              className="absolute top-0 left-0 w-full h-full z-[1]"
               src={targetUser?.avatar?.url ?? ""}
               title={userFullName?.[0] ?? livekitIdentity?.[0]}
             />
@@ -317,21 +317,13 @@ export default function DraggableCircle() {
     });
   };
 
-  const handleUpdateLocalCoords = async (position: { x: number; y: number }) => {
-
-
-
-
+  const handleUpdateLocalCoords = async (position: {
+    x: number;
+    y: number;
+  }) => {
     await updateUserCoords(user?.username, position);
 
-    socket?.emit("updateCoordinates", {
-      room_id: room?.id,
-      coordinates: `${position.x ?? __VARS.defaultPositionOfUserX},${
-        position.y ?? __VARS.defaultPositionOfUserY
-      }`,
-      username: livekitIdentity,
-    });
-
+    handleUpdateCoordinates(position);
   };
 
   const isMyUser = user?.username === livekitIdentity;
