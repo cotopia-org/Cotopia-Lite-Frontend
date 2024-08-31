@@ -340,7 +340,7 @@ export default function DraggableCircle() {
   return (
     <DraggableRoom
       onDragEnd={(position) => {
-        handleUpdateCoordinates(position);
+        // handleUpdateCoordinates(position);
         setIsDragging(false);
       }}
       onDragging={handleUpdateLocalCoords}
