@@ -1,12 +1,10 @@
-import FullLoading from "@/components/shared/full-loading"
-import { useApi } from "@/hooks/swr"
-import { FetchDataType } from "@/lib/axios"
 import { UserMinimalType } from "@/types/user"
 import React from "react"
 import NotFound from "@/components/shared/layouts/not-found"
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
 import UserCard from "../users/card"
 import { DirectType } from "@/types/direct"
+import { useAppSelector } from "@/store/redux/store"
 
 type Props = {
   search?: string
@@ -16,6 +14,8 @@ type Props = {
 
 export default function Directs({ search, onSelect, directs }: Props) {
   const { user } = useProfile()
+
+  const { chatRoom } = useAppSelector((state) => state.roomSlice)
 
   let finalDirects = [...directs]
 

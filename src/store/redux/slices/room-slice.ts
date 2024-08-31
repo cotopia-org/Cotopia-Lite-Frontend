@@ -1,4 +1,5 @@
 import { __VARS } from "@/app/const/vars"
+import { DOWN_LIMIT_PAGE } from "@/context/chat-room-context"
 import axiosInstance from "@/lib/axios"
 import { urlWithQueryParams } from "@/lib/utils"
 import { ChatItemType } from "@/types/chat"
@@ -6,6 +7,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 export type RoomDetailsType = {
   messages: ChatItemType[]
+  new_messages?: number
   upper_limit: number
   down_limit: number
 }
@@ -65,11 +67,9 @@ export const getNextMessages = createAsyncThunk(
     down_limit: number
   }) => {
     try {
-      const newUpperLimit = upper_limit + 1
-      const newDownLimit = down_limit + 1
       const res = await axiosInstance.get(
         urlWithQueryParams(`/rooms/${room_id}/messages`, {
-          page: newUpperLimit,
+          page: upper_limit + 1,
           perPage: __VARS.defaultPerPage,
         })
       )
@@ -78,8 +78,8 @@ export const getNextMessages = createAsyncThunk(
 
       return {
         messages: items,
-        upperLimit: newUpperLimit,
-        downLimit: newDownLimit,
+        upperLimit: upper_limit,
+        downLimit: down_limit,
         roomId: room_id,
       }
     } catch (error) {}
@@ -101,15 +101,27 @@ export const getPrevMessages = createAsyncThunk(
   }) => {
     const newUpperLimit = upper_limit - 1
     const newDownLimit = down_limit - 1
+    let perPage = __VARS.defaultPerPage
+    let page = newUpperLimit
+    const isFirstPage = newUpperLimit === __VARS.pagesLimitDiff
+    if (isFirstPage) {
+      perPage = (__VARS.defaultPerPage / 2) * __VARS.pagesLimitDiff
+      page = DOWN_LIMIT_PAGE
+    }
 
-    if (newDownLimit === 0)
-      return { messages: [], upperLimit: upper_limit, downLimit: down_limit }
+    if (newDownLimit === 0) {
+      return {
+        messages: [],
+        upperLimit: upper_limit,
+        downLimit: down_limit,
+      }
+    }
 
     try {
       const res = await axiosInstance.get(
         urlWithQueryParams(`/rooms/${room_id}/messages`, {
-          page: newDownLimit,
-          perPage: __VARS.defaultPerPage,
+          page: page,
+          perPage: perPage,
         })
       )
       const data = res?.data
@@ -119,6 +131,7 @@ export const getPrevMessages = createAsyncThunk(
       return {
         messages: items,
         upperLimit: newUpperLimit,
+        isFirstPage: isFirstPage,
         downLimit: newDownLimit,
         roomId: room_id,
       }
@@ -142,21 +155,22 @@ const roomSlice = createSlice({
       if (!state.chatRoom) return
 
       const message = action.payload.message
+
       const roomId = action.payload.roomId
+
       const changeType = action?.payload?.type
-
-      const prevMessages = state.chatRoom[roomId].messages ?? []
-
+      const prevMessages = state.chatRoom?.[roomId]?.messages ?? []
       const chatIds = prevMessages.map((x: any) => x.id)
       const foundIndex = chatIds.indexOf(message.id)
-
       let newMessages = [...prevMessages]
-
+      let count = state?.chatRoom[roomId]?.new_messages ?? 0
       if (foundIndex > -1) {
         newMessages[foundIndex] = message
       } else if (changeType && foundIndex <= -1) {
         newMessages = [message, ...prevMessages]
       } else {
+        count += 1
+        newMessages = [message, ...prevMessages]
         //Badge on nav button should be handle here
       }
       return {
@@ -165,7 +179,30 @@ const roomSlice = createSlice({
           ...state.chatRoom,
           [roomId]: {
             ...state.chatRoom[roomId],
+            new_messages: count,
             messages: newMessages,
+          },
+        },
+      }
+    },
+    changeRoomItemByKey: (
+      state,
+      action: PayloadAction<{
+        roomId: number
+        key: keyof RoomDetailsType
+        value: any
+      }>
+    ) => {
+      const { payload } = action
+      if (!state?.chatRoom || !state?.chatRoom?.[payload.roomId]) return
+      let targetRoom = state.chatRoom[payload.roomId]
+      return {
+        ...state,
+        chatRoom: {
+          ...state.chatRoom,
+          [payload.roomId]: {
+            ...targetRoom,
+            [payload.key]: payload.value,
           },
         },
       }
@@ -210,12 +247,14 @@ const roomSlice = createSlice({
         const roomId = response.room_id
         const upperLimit = response.upper_limit
         const messages = response.messages
+
         return {
           ...state,
           loading: false,
           chatRoom: {
             ...state.chatRoom,
             [roomId]: {
+              ...(state?.chatRoom?.[roomId] ?? {}),
               messages,
               upper_limit: upperLimit,
               down_limit: 1,
@@ -237,25 +276,41 @@ const roomSlice = createSlice({
             const response = action.payload
             const roomId = response.roomId as string
             const newMessages = response?.messages
+            let newUpperLimit = action.payload.upperLimit
+            let newDownLimit = action.payload.downLimit
+            if (newMessages.length > 0) {
+              newUpperLimit += 1
+              newDownLimit += 1
+            }
             //get all rooms
             const rooms = state.chatRoom
             //current room
             const room = rooms?.[roomId]
+            if (!state.chatRoom || roomId === undefined) return
+
             //prev messages
             const prevMessages = [...(room?.messages ?? [])]
-            const updatedMessages = [
-              ...prevMessages.slice(__VARS.defaultPerPage),
-              ...newMessages,
-            ]
+
+            let updatedMessages = []
+            if (newMessages.length === 0) {
+              updatedMessages = [...prevMessages]
+            } else {
+              updatedMessages = [
+                ...prevMessages.slice(__VARS.defaultPerPage),
+                ...newMessages,
+              ]
+            }
+
             return {
               ...state,
               nextLoading: false,
               chatRoom: {
                 ...state.chatRoom,
                 [roomId]: {
-                  down_limit: response.downLimit,
+                  ...state.chatRoom[roomId],
+                  down_limit: newDownLimit,
                   messages: updatedMessages,
-                  upper_limit: response.upperLimit,
+                  upper_limit: newUpperLimit,
                 },
               },
             }
@@ -273,26 +328,36 @@ const roomSlice = createSlice({
           const response = action.payload
           const roomId = response?.roomId as string
           const newMessages = response?.messages as ChatItemType[]
+          const isFirstPage = response?.isFirstPage
           //get all rooms
           const rooms = state.chatRoom
           //current room
           const room = rooms?.[roomId]
+          if (!state.chatRoom || roomId === undefined) return
+
           //calc total pages based on per page and page difference
-          const totalLengths = __VARS.defaultPerPage * __VARS.pagesLimitDiff
+          const totalLengths =
+            (__VARS.defaultPerPage / 2) * __VARS.pagesLimitDiff
           const flatIndex = totalLengths - __VARS.defaultPerPage
           //prev messages
           const prevMessages = [...(room?.messages ?? [])]
+          let updatedMessages = []
+          if (isFirstPage) {
+            updatedMessages = [...newMessages]
+          } else {
+            updatedMessages = [
+              ...newMessages,
+              ...prevMessages.slice(0, flatIndex),
+            ]
+          }
 
-          const updatedMessages = [
-            ...newMessages,
-            ...prevMessages.slice(0, flatIndex),
-          ]
           return {
             ...state,
             prevLoading: false,
             chatRoom: {
               ...state.chatRoom,
               [roomId]: {
+                ...state.chatRoom[roomId],
                 down_limit: response.downLimit,
                 messages: updatedMessages,
                 upper_limit: response.upperLimit,
@@ -305,6 +370,7 @@ const roomSlice = createSlice({
 
 export const {
   updateMessages: updateMessagesAction,
+  changeRoomItemByKey: changeRoomItemAction,
   removeMessage: removeMessageAction,
 } = roomSlice.actions
 

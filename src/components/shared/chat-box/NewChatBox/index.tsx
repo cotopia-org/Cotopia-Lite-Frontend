@@ -1,13 +1,5 @@
 import { ChatItemType } from "@/types/chat"
-import {
-  UIEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { UIEvent, memo, useCallback, useEffect, useRef, useState } from "react"
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
 import { _BUS } from "@/app/const/bus"
 import useBus from "use-bus"
@@ -21,13 +13,15 @@ import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
 import { toast } from "sonner"
 import { __VARS } from "@/app/const/vars"
 import { useAppDispatch, useAppSelector } from "@/store/redux/store"
-import { getMiddleIndex } from "@/lib/utils"
-import ChatItem from "../chat-item"
+import { getFocusedMessage, getMiddleIndex } from "@/lib/utils"
 import NotFound from "../../layouts/not-found"
 import FullLoading from "../../full-loading"
 import RowItem from "./RowItem"
-import { getInitMessages } from "@/store/redux/slices/room-slice"
-import { useRoomContext } from "../../room/room-context"
+import {
+  changeRoomItemAction,
+  getInitMessages,
+} from "@/store/redux/slices/room-slice"
+import CBadge from "@/components/shared-ui/c-badge"
 
 type Props = {
   observer_user_id?: number
@@ -37,7 +31,10 @@ type Props = {
 export const SCROLL_THRESHOLD = 200
 
 function NewChatBox({ observer_user_id, className = "" }: Props) {
-  let clss = ""
+  let clss = "relative"
+
+  const [wheelDirection, setWheelDirections] = useState<"down" | "up">("down")
+
   const {
     messages,
     loadMoreMessages: onLoadMessage,
@@ -45,16 +42,17 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
     upperLimit,
     downLimit,
     flag,
-
-    changeBulk,
+    navigateLoading,
+    newMessages,
     changeKey,
+    changeBulk,
+    roomId,
   } = useChatRoomCtx()
-
-  const { room_id } = useRoomContext()
 
   const prevFetchRef = useRef<boolean>(true)
   const nextFetchRef = useRef<boolean>(true)
-  const totalLength = __VARS.defaultPerPage * __VARS.pagesLimitDiff
+  const totalLength = (__VARS.defaultPerPage / 2) * __VARS.pagesLimitDiff
+  const [isFirst, setIsFirst] = useState(true)
 
   const appDispatch = useAppDispatch()
   const [showGotoBottom, setShowGotoBottom] = useState(false)
@@ -62,6 +60,20 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   const { nextLoading, prevLoading } = useAppSelector(
     (state) => state.roomSlice
   )
+
+  useEffect(() => {
+    if (wheelDirection === "up") {
+      setShowGotoBottom(true)
+    } else {
+      setTimeout(() => {
+        if (!scrollerRef.current) return
+        scrollerRef.current.scrollTo({
+          top: scrollerRef.current.scrollHeight,
+          behavior: "instant",
+        })
+      }, 200)
+    }
+  }, [newMessages, downLimit, messages])
 
   const isFirstView = upperLimit === __VARS.pagesLimitDiff
 
@@ -73,8 +85,6 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
   const virtousoRef = useRef<VirtuosoHandle>(null)
   const scrollerRef = useRef<HTMLDivElement>()
-
-  const [isFirst, setIsFirst] = useState(true)
 
   const backToBottom = (type: "smooth" | "instant" = "smooth") => {
     if (scrollerRef?.current)
@@ -90,22 +100,68 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       const findedIndex = finalMsg.findIndex(
         (msg) => msg.id === originMessage.id
       )
+      changeBulk({ flag: undefined, originMessage: undefined })
+
       if (findedIndex >= 0) {
         virtousoRef.current?.scrollToIndex({
           index: findedIndex,
           align: "end",
           behavior: "smooth",
         })
-        changeBulk({ flag: undefined, originMessage: undefined })
       } else {
-        toast.error("Origin message not found")
+        if (originMessage === undefined || messages === undefined)
+          return toast.error("Origin message not found")
+        try {
+          let finded = false
+          let ul = upperLimit
+          let dl = downLimit
+          const flatIndex = totalLength - __VARS.defaultPerPage
+          let finalItems: ChatItemType[] = [...messages].reverse()
+          changeKey({
+            key: "navigateLoading",
+            value: true,
+          })
+          while (!finded) {
+            const { items } = await onLoadMessage(FetchMessageType.Prev, ul, dl)
+            ul--
+            dl--
+            virtousoRef.current?.scrollToIndex({
+              index: 30,
+              behavior: "auto",
+              align: "center",
+            })
+
+            let newItems = []
+            if (ul === __VARS.pagesLimitDiff) {
+              newItems = [...items].reverse()
+            } else {
+              newItems = [...items, ...finalItems.slice(0, flatIndex)].reverse()
+            }
+            finalItems = [...newItems].reverse()
+            const findedIndex = newItems.findIndex(
+              (msg) => msg.id === originMessage.id
+            )
+            if (findedIndex >= 0 || ul < __VARS.pagesLimitDiff) {
+              changeKey({ key: "navigateLoading", value: false })
+              finded = true
+              virtousoRef.current?.scrollToIndex({
+                index: findedIndex,
+                behavior: "auto",
+                align: "center",
+              })
+              break
+            } else {
+              await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
+            }
+          }
+        } catch (error) {}
       }
     } else if (downLimit > 1) {
-      if (room_id === undefined) return
+      if (roomId === undefined) return
       await appDispatch(
         getInitMessages({
           has_loading: false,
-          room_id: room_id,
+          room_id: roomId,
           upper_limit: UPPER_LIMIT_PAGE,
         })
       )
@@ -114,18 +170,34 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       backToBottom()
     }
     setShowGotoBottom(false)
-  }, [finalMsg, originMessage, downLimit, room_id, showGotoBottom])
+  }, [
+    finalMsg,
+    originMessage,
+    downLimit,
+    roomId,
+    showGotoBottom,
+    totalLength,
+    upperLimit,
+  ])
 
   let backToFromNode = null
 
   if (showGotoBottom) {
     backToFromNode = (
-      <CotopiaIconButton
-        onClick={backToMessageHandler}
-        className="absolute bottom-20 z-[2] w-8 h-8 shadow-md opacity-50 hover:!opacity-100 !bg-primary right-5 animate-bounce"
-      >
-        <ChevronDown />
-      </CotopiaIconButton>
+      <div className="absolute bottom-5 z-[5] right-5 animate-bounce">
+        <CBadge
+          count={newMessages ?? 0}
+          showAnimate={false}
+          className="absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2"
+          size="small"
+        />
+        <CotopiaIconButton
+          onClick={backToMessageHandler}
+          className="w-8 h-8 shadow-md opacity-50 hover:!opacity-100 !bg-primary right-5 "
+        >
+          <ChevronDown />
+        </CotopiaIconButton>
+      </div>
     )
   }
 
@@ -151,7 +223,8 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   const loadMoreMessages = useCallback(
     async (type: FetchMessageType, targetIdx: number) => {
       if (!scrollerRef.current) return
-      await onLoadMessage(type)
+      const { items } = await onLoadMessage(type)
+      if (items.length === 0) return
       setTimeout(() => {
         virtousoRef?.current?.scrollToIndex({
           index: targetIdx,
@@ -159,7 +232,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
         })
       }, 100)
     },
-    [onLoadMessage]
+    [onLoadMessage, virtousoRef.current, scrollerRef.current]
   )
 
   useBus(
@@ -178,71 +251,154 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
   const focusOnFlagHandler = useCallback(
     async (message: ChatItemType) => {
-      if (!scrollerRef.current) return
-      try {
-        let finded = false
-        let currPage = 1
-        let finalItems = [...(messages as ChatItemType[])]
-        changeBulk({ flag: "reply", originMessage: message })
-        while (!finded) {
-          const items = await onLoadMessage(currPage)
-          currPage++
-          finalItems = [...finalItems, ...(items as any)]
-            .reverse()
-            .sort((a, b) => a.id - b.id)
-          const msggs = [...finalItems]
-          const findedIndex = msggs.findIndex(
-            (msg) => msg.id === message.reply_to.id
-          )
-
-          changeKey({ key: "messages", value: msggs.reverse() })
-
-          if (findedIndex >= 0) {
-            let mmm = document.querySelector(
-              `[data-testid="virtuoso-scroller"] [data-testid="virtuoso-item-list"] `
-            ) as any
-
-            finded = true
+      if (!scrollerRef.current || !finalMsg || messages === undefined) return
+      const sharedClsses = [
+        "[&_.message-box]:!bg-blue-500/20",
+        "[&_.message-box]:animate-pulse",
+      ]
+      //find index of messages that we want to focus
+      let msgIndex = finalMsg.findIndex((m) => m.id === message.reply_to.id)
+      changeBulk({
+        flag: "reply",
+        originMessage: message,
+      })
+      //find scroller parent box
+      let virEl = document.querySelector(
+        `[data-testid="virtuoso-scroller"] [data-testid="virtuoso-item-list"]`
+      ) as HTMLDivElement
+      const { focusHandler } = getFocusedMessage({
+        message: virEl,
+        changingClass: sharedClsses,
+        targetIndex: msgIndex,
+      })
+      if (msgIndex >= 0) {
+        virtousoRef.current?.scrollToIndex({
+          index: msgIndex,
+          behavior: "auto",
+          align: "center",
+        })
+        focusHandler()
+      } else {
+        try {
+          let finded = false
+          let ul = upperLimit
+          let dl = downLimit
+          let finalItems: ChatItemType[] = [...messages].reverse()
+          changeKey({
+            key: "navigateLoading",
+            value: true,
+          })
+          while (!finded) {
+            const { items } = await onLoadMessage(FetchMessageType.Next, ul, dl)
+            ul++
+            dl++
             virtousoRef.current?.scrollToIndex({
-              index: findedIndex,
+              index: 30,
               behavior: "auto",
               align: "center",
             })
+            let newItems = [
+              ...finalItems.slice(__VARS.defaultPerPage),
+              ...items,
+            ].reverse()
+            finalItems = [...newItems]
+            const findedIndex = newItems.findIndex(
+              (msg) => msg.id === message.reply_to.id
+            )
 
-            setTimeout(() => {
-              for (let item of mmm.childNodes) {
-                if (+(item as any)?.dataset.index == findedIndex) {
-                  item?.classList?.add("[&_.message-box]:!bg-blue-500/20")
-                  item?.classList?.add("[&_.message-box]:animate-pulse")
-                  setTimeout(() => {
-                    item?.classList?.remove("[&_.message-box]:!bg-blue-500/20")
-                    item?.classList?.remove("[&_.message-box]:animate-pulse")
-                  }, 1500)
+            if (items.length === 0) {
+              finded = true
+              try {
+                let xFinded = false
+                let xul = ul
+                let xdl = dl
+                const flatIndex = totalLength - __VARS.defaultPerPage
+                let finalItems: ChatItemType[] = [...newItems]
+                changeKey({
+                  key: "navigateLoading",
+                  value: true,
+                })
+                while (!xFinded) {
+                  const { items } = await onLoadMessage(
+                    FetchMessageType.Prev,
+                    xul,
+                    xdl
+                  )
+                  xul--
+                  xdl--
+                  virtousoRef.current?.scrollToIndex({
+                    index: 30,
+                    behavior: "auto",
+                    align: "center",
+                  })
+
+                  let newItems = []
+                  if (xul === __VARS.pagesLimitDiff) {
+                    newItems = [...items].reverse()
+                  } else {
+                    newItems = [
+                      ...items,
+                      ...finalItems.slice(0, flatIndex),
+                    ].reverse()
+                  }
+                  finalItems = [...newItems].reverse()
+                  const findedIndex = newItems.findIndex(
+                    (msg) => msg.id === message.id
+                  )
+                  if (findedIndex >= 0 || xul < __VARS.pagesLimitDiff) {
+                    changeKey({ key: "navigateLoading", value: false })
+                    xFinded = false
+                    virtousoRef.current?.scrollToIndex({
+                      index: findedIndex,
+                      behavior: "auto",
+                      align: "center",
+                    })
+                    break
+                  } else {
+                    await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
+                  }
                 }
-              }
-            }, 500)
-
-            break
-          } else {
-            await new Promise((resolve) => setTimeout(resolve, 10)) // Adjust delay as needed
+              } catch (error) {}
+            }
+            if (findedIndex >= 0) {
+              changeKey({ key: "navigateLoading", value: false })
+              finded = true
+              const { focusHandler } = getFocusedMessage({
+                message: virEl,
+                changingClass: sharedClsses,
+                targetIndex: findedIndex,
+              })
+              virtousoRef.current?.scrollToIndex({
+                index: findedIndex,
+                behavior: "auto",
+                align: "center",
+              })
+              focusHandler()
+              break
+            } else {
+              await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
+            }
           }
-        }
-      } catch (error) {}
+        } catch (error) {}
+      }
     },
-    [onLoadMessage, messages]
+    [onLoadMessage, finalMsg, upperLimit]
   )
 
   const onScrollHandler = useCallback(
     (e: UIEvent<HTMLDivElement>) => {
-      //scroll limit for getting to fetching messages in end or start of chat
-
       const element = e.currentTarget
-      //the message index should be target after fetching
+
+      const x = e.currentTarget.offsetHeight
+      const y = Math.floor(
+        e.currentTarget.scrollHeight - e.currentTarget.scrollTop
+      )
+      const diff = y - x
+
       const targeIndex = __VARS.defaultPerPage
       const topIndex = targeIndex
       const bottomIndex = totalLength - targeIndex
 
-      const elementRect = element.getBoundingClientRect()
       //check is scroll getting top of the chat box
       if (element.scrollTop <= 0) {
         if (nextFetchRef.current) {
@@ -250,27 +406,39 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
           loadMoreMessages(FetchMessageType.Next, topIndex)
         }
       }
-      //clac prev message treshold to fetch
-      const bottomFetchingTreshold =
-        element.scrollHeight -
-        Math.floor(elementRect.bottom + element.scrollTop)
 
-      if (bottomFetchingTreshold > 0) {
+      if (wheelDirection === "up") {
         setShowGotoBottom((crt) => (!!crt ? crt : true))
       }
-      if (bottomFetchingTreshold <= 0) {
+      if (wheelDirection === "down") {
         setShowGotoBottom(false)
+        appDispatch(
+          changeRoomItemAction({
+            roomId: Number(roomId),
+            key: "new_messages",
+            value: undefined,
+          })
+        )
       }
 
-      if (bottomFetchingTreshold <= 0 && downLimit > 1) {
+      if (wheelDirection === "down" && downLimit > 1) {
         if (prevFetchRef.current) {
           prevFetchRef.current = false
           loadMoreMessages(FetchMessageType.Prev, bottomIndex)
           setShowGotoBottom(false)
         }
       }
+
+      if (diff > 100) {
+        if (wheelDirection === "up") return
+        setWheelDirections("up")
+      }
+      if (diff < 100) {
+        if (wheelDirection === "down") return
+        setWheelDirections("down")
+      }
     },
-    [onLoadMessage]
+    [onLoadMessage, wheelDirection]
   )
 
   const loadingNode = (loading: boolean) => {
@@ -289,6 +457,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       }}
       initialTopMostItemIndex={startMessageIndex}
       data={finalMsg}
+      rows={4}
       components={{
         Footer: () => loadingNode(prevLoading),
         Header: () => loadingNode(nextLoading),
@@ -297,7 +466,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
         <RowItem
           item={item}
           observerId={observer_user_id}
-          // onFetchMessages={() => {}}
+          onFetchMessages={() => focusOnFlagHandler(item)}
         />
       )}
       onScroll={onScrollHandler}
@@ -308,6 +477,12 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
   return (
     <div className={`${clss} ${className}`}>
+      {(navigateLoading && (
+        <div className="absolute top-0 bg-white/60 z-[6] m-auto flex h-full w-full">
+          <FullLoading className="justify-center" />
+        </div>
+      )) ||
+        null}
       {backToFromNode}
       {content}
     </div>

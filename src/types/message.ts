@@ -9,7 +9,7 @@ export type MessageType = {
   room?: WorkspaceRoomType
   text: string
   user: UserType
-  room_id?: number
+  room_id: number
   created_at: number
   reply_to: ChatItemType
   updated_at?: number

@@ -6,7 +6,6 @@ import useBus from "use-bus"
 import { _BUS } from "@/app/const/bus"
 
 import NotFound from "../layouts/not-found"
-import FullLoading from "../full-loading"
 
 type Props = {
   items: ChatItemType[]

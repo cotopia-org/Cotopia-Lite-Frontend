@@ -14,7 +14,7 @@ const RowItem = ({
 }) => {
   return (
     <ChatItem
-      // onFlagSelect={onFetchMessages}
+      onFlagSelect={onFetchMessages}
       item={item}
       observer_user_id={observerId}
     />

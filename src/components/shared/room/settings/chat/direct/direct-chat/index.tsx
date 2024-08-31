@@ -2,21 +2,25 @@ import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
 import { _BUS } from "@/app/const/bus"
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
 import ChatBox from "@/components/shared/chat-box"
+import NewChatBox from "@/components/shared/chat-box/NewChatBox"
 import ChatUserInput from "@/components/shared/chat-box/user-input"
 import { getUserFullname } from "@/lib/utils"
 import { ChatItemType } from "@/types/chat"
 import { UserMinimalType } from "@/types/user"
 import { ChevronLeft } from "lucide-react"
+import { ReactNode } from "react"
 
 type Props = {
   messages: ChatItemType[]
   onBack?: () => void
-  user: UserMinimalType
+  user?: UserMinimalType
   onAdd: (val: string) => void
+  inputNode: ReactNode
 }
 export default function DirectChatBox({
   messages,
   onBack,
+  inputNode,
   user,
   onAdd,
 }: Props) {
@@ -38,18 +42,16 @@ export default function DirectChatBox({
         <CotopiaIconButton className="text-black/60" onClick={onBack}>
           <ChevronLeft />
         </CotopiaIconButton>
-        <p>
-          {`Chat with`}
-          <strong className="ml-1">{`${getUserFullname(user)}`}</strong>
-        </p>
+        {user ? (
+          <p>
+            {`Chat with`}
+            <strong className="ml-1">{`${getUserFullname(user)}`}</strong>
+          </p>
+        ) : null}
       </div>
       <div className="relative h-full flex gap-y-2 flex-col justify-between pt-8">
-        <ChatBox
-          className={clss}
-          items={messages}
-          observer_user_id={myAccount?.id}
-        />
-        <ChatUserInput onAdd={onAdd} />
+        <NewChatBox className={clss} observer_user_id={myAccount?.id} />
+        {inputNode}
       </div>
     </div>
   )

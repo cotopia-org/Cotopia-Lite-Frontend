@@ -39,7 +39,7 @@ const ChatItem = forwardRef(
       replyedNode = (
         <TargetMessageAction
           className="!m-0"
-          // onSelect={onFlagSelect}
+          onSelect={onFlagSelect}
           title={targetMessage.user.username}
           description={targetMessage.text}
         />

@@ -12,13 +12,17 @@ import LocalDirectEnv from "./direct-chat/LocalDirectEnv"
 import { useApi } from "@/hooks/swr"
 import { FetchDataType } from "@/lib/axios"
 import FullLoading from "@/components/shared/full-loading"
+import ChatRoomCtxProvider, {
+  RoomEnvironmentType,
+} from "@/context/chat-room-context"
 
 export default function UserChatDirect() {
   const { user } = useProfile()
-
-  const [selectedDirect, setSelectedDirect] = useState<DirectType>()
+  const [directId, setDirectId] = useState<number | undefined>(undefined)
 
   const [selectedUser, setSelectedUser] = useState<UserMinimalType>()
+
+  const [searched, setSearched] = useState("")
 
   const { data, isLoading, mutate } =
     useApi<FetchDataType<DirectType[]>>(`/users/directs`)
@@ -29,11 +33,10 @@ export default function UserChatDirect() {
 
   const handleBackToList = () => {
     setSearched("")
-    setSelectedDirect(undefined)
+    setDirectId(undefined)
     setSelectedUser(undefined)
     mutate()
   }
-  const [searched, setSearched] = useState("")
 
   const selectUserHandler = useCallback(
     (user: UserMinimalType) => {
@@ -43,12 +46,22 @@ export default function UserChatDirect() {
       })
       setSearched("")
       if (findedDirect) {
-        setSelectedDirect(findedDirect)
+        setDirectId(findedDirect.id)
       } else {
         setSelectedUser(user)
       }
     },
     [searched, directs]
+  )
+
+  const selectDirectHandler = useCallback(
+    (direct: DirectType) => {
+      const currentRoomId = direct.id
+      const selectedUser = direct.participants.find((u) => u.id !== user.id)
+      if (selectedUser) setSelectedUser(selectedUser)
+      if (currentRoomId) setDirectId(currentRoomId)
+    },
+    [user]
   )
 
   let content = (
@@ -70,30 +83,27 @@ export default function UserChatDirect() {
           <Directs
             directs={directs}
             search={searched ?? undefined}
-            onSelect={setSelectedDirect}
+            onSelect={selectDirectHandler}
           />
         )}
       </div>
     </>
   )
 
-  if (selectedDirect)
+  if (directId)
     content = (
-      <RoomDirectEnv
-        direct_id={selectedDirect.id}
-        user={
-          selectedDirect.participants.find(
-            (x) => x.id !== user.id
-          ) as UserMinimalType
-        }
-        onBack={handleBackToList}
-      />
+      <ChatRoomCtxProvider
+        environment={RoomEnvironmentType.direct}
+        room_id={"" + directId}
+      >
+        <RoomDirectEnv user={selectedUser} onBack={handleBackToList} />
+      </ChatRoomCtxProvider>
     )
 
-  if (selectedUser && !selectedDirect) {
+  if (selectedUser && !directId) {
     content = (
       <LocalDirectEnv
-        onAdd={setSelectedDirect}
+        onAdd={setDirectId}
         user={selectedUser}
         onBack={handleBackToList}
       />
