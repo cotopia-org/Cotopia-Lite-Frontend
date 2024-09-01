@@ -1,7 +1,3 @@
-import {
-  useProfile,
-  useSocket,
-} from "@/app/(pages)/(protected)/protected-wrapper";
 import { _BUS } from "@/app/const/bus";
 import { __VARS } from "@/app/const/vars";
 import { useRef } from "react";
@@ -9,6 +5,7 @@ import { useChat } from "@/hooks/chat/use-chat";
 
 import {
   RoomDetailsType,
+  changeRoomItemAction,
   getInitMessages,
   getNextMessages,
   getPrevMessages,
@@ -16,7 +13,6 @@ import {
 } from "@/store/redux/slices/room-slice";
 import { useAppDispatch, useAppSelector } from "@/store/redux/store";
 import { ChatItemType } from "@/types/chat";
-import { MessageType } from "@/types/message";
 import {
   ReactNode,
   createContext,
@@ -138,8 +134,6 @@ const ChatRoomCtxProvider = ({
   room_id: string | undefined;
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const { user } = useProfile();
 
   const ref = useRef<any>();
 
@@ -321,6 +315,25 @@ const ChatRoomCtxProvider = ({
   const changeBultHandler = (values: { [key: string]: any }) => {
     dispatch({ type: "CHANGE_BULK", payload: values });
   };
+
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    //Simulate the seen action only on client
+    const newMessages = JSON.parse(JSON.stringify(messages));
+
+    if (newMessages[0].seen === false) {
+      newMessages[0].seen = true;
+
+      appDispatch(
+        changeRoomItemAction({
+          roomId: +room_id,
+          key: "messages",
+          value: newMessages,
+        })
+      );
+    }
+  }, [room_id, messages]);
 
   return (
     <ChatRoomCtx.Provider
