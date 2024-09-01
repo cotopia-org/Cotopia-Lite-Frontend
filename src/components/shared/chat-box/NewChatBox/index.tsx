@@ -447,7 +447,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   }
 
   const onReachedEndHandler = useCallback(() => {
-    if (newMessages === undefined) return
+    if (newMessages === undefined || newMessages === 0) return
     setTimeout(() => {
       appDispatch(
         changeRoomItemAction({
@@ -475,7 +475,6 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
         Footer: () => loadingNode(prevLoading),
         Header: () => loadingNode(nextLoading),
       }}
-      increaseViewportBy={200}
       endReached={onReachedEndHandler}
       itemContent={(_, item) => (
         <RowItem
