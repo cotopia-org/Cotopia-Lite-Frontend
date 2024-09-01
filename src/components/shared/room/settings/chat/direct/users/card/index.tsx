@@ -22,7 +22,9 @@ export default function UserCard({
 }: Props) {
   if (!user) return;
 
-  const { chatRoom } = useAppSelector((state) => state.roomSlice);
+  const roomSlice = useAppSelector((state) => state.roomSlice);
+
+  const chatRoom = roomSlice?.chatRoom ?? {};
 
   const directMessages = chatRoom?.[direct.id]?.messages ?? [];
 
