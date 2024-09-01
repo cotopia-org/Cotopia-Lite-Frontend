@@ -35,13 +35,16 @@ export default function Message({ item, isMine }: Props) {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (isVisible && item?.seen === false && !isMine) {
-  //     if (socket) {
-  //       socket.emit("seenMessage", { room_id: roomId, message: item })
-  //     }
-  //   }
-  // }, [item, isVisible, isMine, socket])
+  useEffect(() => {
+    if (isVisible && item?.seen === false && !isMine) {
+      if (socket) {
+        socket.emit("seenMessage", {
+          message_id: item.id,
+          room_id: item.room_id,
+        });
+      }
+    }
+  }, [item, isVisible, isMine, socket]);
 
   return (
     <div
