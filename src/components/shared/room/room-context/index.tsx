@@ -2,9 +2,7 @@ import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { updateMessagesAction } from "@/store/redux/slices/room-slice";
 import { useAppDispatch } from "@/store/redux/store";
-import { ChatItemType } from "@/types/chat";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useRouter } from "next/navigation";
 import React, {

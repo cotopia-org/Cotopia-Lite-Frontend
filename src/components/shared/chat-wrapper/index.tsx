@@ -1,6 +1,7 @@
 "use client";
 
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { playSoundEffect } from "@/lib/sound-effects";
 import { updateMessagesAction } from "@/store/redux/slices/room-slice";
 import { useAppDispatch } from "@/store/redux/store";
 import { ChatItemType } from "@/types/chat";
@@ -14,10 +15,14 @@ export default function ChatWrapper({ children }: Props) {
 
   useSocket("roomMessages", (data: ChatItemType) => {
     const roomId = data.room_id;
+    playSoundEffect("newMessage");
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }));
   });
   useSocket("directMessages", (data) => {
     const roomId = data.room_id;
+
+    playSoundEffect("newMessage");
+
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }));
   });
 
