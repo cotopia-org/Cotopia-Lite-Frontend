@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { _BUS } from "@/app/const/bus"
-import FullLoading from "@/components/shared/full-loading"
-import { UserMinimalType } from "@/types/user"
-import DirectChatBox from "."
-import { useChatRoomCtx } from "@/context/chat-room-context"
-import ChatUserInput from "@/components/shared/chat-box/user-input"
-import EditChatInput from "../../room/EditChatInput"
-import ReplyChatInput from "../../room/ReplyChatInput"
+import { _BUS } from "@/app/const/bus";
+import FullLoading from "@/components/shared/full-loading";
+import { UserMinimalType } from "@/types/user";
+import DirectChatBox from ".";
+import { useChatRoomCtx } from "@/context/chat-room-context";
+import ChatUserInput from "@/components/shared/chat-box/user-input";
+import EditChatInput from "../../room/EditChatInput";
+import ReplyChatInput from "../../room/ReplyChatInput";
 
 interface Props {
-  user?: UserMinimalType
-  onBack: () => void
+  user?: UserMinimalType;
+  onBack: () => void;
 }
 
 const RoomDirectEnv = ({ onBack, user }: Props) => {
@@ -23,28 +23,33 @@ const RoomDirectEnv = ({ onBack, user }: Props) => {
     onReplyMessage,
     messages,
     loading,
-  } = useChatRoomCtx()
+  } = useChatRoomCtx();
 
-  if (user === undefined) return null
+  if (user === undefined) return null;
 
   let chatInputNode = (
     <ChatUserInput onAdd={(text) => onAddMessage(text, user.id)} />
-  )
+  );
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (
       <EditChatInput message={targetMessage} onAdd={onEditMessage} />
-    )
+    );
   }
   if (flag === "reply" && targetMessage) {
     chatInputNode = (
-      <ReplyChatInput message={targetMessage} onAdd={onReplyMessage} />
-    )
+      <ReplyChatInput
+        message={targetMessage}
+        onAdd={(message) => {
+          onReplyMessage(message, user.id);
+        }}
+      />
+    );
   }
 
-  let content = null
+  let content = null;
 
-  if (loading) content = <FullLoading />
+  if (loading) content = <FullLoading />;
 
   if (!loading && !!messages)
     content = (
@@ -55,9 +60,9 @@ const RoomDirectEnv = ({ onBack, user }: Props) => {
         user={user}
         onBack={onBack}
       />
-    )
+    );
 
-  return content
-}
+  return content;
+};
 
-export default RoomDirectEnv
+export default RoomDirectEnv;

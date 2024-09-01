@@ -15,7 +15,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <main className='w-screen h-screen flex flex-col items-center justify-center'>
+    <main className='w-full h-screen flex flex-col items-center justify-center'>
       <RegisterForm onRegistered={onRegistered} />
     </main>
   );

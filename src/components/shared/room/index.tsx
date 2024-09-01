@@ -8,6 +8,7 @@ import { WorkspaceRoomType } from "@/types/room";
 import { createContext, useContext, useEffect, useState } from "react";
 import LiveKitConnectionStatus from "./connection-status";
 import CheckPermissions2, { useMediaPermissions } from "./check-permissions-2";
+import ChatWrapper from "../chat-wrapper";
 
 type MediaPermission = {
   audio: boolean;
@@ -144,14 +145,16 @@ export default function RoomHolder({
     <RoomHolderContext.Provider
       value={{ changeMediaPermission, mediaPermissions }}
     >
-      <RoomContext
-        room={room}
-        room_id={room_id}
-        onRoomUpdated={onRoomUpdated}
-        workspace_id={workspace_id}
-      >
-        {content}
-      </RoomContext>
+      <ChatWrapper>
+        <RoomContext
+          room={room}
+          room_id={room_id}
+          onRoomUpdated={onRoomUpdated}
+          workspace_id={workspace_id}
+        >
+          {content}
+        </RoomContext>
+      </ChatWrapper>
     </RoomHolderContext.Provider>
   );
 }
