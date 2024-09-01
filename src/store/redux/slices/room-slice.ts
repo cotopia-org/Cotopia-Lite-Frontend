@@ -288,7 +288,7 @@ const roomSlice = createSlice({
               newDownLimit += 1;
             }
             //get all rooms
-            const rooms = state.chatRoom;
+            const rooms = state?.chatRoom ?? {};
             //current room
             const room = rooms?.[roomId];
             if (!state.chatRoom || roomId === undefined) return;
@@ -335,7 +335,7 @@ const roomSlice = createSlice({
           const newMessages = response?.messages as ChatItemType[];
           const isFirstPage = response?.isFirstPage;
           //get all rooms
-          const rooms = state.chatRoom;
+          const rooms = state?.chatRoom ?? {};
           //current room
           const room = rooms?.[roomId];
           if (!state.chatRoom || roomId === undefined) return;
