@@ -21,13 +21,12 @@ import {
 } from "@xyflow/react";
 import { useRoomContext } from "../../room/room-context";
 import UserNode from "../nodes/user";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { convertCoordinateString } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
 import BackgroundNode from "../nodes/background";
 import { __VARS } from "@/app/const/vars";
-import NodesPreview from "../nodes-preview";
 import { Track } from "livekit-client";
 import ShareScreen from "../nodes/share-screen";
+import { convertCoordinateString } from "@/lib/utils";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -77,8 +76,22 @@ function ReactFlowHandler({ tracks }: Props) {
   const socket = useSocket();
 
   const [nodes, setNodes] = useNodesState<Node>([]);
+
   useEffect(() => {
     setNodes([
+      {
+        id: "4214242141",
+        position: {
+          x: 0,
+          y: 0,
+        },
+        type: "backgroundNode",
+        draggable: false,
+        data: {},
+        focusable: false,
+        deletable: false,
+        selectable: false,
+      },
       ...tracks
         ?.filter((x) => x.source === Track.Source.ScreenShare)
         ?.map(
@@ -97,25 +110,7 @@ function ReactFlowHandler({ tracks }: Props) {
               extent: "parent",
             } as Node)
         ),
-    ]);
-  }, [tracks]);
-
-  useEffect(() => {
-    setNodes([
-      {
-        id: "4214242141",
-        position: {
-          x: 0,
-          y: 0,
-        },
-        type: "backgroundNode",
-        draggable: false,
-        data: {},
-        focusable: false,
-        deletable: false,
-        selectable: false,
-      },
-      ...participants.map((x, index) => {
+      ...participants.map((x) => {
         const targetUser = socketParticipants.find(
           (a) => a.username === x.identity
         );
@@ -124,8 +119,8 @@ function ReactFlowHandler({ tracks }: Props) {
 
         const coords = targetUser?.coordinates?.split(",");
 
-        let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
-        let ycoord = rf?.getNode(rfUserId)?.position.y ?? coords?.[1] ?? 200;
+        let xcoord = coords?.[0] ?? rf?.getNode(rfUserId)?.position.x ?? 200;
+        let ycoord = coords?.[1] ?? rf?.getNode(rfUserId)?.position.y ?? 200;
 
         if (typeof xcoord === "string") xcoord = +xcoord;
         if (typeof ycoord === "string") ycoord = +ycoord;
@@ -152,7 +147,7 @@ function ReactFlowHandler({ tracks }: Props) {
         return object;
       }),
     ]);
-  }, [participants, socketParticipants]);
+  }, [participants, socketParticipants, tracks]);
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
