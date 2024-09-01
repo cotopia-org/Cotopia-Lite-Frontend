@@ -9,6 +9,7 @@ export const sounds = {
     src: ["/assets/sounds-effects/coordinate-changed.mp3"],
   }),
   newMessage: new Howl({ src: ["/assets/sounds-effects/new-message.mp3"] }),
+  newMessage2: new Howl({ src: ["/assets/sounds-effects/new-message-2.wav"] }),
   userGotClosed: new Howl({
     src: ["/assets/sounds-effects/user-got-closed.mp3"],
   }),
