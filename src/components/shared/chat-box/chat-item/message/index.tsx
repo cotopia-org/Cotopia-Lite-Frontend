@@ -1,4 +1,5 @@
-import { useChat } from "@/hooks/chat/use-chat"
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 import { ChatItemType } from "@/types/chat"
 import { useEffect, useRef, useState } from "react"
 import Linkify from "react-linkify"
@@ -8,14 +9,11 @@ type Props = {
   item: ChatItemType
 }
 export default function Message({ item, isMine }: Props) {
-  const [stateMessage, setStateMessage] = useState(item)
-
-  useEffect(() => {
-    if (item !== undefined) setStateMessage(item)
-  }, [item])
-
   const divRef = useRef<HTMLDivElement>(null)
 
+  const { roomId } = useChatRoomCtx()
+
+  const socket = useSocket()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -37,18 +35,13 @@ export default function Message({ item, isMine }: Props) {
     }
   }, [])
 
-  const { seenMessage } = useChat()
-
   useEffect(() => {
-    if (isVisible && stateMessage?.seen === false && !isMine) {
-      // seenMessage(stateMessage?.id).then((res) => {
-      //   setStateMessage({
-      //     ...stateMessage,
-      //     seen: true,
-      //   })
-      // })
+    if (isVisible && item?.seen === false && !isMine) {
+      if (socket) {
+        socket.emit("seenMessage", { room_id: roomId, message: item })
+      }
     }
-  }, [stateMessage, isVisible, isMine])
+  }, [item, isVisible, isMine, socket])
 
   return (
     <div

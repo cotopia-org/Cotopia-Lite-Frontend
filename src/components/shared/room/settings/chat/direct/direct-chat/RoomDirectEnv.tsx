@@ -25,7 +25,11 @@ const RoomDirectEnv = ({ onBack, user }: Props) => {
     loading,
   } = useChatRoomCtx()
 
-  let chatInputNode = <ChatUserInput onAdd={onAddMessage} />
+  if (user === undefined) return null
+
+  let chatInputNode = (
+    <ChatUserInput onAdd={(text) => onAddMessage(text, user.id)} />
+  )
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (

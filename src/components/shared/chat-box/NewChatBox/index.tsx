@@ -251,6 +251,8 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
 
   const focusOnFlagHandler = useCallback(
     async (message: ChatItemType) => {
+      if (!!message.deleted_at) return
+
       if (!scrollerRef.current || !finalMsg || messages === undefined) return
       const sharedClsses = [
         "[&_.message-box]:!bg-blue-500/20",
@@ -412,13 +414,6 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       }
       if (wheelDirection === "down") {
         setShowGotoBottom(false)
-        appDispatch(
-          changeRoomItemAction({
-            roomId: Number(roomId),
-            key: "new_messages",
-            value: undefined,
-          })
-        )
       }
 
       if (wheelDirection === "down" && downLimit > 1) {
@@ -429,13 +424,18 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
         }
       }
 
-      if (diff > 100) {
+      if (diff > 50) {
         if (wheelDirection === "up") return
         setWheelDirections("up")
       }
-      if (diff < 100) {
+      if (diff < 50) {
         if (wheelDirection === "down") return
         setWheelDirections("down")
+      }
+
+      if (diff <= 0) {
+        e.cancelable
+        e.isDefaultPrevented
       }
     },
     [onLoadMessage, wheelDirection]
@@ -445,6 +445,19 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
     if (!loading) return null
     return <FullLoading className="py-3" />
   }
+
+  const onReachedEndHandler = useCallback(() => {
+    if (newMessages === undefined) return
+    setTimeout(() => {
+      appDispatch(
+        changeRoomItemAction({
+          roomId: Number(roomId),
+          key: "new_messages",
+          value: undefined,
+        })
+      )
+    }, 500)
+  }, [roomId, newMessages])
 
   let content = (
     <Virtuoso
@@ -462,6 +475,8 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
         Footer: () => loadingNode(prevLoading),
         Header: () => loadingNode(nextLoading),
       }}
+      increaseViewportBy={200}
+      endReached={onReachedEndHandler}
       itemContent={(_, item) => (
         <RowItem
           item={item}

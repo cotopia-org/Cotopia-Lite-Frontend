@@ -91,6 +91,18 @@ const ChatItem = forwardRef(
       />
     )
 
+    if (!!item.deleted_at) {
+      content = (
+        <MessageBox
+          fullWidth={isRoomEnv}
+          ref={ref}
+          beforeNode={replyedNode}
+          item={item}
+          isMine={isMyMessage}
+        />
+      )
+    }
+
     let messageNode = isMyMessage ? (
       <>
         {(deleteAnchor && (

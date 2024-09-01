@@ -145,7 +145,15 @@ export default function RoomContext({
   })
   useSocket("directMessages", (data) => {
     const roomId = data.room_id
-    console.log("DMMESSAGE", data)
+    appDispatch(updateMessagesAction({ message: data, roomId: roomId }))
+  })
+  useSocket("messageSeen", (data) => {
+    const roomId = data.room_id
+    const message = data.message
+    appDispatch(updateMessagesAction({ message, roomId: roomId }))
+  })
+  useSocket("messageUpdated", (data) => {
+    const roomId = data.room_id
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }))
   })
 

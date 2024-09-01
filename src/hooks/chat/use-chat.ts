@@ -29,9 +29,10 @@ export const useChat = () => {
 
   const sendToDirect = async (
     message: string,
-    userId: number | string,
+    userId?: number | string,
     replyTo?: number
   ) => {
+    if (!userId) return
     let payload: { [key: string]: any } = {
       text: message,
       user_id: +userId,

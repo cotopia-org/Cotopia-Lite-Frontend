@@ -15,9 +15,8 @@ type Props = {
 export default function Directs({ search, onSelect, directs }: Props) {
   const { user } = useProfile()
 
-  const { chatRoom } = useAppSelector((state) => state.roomSlice)
-
   let finalDirects = [...directs]
+  console.log
 
   if (search)
     finalDirects = finalDirects.filter((x) => {
@@ -36,7 +35,7 @@ export default function Directs({ search, onSelect, directs }: Props) {
   return (
     <div className="flex flex-col gap-y-4">
       {finalDirects.map((item, key) => {
-        let lastMessage = item.last_message
+        let defaultMessage = item.last_message
         return (
           <UserCard
             key={key}
@@ -45,7 +44,8 @@ export default function Directs({ search, onSelect, directs }: Props) {
                 (x) => x.id !== user?.id
               ) as UserMinimalType
             }
-            latestMessage={lastMessage}
+            defaultLatest={defaultMessage}
+            direct={item}
             onClick={() => onSelect(item)}
           />
         )

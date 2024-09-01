@@ -43,6 +43,7 @@ export const getInitMessages = createAsyncThunk(
   }) => {
     //calculate per page base on upper limit
     let perPage = (__VARS.defaultPerPage / 2) * upper_limit
+
     const res = await axiosInstance.get(
       urlWithQueryParams(`/rooms/${room_id}/messages`, {
         page: 1,
@@ -214,8 +215,11 @@ const roomSlice = createSlice({
       const message = action.payload.message
       const roomId = action.payload.message.room_id
       if (!state.chatRoom || roomId === undefined) return
-      const prevMessages = state.chatRoom[roomId].messages ?? []
-      let newMessages = prevMessages.filter((msg) => msg.id !== message.id)
+      let prevMessages = state.chatRoom[roomId].messages ?? []
+      const msgIndex = prevMessages.findIndex((msg) => msg.id === message.id)
+      let newMessages = [...prevMessages]
+      newMessages[msgIndex] = message
+
       return {
         ...state,
         chatRoom: {

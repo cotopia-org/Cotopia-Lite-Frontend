@@ -52,7 +52,7 @@ type InitCtxType = {
     upLimit?: number,
     downLimit?: number
   ) => Promise<{ items: ChatItemType[] }>
-  onAddMessage: (text: string) => void
+  onAddMessage: (text: string, userId?: number) => void
   onReplyMessage: (text: string) => void
   onEditMessage: (text: string) => void
   ref: any
@@ -194,7 +194,6 @@ const ChatRoomCtxProvider = ({
       let objToSend = { room_id, upper_limit, down_limit }
       if (!!ul) objToSend["upper_limit"] = ul
       if (!!dl) objToSend["down_limit"] = dl
-      console.log(objToSend, "OBJ")
       let res: any
       switch (type) {
         case FetchMessageType.Next:
@@ -208,20 +207,15 @@ const ChatRoomCtxProvider = ({
     [upper_limit, down_limit, messages, ctxType, room_id]
   )
 
-  const updateMessagesHandler = useCallback((chat: ChatItemType) => {
-    appDispatch(updateMessagesAction({ message: chat, roomId: room_id }))
-  }, [])
-
   const addMessageHandler = useCallback(
-    async (text: string) => {
+    async (text: string, userId?: number) => {
       if (!room_id) return
 
       try {
         let message: ChatItemType | undefined = undefined
-
         switch (ctxType) {
           case RoomEnvironmentType.direct:
-            message = await sendToDirect(text, user.id)
+            message = await sendToDirect(text, userId)
             break
           case RoomEnvironmentType.room:
             message = await sendToRoom(text, room_id)
@@ -264,10 +258,12 @@ const ChatRoomCtxProvider = ({
       })
       try {
         const message = await editMessage(text, state.targetMessage?.id)
-        if (message) updateMessagesHandler(message)
+        if (message) {
+          appDispatch(updateMessagesAction({ message, roomId: room_id }))
+        }
       } catch (error) {}
     },
-    [state.targetMessage, updateMessagesHandler]
+    [state.targetMessage]
   )
 
   const replyMessageHandler = useCallback(

@@ -6,6 +6,7 @@ import { UserType } from "./user"
 export type MessageType = {
   files: AttachmentFileType[]
   id: number
+  deleted_at: number | null
   room?: WorkspaceRoomType
   text: string
   user: UserType
