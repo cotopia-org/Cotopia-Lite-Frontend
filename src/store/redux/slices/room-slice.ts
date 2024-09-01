@@ -53,8 +53,6 @@ export const getInitMessages = createAsyncThunk(
     const data = res?.data;
     const messages: ChatItemType[] = (!!data && data?.data) || [];
 
-    messages[0].seen = true;
-
     return { messages, upper_limit, room_id, has_loading };
   }
 );
