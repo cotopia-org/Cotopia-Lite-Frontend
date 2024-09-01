@@ -27,7 +27,7 @@ const initialState: InitialStateType = {
   loading: false,
   nextLoading: false,
   prevLoading: false,
-  chatRoom: {},
+  chatRoom: undefined,
 };
 
 export const getInitMessages = createAsyncThunk(
@@ -257,7 +257,7 @@ const roomSlice = createSlice({
           ...state,
           loading: false,
           chatRoom: {
-            ...state.chatRoom,
+            ...(state?.chatRoom ?? {}),
             [roomId]: {
               ...(state?.chatRoom?.[roomId] ?? {}),
               messages,
