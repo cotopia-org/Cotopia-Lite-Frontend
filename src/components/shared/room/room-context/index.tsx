@@ -2,6 +2,9 @@ import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
+import { updateMessagesAction } from "@/store/redux/slices/room-slice";
+import { useAppDispatch } from "@/store/redux/store";
+import { ChatItemType } from "@/types/chat";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useRouter } from "next/navigation";
 import React, {
@@ -66,6 +69,7 @@ export default function RoomContext({
   const socket = useSocket();
 
   const router = useRouter();
+  const appDispatch = useAppDispatch();
 
   const handleJoinRoom = async () => {
     const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
@@ -133,39 +137,6 @@ export default function RoomContext({
   useSocket("roomUpdated", (data) => {
     setLocalRoom(data);
     if (onRoomUpdated) onRoomUpdated(data);
-  });
-
-  useSocket("updateCoordinates", (data) => {
-    const username = data?.username;
-    const coordinates = data?.coordinates;
-
-    if (!username) {
-      return;
-    }
-
-    if (!coordinates) {
-      return;
-    }
-
-    setLocalRoom((prev) => {
-      const prevParticipants = prev?.participants ?? [];
-
-      const findIndexParticipant = prevParticipants.findIndex(
-        (x) => x.username === username
-      );
-
-      if (findIndexParticipant > -1) {
-        prevParticipants[findIndexParticipant] = {
-          ...prevParticipants[findIndexParticipant],
-          coordinates,
-        };
-      }
-
-      return {
-        ...((prev ?? {}) as WorkspaceRoomType),
-        participants: prevParticipants,
-      };
-    });
   });
 
   const [sidebar, setSidebar] = useState<ReactNode>();

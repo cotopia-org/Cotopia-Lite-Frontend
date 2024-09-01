@@ -5,17 +5,35 @@ import Username from "./username";
 import Message from "./message";
 
 import { ChatItemType } from "@/types/chat";
+import { DirectType } from "@/types/direct";
+import { useAppSelector } from "@/store/redux/store";
 
 type Props = {
   user: UserMinimalType;
-  latestMessage?: ChatItemType;
+  defaultLatest?: ChatItemType;
+  direct: DirectType;
   onClick: () => void;
 };
-export default function UserCard({ user, latestMessage, onClick }: Props) {
+export default function UserCard({
+  user,
+  direct,
+  onClick,
+  defaultLatest,
+}: Props) {
   if (!user) return;
 
+  const { chatRoom } = useAppSelector((state) => state.roomSlice);
+
+  const directMessages = chatRoom?.[direct.id]?.messages ?? [];
+
+  let latestMessage: ChatItemType | undefined = defaultLatest;
+
+  if (directMessages.length > 0) {
+    latestMessage = directMessages[0];
+  }
+
   let msgUnseen = latestMessage?.seen === false;
-  let isMineMsg = user?.id !== latestMessage?.user.id;
+  let isMineMsg = user?.id !== latestMessage?.user?.id;
 
   let isMsgUnseen = msgUnseen && !isMineMsg;
 
@@ -45,7 +63,10 @@ export default function UserCard({ user, latestMessage, onClick }: Props) {
       <div className='flex flex-col'>
         <Username className={userNameClss} username={user?.username} />
         {!!latestMessage && (
-          <Message className={lastMsgClss} message={latestMessage.text} />
+          <Message
+            className={lastMsgClss}
+            message={latestMessage?.text ?? ""}
+          />
         )}
       </div>
     </div>

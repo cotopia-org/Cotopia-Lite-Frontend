@@ -39,7 +39,7 @@ const ChatItem = forwardRef(
       replyedNode = (
         <TargetMessageAction
           className="!m-0"
-          // onSelect={onFlagSelect}
+          onSelect={onFlagSelect}
           title={targetMessage.user.username}
           description={targetMessage.text}
         />
@@ -90,6 +90,18 @@ const ChatItem = forwardRef(
         }
       />
     )
+
+    if (!!item.deleted_at) {
+      content = (
+        <MessageBox
+          fullWidth={isRoomEnv}
+          ref={ref}
+          beforeNode={replyedNode}
+          item={item}
+          isMine={isMyMessage}
+        />
+      )
+    }
 
     let messageNode = isMyMessage ? (
       <>

@@ -1,20 +1,18 @@
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
-import { _BUS } from "@/app/const/bus"
-import { __VARS } from "@/app/const/vars"
-import { useRef } from "react"
-import { useRoomContext } from "@/components/shared/room/room-context"
-import { useChat } from "@/hooks/chat/use-chat"
+import { _BUS } from "@/app/const/bus";
+import { __VARS } from "@/app/const/vars";
+import { useRef } from "react";
+import { useChat } from "@/hooks/chat/use-chat";
 
 import {
   RoomDetailsType,
+  changeRoomItemAction,
   getInitMessages,
   getNextMessages,
   getPrevMessages,
   updateMessagesAction,
-} from "@/store/redux/slices/room-slice"
-import { useAppDispatch, useAppSelector } from "@/store/redux/store"
-import { ChatItemType } from "@/types/chat"
-import { MessageType } from "@/types/message"
+} from "@/store/redux/slices/room-slice";
+import { useAppDispatch, useAppSelector } from "@/store/redux/store";
+import { ChatItemType } from "@/types/chat";
 import {
   ReactNode,
   createContext,
@@ -22,11 +20,11 @@ import {
   useContext,
   useEffect,
   useReducer,
-} from "react"
+} from "react";
 
-import { dispatch as busDispatch } from "use-bus"
+import { dispatch as busDispatch } from "use-bus";
 
-export type FlagType = "edit" | "reply" | "pin"
+export type FlagType = "edit" | "reply" | "pin";
 
 export enum FetchMessageType {
   "Prev" = 1,
@@ -34,24 +32,29 @@ export enum FetchMessageType {
 }
 
 type InitCtxType = {
-  env: RoomEnvironmentType
-  messages: ChatItemType[] | undefined
-  targetMessage: ChatItemType | undefined
-  originMessage: ChatItemType | undefined
-  flag: FlagType | undefined
-  moveToFlag: boolean
-  backFromFlag: boolean
-  loading: boolean
-  upperLimit: number
-  downLimit: number
-  loadMoreMessages: (type: FetchMessageType, page?: number) => Promise<void>
-  onAddMessage: (text: string) => void
-  onReplyMessage: (text: string) => void
-  onEditMessage: (text: string) => void
-  ref: any
-  changeKey: (value: { key: string; value: any }) => void
-  changeBulk: (values: { [key: string]: any }) => void
-}
+  env: RoomEnvironmentType;
+  messages: ChatItemType[] | undefined;
+  targetMessage: ChatItemType | undefined;
+  newMessages: number | undefined;
+  originMessage: ChatItemType | undefined;
+  roomId: string | undefined;
+  flag: FlagType | undefined;
+  loading: boolean;
+  navigateLoading: boolean;
+  upperLimit: number;
+  downLimit: number;
+  loadMoreMessages: (
+    type: FetchMessageType,
+    upLimit?: number,
+    downLimit?: number
+  ) => Promise<{ items: ChatItemType[] }>;
+  onAddMessage: (text: string, userId?: number) => void;
+  onReplyMessage: (text: string, userId?: number) => void;
+  onEditMessage: (text: string) => void;
+  ref: any;
+  changeKey: (value: { key: string; value: any }) => void;
+  changeBulk: (values: { [key: string]: any }) => void;
+};
 
 export enum RoomEnvironmentType {
   "room" = "roomMessages",
@@ -63,10 +66,11 @@ const initCtx: InitCtxType = {
   targetMessage: undefined,
   originMessage: undefined,
   loading: false,
+  navigateLoading: false,
   ref: undefined,
+  newMessages: undefined,
   flag: undefined,
-  moveToFlag: false,
-  backFromFlag: false,
+  roomId: undefined,
   onAddMessage: () => {},
   upperLimit: __VARS.pagesLimitDiff,
   downLimit: 1,
@@ -74,143 +78,149 @@ const initCtx: InitCtxType = {
   onReplyMessage: () => {},
   changeKey: (value) => {},
   changeBulk: (values) => {},
-  loadMoreMessages: () => new Promise<void>((resolve, reject) => {}),
-}
+  loadMoreMessages: () =>
+    new Promise<{ items: ChatItemType[] }>((resolve, reject) => []),
+};
 
-const ChatRoomCtx = createContext(initCtx)
+const ChatRoomCtx = createContext(initCtx);
 
 type InitStateType = {
-  moveToFlag: boolean
-  backFromFlag: boolean
-  page: number
-  targetMessage: ChatItemType | undefined
-  originMessage: ChatItemType | undefined
-  flag: FlagType | undefined
-}
+  targetMessage: ChatItemType | undefined;
+  originMessage: ChatItemType | undefined;
+  flag: FlagType | undefined;
+  navigateLoading: boolean;
+};
 
 const initialState: InitStateType = {
-  page: 1,
-  moveToFlag: false,
-  backFromFlag: false,
+  navigateLoading: false,
   targetMessage: undefined,
   originMessage: undefined,
   flag: undefined,
-}
+};
 
 type ActionTypes =
   | {
-      type: "CHANGE_KEY"
-      payload: { key: string; value: any }
+      type: "CHANGE_KEY";
+      payload: { key: string; value: any };
     }
   | {
-      type: "CHANGE_BULK"
-      payload: { [key: string]: any }
-    }
+      type: "CHANGE_BULK";
+      payload: { [key: string]: any };
+    };
 
 const reducer = (state: InitStateType, action: ActionTypes) => {
   switch (action.type) {
     case "CHANGE_KEY":
-      const targetKey = action.payload.key
-      const targetVal = action.payload.value
-      return { ...state, [targetKey]: targetVal }
+      const targetKey = action.payload.key;
+      const targetVal = action.payload.value;
+      return { ...state, [targetKey]: targetVal };
     case "CHANGE_BULK":
-      return { ...state, ...action.payload }
+      return { ...state, ...action.payload };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export const UPPER_LIMIT_PAGE = __VARS.pagesLimitDiff
-const DOWN_LIMIT_PAGE = 1
+export const UPPER_LIMIT_PAGE = __VARS.pagesLimitDiff;
+export const DOWN_LIMIT_PAGE = 1;
 
 const ChatRoomCtxProvider = ({
   children,
   environment,
+  room_id,
 }: {
-  children: ReactNode
-  environment: RoomEnvironmentType
+  children: ReactNode;
+  environment: RoomEnvironmentType;
+  room_id: string | undefined;
 }) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const ref = useRef<any>()
-  const appDispatch = useAppDispatch()
+  const ref = useRef<any>();
 
-  const { chatRoom, loading } = useAppSelector((state) => state.roomSlice)
+  const ctxType = environment;
+  const appDispatch = useAppDispatch();
 
-  const { room_id } = useRoomContext()
+  const { chatRoom, loading } = useAppSelector((state) => state.roomSlice);
 
-  const { sendToRoom, editMessage } = useChat()
+  const { sendToRoom, editMessage, sendToDirect } = useChat();
 
-  if (!room_id) return null
+  if (!room_id) return null;
 
-  let selectedRoom: RoomDetailsType | undefined = undefined
+  let selectedRoom: RoomDetailsType | undefined = undefined;
 
   //collect all chat room ids
-  const roomIds = chatRoom ? Object.keys(chatRoom) : []
+  const roomIds = chatRoom ? Object.keys(chatRoom) : [];
   //check is room exist or not
   if (roomIds.includes(room_id)) {
-    selectedRoom = chatRoom?.[room_id]
+    selectedRoom = chatRoom?.[room_id];
   }
+  const upper_limit = selectedRoom?.upper_limit ?? UPPER_LIMIT_PAGE;
 
-  const upper_limit = selectedRoom?.upper_limit ?? UPPER_LIMIT_PAGE
+  const down_limit = selectedRoom?.down_limit ?? DOWN_LIMIT_PAGE;
 
-  const down_limit = selectedRoom?.down_limit ?? DOWN_LIMIT_PAGE
+  const isFirstFetch = selectedRoom === undefined;
 
-  const isFirstFetch = selectedRoom === undefined
+  const messages = selectedRoom?.messages ?? [];
 
-  const messages = selectedRoom?.messages ?? []
+  const newMessages = selectedRoom?.new_messages;
 
   useEffect(() => {
     const firstFetchMessages = async () => {
-      if (!room_id || !isFirstFetch) return
+      if (!room_id || !isFirstFetch) return;
       appDispatch(
         getInitMessages({
           has_loading: true,
           room_id: room_id,
           upper_limit: UPPER_LIMIT_PAGE,
         })
-      )
-    }
+      );
+    };
 
-    firstFetchMessages()
-  }, [isFirstFetch])
+    firstFetchMessages();
+  }, [isFirstFetch, room_id]);
 
   const loadMoreMessages = useCallback(
-    async (type: FetchMessageType, page?: number) => {
-      const objToSend = { room_id, upper_limit, down_limit }
-      if (!!page) objToSend["upper_limit"] = page
-
+    async (
+      type: FetchMessageType,
+      ul?: number,
+      dl?: number
+    ): Promise<{ items: ChatItemType[] }> => {
+      let objToSend = { room_id, upper_limit, down_limit };
+      if (!!ul) objToSend["upper_limit"] = ul;
+      if (!!dl) objToSend["down_limit"] = dl;
+      let res: any;
       switch (type) {
         case FetchMessageType.Next:
-          appDispatch(getNextMessages(objToSend))
-          break
+          res = await appDispatch(getNextMessages(objToSend));
+          return { items: res.payload.messages ?? [] };
         case FetchMessageType.Prev:
-          appDispatch(getPrevMessages(objToSend))
-          break
+          res = await appDispatch(getPrevMessages(objToSend));
+          return { items: res.payload.messages ?? [] };
       }
     },
-    [upper_limit, down_limit]
-  )
-
-  const updateMessagesHandler = useCallback((chat: ChatItemType) => {
-    appDispatch(updateMessagesAction({ message: chat, roomId: room_id }))
-  }, [])
-
-  useEffect(() => {
-    if (down_limit === 1) {
-      busDispatch(_BUS.scrollEndChatBox)
-    }
-  }, [down_limit, messages?.length])
+    [upper_limit, down_limit, messages, ctxType, room_id]
+  );
 
   const addMessageHandler = useCallback(
-    async (text: string) => {
-      if (!room_id) return
+    async (text: string, userId?: number) => {
+      if (!room_id) return;
+
       try {
-        const message = (await sendToRoom(text, room_id)) as ChatItemType
-        if (down_limit === 1) {
+        let message: ChatItemType | undefined = undefined;
+        switch (ctxType) {
+          case RoomEnvironmentType.direct:
+            message = await sendToDirect(text, userId);
+            break;
+          case RoomEnvironmentType.room:
+            message = await sendToRoom(text, room_id);
+          default:
+            break;
+        }
+        if (down_limit === 1 && message) {
           appDispatch(
             updateMessagesAction({ message, roomId: room_id, type: "static" })
-          )
+          );
+          busDispatch(_BUS.scrollEndChatBox);
         } else {
           await appDispatch(
             getInitMessages({
@@ -218,8 +228,8 @@ const ChatRoomCtxProvider = ({
               room_id: room_id,
               upper_limit: UPPER_LIMIT_PAGE,
             })
-          )
-          busDispatch(_BUS.scrollEndChatBox)
+          );
+          busDispatch(_BUS.scrollEndChatBox);
         }
       } catch (e) {}
     },
@@ -227,44 +237,54 @@ const ChatRoomCtxProvider = ({
       appDispatch,
       updateMessagesAction,
       room_id,
+      ctxType,
       down_limit,
       state?.targetMessage,
     ]
-  )
+  );
 
   const editMessageHandler = useCallback(
     async (text: string) => {
-      if (state.targetMessage === undefined) return
+      if (state.targetMessage === undefined) return;
       dispatch({
         type: "CHANGE_BULK",
         payload: { targetMessage: undefined, flag: undefined },
-      })
+      });
       try {
-        const message = await editMessage(text, state.targetMessage?.id)
-        if (message) updateMessagesHandler(message)
+        const message = await editMessage(text, state.targetMessage?.id);
+        if (message) {
+          appDispatch(updateMessagesAction({ message, roomId: room_id }));
+        }
       } catch (error) {}
     },
-    [state.targetMessage, updateMessagesHandler]
-  )
+    [state.targetMessage]
+  );
 
   const replyMessageHandler = useCallback(
-    async (text: string) => {
-      if (!state.targetMessage || !room_id) return
+    async (text: string, userId?: number) => {
       dispatch({
         type: "CHANGE_BULK",
         payload: { targetMessage: undefined, flag: undefined },
-      })
-      try {
-        const message = (await sendToRoom(
-          text,
-          room_id,
-          state.targetMessage.id
-        )) as ChatItemType
+      });
 
-        if (down_limit === 1) {
+      if (!state.targetMessage || !room_id) return;
+
+      try {
+        let message: ChatItemType | undefined = undefined;
+        switch (ctxType) {
+          case RoomEnvironmentType.room:
+            message = await sendToRoom(text, room_id, state.targetMessage.id);
+            break;
+          case RoomEnvironmentType.direct:
+            message = await sendToDirect(text, userId, state.targetMessage.id);
+          default:
+            break;
+        }
+        if (down_limit === 1 && message) {
           appDispatch(
             updateMessagesAction({ message, roomId: room_id, type: "static" })
-          )
+          );
+          busDispatch(_BUS.scrollEndChatBox);
         } else {
           await appDispatch(
             getInitMessages({
@@ -272,8 +292,8 @@ const ChatRoomCtxProvider = ({
               room_id: room_id,
               upper_limit: UPPER_LIMIT_PAGE,
             })
-          )
-          busDispatch(_BUS.scrollEndChatBox)
+          );
+          busDispatch(_BUS.scrollEndChatBox);
         }
       } catch (error) {}
     },
@@ -282,26 +302,38 @@ const ChatRoomCtxProvider = ({
       appDispatch,
       updateMessagesAction,
       room_id,
+      ctxType,
       down_limit,
       state?.targetMessage,
     ]
-  )
+  );
 
   const changeStateHandler = (value: { key: string; value: any }) => {
-    dispatch({ type: "CHANGE_KEY", payload: value })
-  }
+    dispatch({ type: "CHANGE_KEY", payload: value });
+  };
 
   const changeBultHandler = (values: { [key: string]: any }) => {
-    dispatch({ type: "CHANGE_BULK", payload: values })
-  }
+    dispatch({ type: "CHANGE_BULK", payload: values });
+  };
 
-  useSocket(
-    environment,
-    (data: MessageType) => {
-      updateMessagesHandler(data)
-    },
-    [addMessageHandler]
-  )
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    //Simulate the seen action only on client
+    const newMessages = JSON.parse(JSON.stringify(messages));
+
+    if (newMessages[0].seen === false) {
+      newMessages[0].seen = true;
+
+      appDispatch(
+        changeRoomItemAction({
+          roomId: +room_id,
+          key: "messages",
+          value: newMessages,
+        })
+      );
+    }
+  }, [room_id, messages]);
 
   return (
     <ChatRoomCtx.Provider
@@ -309,13 +341,14 @@ const ChatRoomCtxProvider = ({
         env: environment,
         loading: loading || chatRoom === undefined,
         flag: state.flag,
+        newMessages,
         ref,
+        roomId: room_id,
         upperLimit: upper_limit,
         downLimit: down_limit,
-        moveToFlag: state.moveToFlag,
-        backFromFlag: state.backFromFlag,
         originMessage: state.originMessage,
         changeKey: changeStateHandler,
+        navigateLoading: state.navigateLoading,
         changeBulk: changeBultHandler,
         messages,
         targetMessage: state.targetMessage,
@@ -327,9 +360,9 @@ const ChatRoomCtxProvider = ({
     >
       {children}
     </ChatRoomCtx.Provider>
-  )
-}
+  );
+};
 
-export const useChatRoomCtx = () => useContext(ChatRoomCtx)
+export const useChatRoomCtx = () => useContext(ChatRoomCtx);
 
-export default ChatRoomCtxProvider
+export default ChatRoomCtxProvider;

@@ -22,8 +22,14 @@ const MessageBox = forwardRef(
     const isMessageEdited = !!item.is_edited
     const isMessageSeen = !!item.seen
 
+    const isDeleted = !!item?.deleted_at
+
     let messageBoxClss =
       "message-box relative flex flex-row items-center gap-x-4 p-2 rounded-lg"
+
+    if (isDeleted) {
+      messageBoxClss += " opacity-55 select-none pointer-events-none"
+    }
 
     if (fullWidth) messageBoxClss += " w-full"
     if (!fullWidth) messageBoxClss += " w-[200px]"
@@ -36,7 +42,11 @@ const MessageBox = forwardRef(
     let editLable = null
 
     if (isMessageEdited) {
-      editLable = <span className="text-xs text-gray-600">Edited</span>
+      editLable = (
+        <span className="text-xs pointer-events-none text-gray-600">
+          Edited
+        </span>
+      )
     }
 
     if (isMine) {

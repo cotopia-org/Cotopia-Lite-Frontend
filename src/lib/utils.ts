@@ -118,3 +118,40 @@ export function convertMinutesToHHMMSS(minutes: number): string {
 }
 
 export const getMiddleIndex = (length: number) => Math.floor((length - 1) / 2)
+
+export const getFocusedMessage = ({
+  message,
+  targetIndex,
+  changingClass,
+  removeTimeout = 1500,
+}: {
+  message: HTMLDivElement
+  targetIndex: number
+  removeTimeout?: number
+  changingClass: string[]
+}): { focusHandler: () => void | undefined } => {
+  if (message === undefined || targetIndex < 0)
+    return { focusHandler: () => {} }
+
+  const findFocusedMessage = () => {
+    const nodes = message.childNodes as NodeListOf<HTMLDivElement>
+    setTimeout(() => {
+      for (let item of nodes) {
+        const datesetIndex = item.dataset?.index
+        if (datesetIndex === undefined) return
+        if (Number(datesetIndex) === Number(targetIndex)) {
+          changingClass.map((clss) => {
+            return item.classList.add(clss)
+          })
+          setTimeout(() => {
+            changingClass.map((clss) => {
+              return item.classList.remove(clss)
+            })
+          }, removeTimeout)
+        }
+      }
+    }, 500)
+  }
+
+  return { focusHandler: findFocusedMessage }
+}

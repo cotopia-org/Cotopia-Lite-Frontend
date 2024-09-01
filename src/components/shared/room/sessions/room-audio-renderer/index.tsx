@@ -1,25 +1,25 @@
-import { getTrackReferenceId, isLocal } from "@livekit/components-core";
-import { useTracks } from "@livekit/components-react";
-import { Track } from "livekit-client";
-import * as React from "react";
-import { AudioTrack } from "./audio-track";
-import { UserMinimalType, UserType } from "@/types/user";
-import { useRoomContext } from "../../room-context";
-import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
-import { __VARS } from "@/app/const/vars";
-import { doCirclesMeet } from "@/lib/utils";
+import { getTrackReferenceId, isLocal } from "@livekit/components-core"
+import { useTracks } from "@livekit/components-react"
+import { Track } from "livekit-client"
+import * as React from "react"
+import { AudioTrack } from "./audio-track"
+import { UserMinimalType, UserType } from "@/types/user"
+import { useRoomContext } from "../../room-context"
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
+import { __VARS } from "@/app/const/vars"
+import { doCirclesMeet } from "@/lib/utils"
 
 /** @public */
 export interface RoomAudioRendererProps {
   /** Sets the volume for all audio tracks rendered by this component. By default, the range is between `0.0` and `1.0`. */
-  volume?: number;
+  volume?: number
   /**
    * If set to `true`, mutes all audio tracks rendered by the component.
    * @remarks
    * If set to `true`, the server will stop sending audio track data to the client.
    * @alpha
    */
-  muted?: boolean;
+  muted?: boolean
 }
 
 /**
@@ -36,14 +36,14 @@ export interface RoomAudioRendererProps {
  */
 
 export function RoomAudioRenderer() {
-  const { user } = useProfile();
+  const { user } = useProfile()
 
-  const { room } = useRoomContext();
-  const allParticipants = room?.participants ?? [];
+  const { room } = useRoomContext()
+  const allParticipants = room?.participants ?? []
 
   const updatedMyUser = allParticipants?.find(
-    (x) => x.username === user.username
-  );
+    (x) => x?.username === user?.username
+  )
 
   const tracks = useTracks(
     [
@@ -58,24 +58,24 @@ export function RoomAudioRenderer() {
   ).filter(
     (ref) =>
       !isLocal(ref.participant) && ref.publication.kind === Track.Kind.Audio
-  );
+  )
 
   return (
     <div style={{ display: "none" }}>
       {tracks.map((trackRef) => {
         const trackOwner = allParticipants?.find(
           (x) => x.username === trackRef?.participant?.identity
-        );
+        )
 
         const { meet, volumePercentage } = doCirclesMeet(
           updatedMyUser,
           trackOwner
-        );
+        )
 
-        let volume = volumePercentage / 100;
-        let isMuted = !meet;
+        let volume = volumePercentage / 100
+        let isMuted = !meet
 
-        if (volume >= 1) volume = 1;
+        if (volume >= 1) volume = 1
 
         return (
           <AudioTrack
@@ -84,8 +84,8 @@ export function RoomAudioRenderer() {
             volume={volume}
             muted={isMuted}
           />
-        );
+        )
       })}
     </div>
-  );
+  )
 }
