@@ -27,7 +27,7 @@ const initialState: InitialStateType = {
   loading: false,
   nextLoading: false,
   prevLoading: false,
-  chatRoom: undefined,
+  chatRoom: {},
 };
 
 export const getInitMessages = createAsyncThunk(
