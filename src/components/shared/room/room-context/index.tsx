@@ -135,39 +135,6 @@ export default function RoomContext({
     if (onRoomUpdated) onRoomUpdated(data);
   });
 
-  useSocket("updateCoordinates", (data) => {
-    const username = data?.username;
-    const coordinates = data?.coordinates;
-
-    if (!username) {
-      return;
-    }
-
-    if (!coordinates) {
-      return;
-    }
-
-    setLocalRoom((prev) => {
-      const prevParticipants = prev?.participants ?? [];
-
-      const findIndexParticipant = prevParticipants.findIndex(
-        (x) => x.username === username
-      );
-
-      if (findIndexParticipant > -1) {
-        prevParticipants[findIndexParticipant] = {
-          ...prevParticipants[findIndexParticipant],
-          coordinates,
-        };
-      }
-
-      return {
-        ...((prev ?? {}) as WorkspaceRoomType),
-        participants: prevParticipants,
-      };
-    });
-  });
-
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);

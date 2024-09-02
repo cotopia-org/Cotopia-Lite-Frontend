@@ -12,7 +12,10 @@ import {
   MiniMap,
   //   Background,
   Node,
+  NodeChange,
   NodeMouseHandler,
+  NodePositionChange,
+  NodeSelectionChange,
   OnNodesChange,
   ReactFlow,
   ReactFlowInstance,
@@ -75,7 +78,34 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const socket = useSocket();
 
-  const [nodes, setNodes] = useNodesState<Node>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const handleNodesChange = (changes: NodeChange[]) => {
+    changes.forEach((change) => {
+      switch (change.type) {
+        case "position":
+          const positionChange = change as NodePositionChange;
+          console.log(
+            `Node with ID ${positionChange.id} has been moved to position`,
+            positionChange.position
+          );
+          break;
+        case "select":
+          const selectionChange = change as NodeSelectionChange;
+          console.log(
+            `Node with ID ${selectionChange.id} was ${
+              selectionChange.selected ? "selected" : "deselected"
+            }`
+          );
+          break;
+        // Handle other change types like 'dimensions', 'remove', etc.
+        default:
+          console.log(`Unhandled change type: ${change.type}`);
+      }
+    });
+
+    // Always apply the changes to keep the nodes state updated
+    onNodesChange(changes);
+  };
 
   useEffect(() => {
     setNodes([
@@ -130,7 +160,7 @@ function ReactFlowHandler({ tracks }: Props) {
         const isDraggable = user?.username === track?.participant?.identity;
 
         let object: Node = {
-          id: "" + targetUser?.id,
+          id: "" + targetUser?.username,
           type: "userNode",
           data: {
             track,
@@ -149,6 +179,32 @@ function ReactFlowHandler({ tracks }: Props) {
     ]);
   }, [participants, socketParticipants, tracks]);
 
+  useSocket("updateCoordinates", (data) => {
+    const username = data?.username;
+    const coordinates = data?.coordinates;
+
+    if (!username) {
+      return;
+    }
+
+    if (!coordinates) {
+      return;
+    }
+
+    const coords_array = coordinates.split(",");
+
+    if (coords_array.length !== 2) return;
+
+    let x = coords_array[0];
+    let y = coords_array[1];
+
+    setNodes((nds) => {
+      return nds.map((node) =>
+        node.id === username ? { ...node, position: { x: +x, y: +y } } : node
+      );
+    });
+  });
+
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
       if (!socket) return;
@@ -162,21 +218,16 @@ function ReactFlowHandler({ tracks }: Props) {
         username: livekitIdentity,
       });
 
-      updateUserCoords(livekitIdentity, node.position);
+      // updateUserCoords(livekitIdentity, node.position);
     }
   };
-
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
-  );
 
   return (
     <ReactFlow
       style={{ width: "100%", height: "100%" }}
       nodesDraggable={true}
       onNodeDragStop={onNodeDragStop}
-      onNodesChange={onNodesChange}
+      onNodesChange={handleNodesChange}
       panOnDrag={true}
       zoomOnScroll={true}
       zoomOnPinch={true}

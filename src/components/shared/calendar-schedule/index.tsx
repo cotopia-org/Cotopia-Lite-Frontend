@@ -1,35 +1,25 @@
 "use client";
 
 import { CalendarType } from "@/types/calendar";
-import { useState } from "react";
-import { useApi } from "@/hooks/swr";
-import { FetchDataType } from "@/lib/axios";
-import { DateRange } from "react-day-picker";
 import CreateSchedule2 from "./create-schedule-2";
 
 type Props = {
   calendar: CalendarType;
 };
 export default function CalendarSchedule({ calendar }: Props) {
-  const { data, isLoading: getCalendarLoading } = useApi<
-    FetchDataType<CalendarType>
-  >(`/calendars/${calendar.id}`);
+  // const [hasChanged, setHasChanged] = useState(false);
 
-  const calendarData = data !== undefined ? data?.data : undefined;
+  // const [date, setDate] = useState<DateRange | undefined>({
+  //   from: new Date(),
+  //   to: undefined,
+  // });
 
-  const [hasChanged, setHasChanged] = useState(false);
-
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: undefined,
-  });
-
-  const handleChangeDate = (date: DateRange | undefined) => {
-    if (date !== undefined) {
-      setHasChanged(true);
-      setDate(date);
-    }
-  };
+  // const handleChangeDate = (date: DateRange | undefined) => {
+  //   if (date !== undefined) {
+  //     setHasChanged(true);
+  //     setDate(date);
+  //   }
+  // };
 
   return (
     <div className='flex flex-col gap-y-4 w-[280px] max-h-[800px] max-w-full overflow-y-auto'>
