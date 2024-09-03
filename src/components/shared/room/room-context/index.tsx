@@ -112,7 +112,7 @@ export default function RoomContext({
     setLocalRoom((prev) => {
       const updatedPartValues = {
         participants: localRoom.participants.map((x) => {
-          if (x.username === username) {
+          if (x.username.toLowerCase() === username.toLowerCase()) {
             x.coordinates = `${position.x},${position.y}`;
           }
 
