@@ -23,6 +23,7 @@ export default function ChatWrapper({ children }: Props) {
     if (user.id !== data.user?.id) playSoundEffect("newMessage2");
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }));
   });
+
   useSocket("directMessages", (data) => {
     const roomId = data.room_id;
 
@@ -31,11 +32,12 @@ export default function ChatWrapper({ children }: Props) {
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }));
   });
 
-  useSocket("messageSeen", (data) => {
+  useSocket("seenMessage", (data) => {
     const roomId = data.room_id;
     const message = data.message;
     appDispatch(updateMessagesAction({ message, roomId: roomId }));
   });
+
   useSocket("messageUpdated", (data) => {
     const roomId = data.room_id;
     appDispatch(updateMessagesAction({ message: data, roomId: roomId }));

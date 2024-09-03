@@ -39,6 +39,7 @@ export default function Message({ item, isMine }: Props) {
     if (isVisible && item?.seen === false && !isMine) {
       if (socket) {
         socket.emit("seenMessage", {
+          message: item,
           message_id: item.id,
           room_id: item.room_id,
         });
