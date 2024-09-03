@@ -137,6 +137,16 @@ export default function RoomContext({
     if (onRoomUpdated) onRoomUpdated(data);
   });
 
+  useSocket("updateCoordinates", (data) => {
+    const position = data?.coordinates?.split(",");
+
+    if (!data?.username) return;
+
+    if (position?.length !== 2) return;
+
+    updateUserCoords(data.username, { x: +position?.[0], y: +position?.[1] });
+  });
+
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);

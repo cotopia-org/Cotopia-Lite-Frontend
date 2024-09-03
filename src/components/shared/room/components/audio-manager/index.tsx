@@ -83,7 +83,7 @@ const LiveKitAudioManager = () => {
     checkBoundaries();
   });
 
-  useSocket("updateCoordinate", (data) => {
+  useSocket("updateCoordinates", (data) => {
     checkBoundaries();
   });
 
