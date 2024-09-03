@@ -203,8 +203,6 @@ function ReactFlowHandler({ tracks }: Props) {
   }, [tracks]);
 
   const updateUserCoordinate = useCallback((data: UserMinimalType) => {
-    console.log("data", data);
-
     const username = data?.username;
     const coordinates = data?.coordinates;
 
@@ -234,6 +232,14 @@ function ReactFlowHandler({ tracks }: Props) {
 
   useSocket("updateCoordinates", (data) => {
     updateUserCoordinate(data);
+  });
+
+  useSocket("userLeftFromRoom", (data) => {
+    console.log("data", data);
+  });
+
+  useSocket("userJoinedToRoom", (data) => {
+    console.log("data", data);
   });
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
