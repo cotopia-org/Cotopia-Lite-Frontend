@@ -184,13 +184,13 @@ export const ParticipantTile = React.forwardRef<
     }
   }
 
-  let showAvatar = false;
+  let showAvatar = true;
 
   //I heet the circles? checking
   const { meet } = doCirclesMeet(updatedMyUser, targetUser);
 
-  //Show user avatar if user is muted or isn't in user's area
-  showAvatar = !(isMuted || meet) || isMuted || isMyUser;
+  if (!isMuted && trackRef?.source === Track.Source.Camera && meet)
+    showAvatar = false;
 
   //Scale down the user profile if user isn't in user's area
   if (!meet) clss += ` scale-[0.6]`;
@@ -208,8 +208,8 @@ export const ParticipantTile = React.forwardRef<
     clss += ` bg-gray-600`;
   }
 
-  if (!isMuted && trackRef?.source !== Track.Source.ScreenShare && isMyUser)
-    showAvatar = false;
+  // if (!isMuted && trackRef?.source !== Track.Source.ScreenShare && isMyUser)
+  //   showAvatar = false;
 
   // if (!videoState) showAvatar = true;
 

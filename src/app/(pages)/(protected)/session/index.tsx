@@ -56,11 +56,13 @@ function TrackRefContextIfNeeded(
 }
 
 type Props = {
+  participant?: Participant;
   track?: TrackReferenceOrPlaceholder;
   draggable?: boolean;
   isDragging?: boolean;
 };
 export default function UserSession({
+  participant,
   track,
   draggable = false,
   isDragging = false,
@@ -82,7 +84,7 @@ export default function UserSession({
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>
       <SpacialParticipantContextIfNeeded
-        participant={trackReference.participant}
+        participant={participant ?? trackReference.participant}
       >
         <SessionContext.Provider value={{ track: trackReference, draggable }}>
           <DraggableCircle defaultIsDragging={isDragging} />

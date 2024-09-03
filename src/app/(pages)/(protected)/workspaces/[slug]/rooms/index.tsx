@@ -33,8 +33,6 @@ export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
     setRooms((prev) =>
       prev.map((prevRoom) => {
         if (prevRoom.id === room.id) {
-          console.log("room", room);
-
           return room;
         }
 

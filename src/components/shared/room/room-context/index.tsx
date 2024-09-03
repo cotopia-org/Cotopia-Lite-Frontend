@@ -107,26 +107,29 @@ export default function RoomContext({
   ) => {
     if (!localRoom) return;
 
-    setLocalRoom((prev) => {
-      const updatedPartValues = {
-        participants: localRoom.participants.map((x) => {
-          if (x.username === username) {
-            x.coordinates = `${position.x},${position.y}`;
-          }
+    console.log("username", username);
+    console.log("position", position);
 
-          return x;
-        }),
+    setLocalRoom((prev) => {
+      const participants = prev?.participants ?? [];
+
+      const participant_index = participants.findIndex(
+        (x) => x.username === username
+      );
+
+      if (participant_index === -1) return prev;
+
+      participants[participant_index] = {
+        ...participants[participant_index],
+        coordinates: `${position.x},${position.y}`,
       };
 
-      return prev
-        ? {
-            ...prev,
-            ...updatedPartValues,
-          }
-        : {
-            ...localRoom,
-            ...updatedPartValues,
-          };
+      console.log("participants", participants);
+
+      return {
+        ...prev,
+        participants,
+      } as WorkspaceRoomType;
     });
   };
 

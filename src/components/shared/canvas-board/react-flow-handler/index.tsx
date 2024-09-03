@@ -2,12 +2,8 @@ import {
   useProfile,
   useSocket,
 } from "@/app/(pages)/(protected)/protected-wrapper";
+import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import {
-  TrackReferenceOrPlaceholder,
-  useParticipants,
-} from "@livekit/components-react";
-import {
-  applyNodeChanges,
   Background,
   MiniMap,
   //   Background,
@@ -16,7 +12,6 @@ import {
   NodeMouseHandler,
   NodePositionChange,
   NodeSelectionChange,
-  OnNodesChange,
   ReactFlow,
   ReactFlowInstance,
   useNodesState,
@@ -24,12 +19,14 @@ import {
 } from "@xyflow/react";
 import { useRoomContext } from "../../room/room-context";
 import UserNode from "../nodes/user";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BackgroundNode from "../nodes/background";
 import { __VARS } from "@/app/const/vars";
 import { Track } from "livekit-client";
 import ShareScreen from "../nodes/share-screen";
 import { convertCoordinateString } from "@/lib/utils";
+import { WorkspaceRoomShortType } from "@/types/room";
+import { UserMinimalType } from "@/types/user";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -70,36 +67,37 @@ function ReactFlowHandler({ tracks }: Props) {
     });
   }, [user?.coordinates, rf]);
 
-  const { room, updateUserCoords } = useRoomContext();
+  const { room, updateUserCoords, room_id } = useRoomContext();
 
   const socketParticipants = room?.participants ?? [];
 
-  const participants = useParticipants();
-
   const socket = useSocket();
 
+  const initState = useRef(true);
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+
   const handleNodesChange = (changes: NodeChange[]) => {
     changes.forEach((change) => {
       switch (change.type) {
         case "position":
           const positionChange = change as NodePositionChange;
-          console.log(
-            `Node with ID ${positionChange.id} has been moved to position`,
-            positionChange.position
-          );
+          // console.log(
+          //   `Node with ID ${positionChange.id} has been moved to position`,
+          //   positionChange.position
+          // );
           break;
         case "select":
           const selectionChange = change as NodeSelectionChange;
-          console.log(
-            `Node with ID ${selectionChange.id} was ${
-              selectionChange.selected ? "selected" : "deselected"
-            }`
-          );
+          // console.log(
+          //   `Node with ID ${selectionChange.id} was ${
+          //     selectionChange.selected ? "selected" : "deselected"
+          //   }`
+          // );
           break;
         // Handle other change types like 'dimensions', 'remove', etc.
         default:
-          console.log(`Unhandled change type: ${change.type}`);
+        // console.log(`Unhandled change type: ${change.type}`);
       }
     });
 
@@ -107,8 +105,9 @@ function ReactFlowHandler({ tracks }: Props) {
     onNodesChange(changes);
   };
 
-  useEffect(() => {
-    setNodes([
+  //Node with background
+  const nodesWithBackground = useCallback(
+    (nodes: Node[]) => [
       {
         id: "4214242141",
         position: {
@@ -122,6 +121,66 @@ function ReactFlowHandler({ tracks }: Props) {
         deletable: false,
         selectable: false,
       },
+      ...nodes,
+    ],
+    []
+  );
+
+  //Init canvas
+  useEffect(() => {
+    if (initState.current === false) return;
+
+    //Is we have no participant in room
+    if (socketParticipants.length === 0) {
+      setNodes(nodesWithBackground([]));
+      return;
+    }
+
+    setNodes(
+      nodesWithBackground(
+        socketParticipants.map((participant) => {
+          const rfUserId = "" + participant?.username;
+
+          const coords = participant?.coordinates?.split(",");
+
+          let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
+          let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
+
+          if (typeof xcoord === "string") xcoord = +xcoord;
+          if (typeof ycoord === "string") ycoord = +ycoord;
+
+          const track = tracks.find(
+            (a) => a.participant.identity === participant.username
+          );
+
+          const isDraggable = user?.username === track?.participant?.identity;
+
+          let object: Node = {
+            id: "" + participant?.username,
+            type: "userNode",
+            data: {
+              username: participant.username,
+              draggable: isDraggable,
+              isDragging: false,
+            },
+            position: { x: xcoord, y: ycoord },
+            parentId: "4214242141",
+            extent: "parent",
+          };
+
+          if (!isDraggable) object["draggable"] = false;
+
+          return object;
+        })
+      )
+    );
+
+    initState.current = false;
+  }, [socketParticipants, tracks]);
+
+  useEffect(() => {
+    setNodes((prev) => [
+      ...prev,
       ...tracks
         ?.filter((x) => x.source === Track.Source.ScreenShare)
         ?.map(
@@ -140,46 +199,12 @@ function ReactFlowHandler({ tracks }: Props) {
               extent: "parent",
             } as Node)
         ),
-      ...participants.map((x) => {
-        const targetUser = socketParticipants.find(
-          (a) => a.username === x.identity
-        );
-
-        const rfUserId = "" + targetUser?.id;
-
-        const coords = targetUser?.coordinates?.split(",");
-
-        let xcoord = coords?.[0] ?? rf?.getNode(rfUserId)?.position.x ?? 200;
-        let ycoord = coords?.[1] ?? rf?.getNode(rfUserId)?.position.y ?? 200;
-
-        if (typeof xcoord === "string") xcoord = +xcoord;
-        if (typeof ycoord === "string") ycoord = +ycoord;
-
-        const track = tracks.find((a) => a.participant.identity === x.identity);
-
-        const isDraggable = user?.username === track?.participant?.identity;
-
-        let object: Node = {
-          id: "" + targetUser?.username,
-          type: "userNode",
-          data: {
-            track,
-            draggable: isDraggable,
-            isDragging: false,
-          },
-          position: { x: xcoord, y: ycoord },
-          parentId: "4214242141",
-          extent: "parent",
-        };
-
-        if (!isDraggable) object["draggable"] = false;
-
-        return object;
-      }),
     ]);
-  }, [participants, socketParticipants, tracks]);
+  }, [tracks]);
 
-  useSocket("updateCoordinates", (data) => {
+  const updateUserCoordinate = useCallback((data: UserMinimalType) => {
+    console.log("data", data);
+
     const username = data?.username;
     const coordinates = data?.coordinates;
 
@@ -198,19 +223,24 @@ function ReactFlowHandler({ tracks }: Props) {
     let x = coords_array[0];
     let y = coords_array[1];
 
+    updateUserCoords(username, { x: +x, y: +y });
+
     setNodes((nds) => {
       return nds.map((node) =>
         node.id === username ? { ...node, position: { x: +x, y: +y } } : node
       );
     });
+  }, []);
+
+  useSocket("updateCoordinates", (data) => {
+    updateUserCoordinate(data);
   });
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
       if (!socket) return;
 
-      const livekitIdentity = (node?.data?.track as TrackReferenceOrPlaceholder)
-        ?.participant.identity;
+      const livekitIdentity = node?.data?.username as string;
 
       socket.emit("updateCoordinates", {
         room_id: room?.id,
@@ -218,7 +248,7 @@ function ReactFlowHandler({ tracks }: Props) {
         username: livekitIdentity,
       });
 
-      // updateUserCoords(livekitIdentity, node.position);
+      updateUserCoords(livekitIdentity, node.position);
     }
   };
 
