@@ -180,7 +180,7 @@ function ReactFlowHandler({ tracks }: Props) {
 
   useEffect(() => {
     setNodes((prev) => [
-      ...prev,
+      ...prev.filter((x) => x.type !== "shareSreenCard"),
       ...tracks
         ?.filter((x) => x.source === Track.Source.ScreenShare)
         ?.map(
