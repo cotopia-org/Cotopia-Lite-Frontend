@@ -98,54 +98,43 @@ export default function RoomContext({
     setPermissionState((prev) => ({ ...prev, [key]: newValue }));
   };
 
-  const [localRoom, setLocalRoom] = useState(room);
-  useEffect(() => {
-    if (room !== undefined) setLocalRoom(room);
-  }, [room]);
-
   const updateUserCoords = (
     username: string,
     position: { x: number; y: number }
   ) => {
-    if (!localRoom) return;
+    if (room === undefined) return;
 
-    setLocalRoom((prev) => {
-      const updatedPartValues = {
-        participants: localRoom.participants.map((x) => {
-          if (x.username.toLowerCase() === username.toLowerCase()) {
-            x.coordinates = `${position.x},${position.y}`;
-          }
+    const updatedPartValues = {
+      participants: room.participants.map((x) => {
+        if (x.username.toLowerCase() === username.toLowerCase()) {
+          x.coordinates = `${position.x},${position.y}`;
+        }
 
-          return x;
-        }),
-      };
+        return x;
+      }),
+    };
 
-      return prev
-        ? {
-            ...prev,
-            ...updatedPartValues,
-          }
-        : {
-            ...localRoom,
-            ...updatedPartValues,
-          };
-    });
+    const newRoom = {
+      ...room,
+      ...updatedPartValues,
+    };
+
+    if (onRoomUpdated) onRoomUpdated(newRoom);
   };
 
-  useSocket("roomUpdated", (data) => {
-    setLocalRoom(data);
-    if (onRoomUpdated) onRoomUpdated(data);
-  });
+  useSocket(
+    "updateCoordinates",
+    (data) => {
+      const position = data?.coordinates?.split(",");
 
-  useSocket("updateCoordinates", (data) => {
-    const position = data?.coordinates?.split(",");
+      if (!data?.username) return;
 
-    if (!data?.username) return;
+      if (position?.length !== 2) return;
 
-    if (position?.length !== 2) return;
-
-    updateUserCoords(data.username, { x: +position?.[0], y: +position?.[1] });
-  });
+      updateUserCoords(data.username, { x: +position?.[0], y: +position?.[1] });
+    },
+    [updateUserCoords]
+  );
 
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
@@ -154,7 +143,7 @@ export default function RoomContext({
   return (
     <RoomCtx.Provider
       value={{
-        room: localRoom,
+        room,
         room_id,
         workspace_id,
         sidebar,

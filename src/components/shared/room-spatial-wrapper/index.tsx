@@ -10,6 +10,7 @@ import { WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
 import ModalDisconnected from "../room/connection-status/modal-disconnected";
 import useNetworkStatus from "@/hooks/use-net";
+import FullLoading from "../full-loading";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -53,6 +54,12 @@ export default function RoomSpatialWrapper({
         stopLoading();
       });
   };
+
+  console.log("room", room);
+
+  useSocket("roomUpdated", (data) => {
+    setRoom(data);
+  });
 
   useEffect(() => {
     if (!socket) return;
@@ -104,7 +111,10 @@ export default function RoomSpatialWrapper({
         <RoomHolder
           token={token}
           room={room}
-          onRoomUpdated={setRoom}
+          onRoomUpdated={(room) => {
+            setRoom(room);
+            console.log("room", room);
+          }}
           room_id={room_id}
           workspace_id={workspace_id}
           isReConnecting={isReConnecting}
