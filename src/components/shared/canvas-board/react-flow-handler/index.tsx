@@ -39,6 +39,11 @@ const nodeTypes = {
   shareSreenCard: ShareScreen,
 };
 
+type LeftJoinType = {
+  room_id: number;
+  user: UserMinimalType;
+};
+
 function ReactFlowHandler({ tracks }: Props) {
   const [viewPort, setViewPort] = useState<Viewport>();
 
@@ -126,6 +131,43 @@ function ReactFlowHandler({ tracks }: Props) {
     []
   );
 
+  const addParticipants = (particpants: UserMinimalType[]) => {
+    return particpants.map((participant) => {
+      const rfUserId = "" + participant?.username;
+
+      const coords = participant?.coordinates?.split(",");
+
+      let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
+      let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
+
+      if (typeof xcoord === "string") xcoord = +xcoord;
+      if (typeof ycoord === "string") ycoord = +ycoord;
+
+      const track = tracks.find(
+        (a) => a.participant.identity === participant.username
+      );
+
+      const isDraggable = user?.username === track?.participant?.identity;
+
+      let object: Node = {
+        id: "" + participant?.username,
+        type: "userNode",
+        data: {
+          username: participant.username,
+          draggable: isDraggable,
+          isDragging: false,
+        },
+        position: { x: xcoord, y: ycoord },
+        parentId: "4214242141",
+        extent: "parent",
+      };
+
+      if (!isDraggable) object["draggable"] = false;
+
+      return object;
+    });
+  };
+
   //Init canvas
   useEffect(() => {
     if (initState.current === false) return;
@@ -136,44 +178,7 @@ function ReactFlowHandler({ tracks }: Props) {
       return;
     }
 
-    setNodes(
-      nodesWithBackground(
-        socketParticipants.map((participant) => {
-          const rfUserId = "" + participant?.username;
-
-          const coords = participant?.coordinates?.split(",");
-
-          let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
-          let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
-
-          if (typeof xcoord === "string") xcoord = +xcoord;
-          if (typeof ycoord === "string") ycoord = +ycoord;
-
-          const track = tracks.find(
-            (a) => a.participant.identity === participant.username
-          );
-
-          const isDraggable = user?.username === track?.participant?.identity;
-
-          let object: Node = {
-            id: "" + participant?.username,
-            type: "userNode",
-            data: {
-              username: participant.username,
-              draggable: isDraggable,
-              isDragging: false,
-            },
-            position: { x: xcoord, y: ycoord },
-            parentId: "4214242141",
-            extent: "parent",
-          };
-
-          if (!isDraggable) object["draggable"] = false;
-
-          return object;
-        })
-      )
-    );
+    setNodes(nodesWithBackground(addParticipants(socketParticipants)));
 
     initState.current = false;
   }, [socketParticipants, tracks]);
@@ -234,12 +239,24 @@ function ReactFlowHandler({ tracks }: Props) {
     updateUserCoordinate(data);
   });
 
-  useSocket("userLeftFromRoom", (data) => {
-    console.log("data", data);
+  useSocket("userLeftFromRoom", (data: LeftJoinType) => {
+    const { room_id: gotRoomId, user } = data;
+
+    if (room_id === undefined) return;
+
+    if (gotRoomId !== +room_id) return;
+
+    setNodes((prev) => prev.filter((x) => x.id !== user.username));
   });
 
-  useSocket("userJoinedToRoom", (data) => {
-    console.log("data", data);
+  useSocket("userJoinedToRoom", (data: LeftJoinType) => {
+    const { room_id: gotRoomId, user } = data;
+
+    if (room_id === undefined) return;
+
+    if (gotRoomId !== +room_id) return;
+
+    setNodes((prev) => [...prev, ...addParticipants([user])]);
   });
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
