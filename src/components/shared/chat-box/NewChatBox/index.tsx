@@ -22,15 +22,17 @@ import {
   getInitMessages,
 } from "@/store/redux/slices/room-slice"
 import CBadge from "@/components/shared-ui/c-badge"
+import { UserMinimalType } from "@/types/user"
 
 type Props = {
   observer_user_id?: number
+  user?: UserMinimalType
   className?: string
 }
 
 export const SCROLL_THRESHOLD = 200
 
-function NewChatBox({ observer_user_id, className = "" }: Props) {
+function NewChatBox({ observer_user_id, user, className = "" }: Props) {
   let clss = "relative"
 
   const [wheelDirection, setWheelDirections] = useState<"down" | "up">("down")
@@ -186,7 +188,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
     backToFromNode = (
       <div className="absolute bottom-5 z-[5] right-5 animate-bounce">
         <CBadge
-          count={newMessages ?? 0}
+          count={newMessages.length}
           showAnimate={false}
           className="absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2"
           size="small"
@@ -252,14 +254,14 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   const focusOnFlagHandler = useCallback(
     async (message: ChatItemType) => {
       if (!!message.deleted_at) return
-
+      if (message.reply_to === null) return
       if (!scrollerRef.current || !finalMsg || messages === undefined) return
       const sharedClsses = [
         "[&_.message-box]:!bg-blue-500/20",
         "[&_.message-box]:animate-pulse",
       ]
       //find index of messages that we want to focus
-      let msgIndex = finalMsg.findIndex((m) => m.id === message.reply_to.id)
+      let msgIndex = finalMsg.findIndex((m) => m.id === message.reply_to?.id)
       changeBulk({
         flag: "reply",
         originMessage: message,
@@ -305,7 +307,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
             ].reverse()
             finalItems = [...newItems]
             const findedIndex = newItems.findIndex(
-              (msg) => msg.id === message.reply_to.id
+              (msg) => msg.id === message.reply_to?.id
             )
 
             if (items.length === 0) {
@@ -447,16 +449,16 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
   }
 
   const onReachedEndHandler = useCallback(() => {
-    if (newMessages === undefined || newMessages === 0) return
-    setTimeout(() => {
-      appDispatch(
-        changeRoomItemAction({
-          roomId: Number(roomId),
-          key: "new_messages",
-          value: undefined,
-        })
-      )
-    }, 500)
+    // if (newMessages === undefined || newMessages === 0) return
+    // setTimeout(() => {
+    //   appDispatch(
+    //     changeRoomItemAction({
+    //       roomId: Number(roomId),
+    //       key: "new_messages",
+    //       value: undefined,
+    //     })
+    //   )
+    // }, 500)
   }, [roomId, newMessages])
 
   let content = (
@@ -478,6 +480,7 @@ function NewChatBox({ observer_user_id, className = "" }: Props) {
       endReached={onReachedEndHandler}
       itemContent={(_, item) => (
         <RowItem
+          user={user}
           item={item}
           observerId={observer_user_id}
           onFetchMessages={() => focusOnFlagHandler(item)}

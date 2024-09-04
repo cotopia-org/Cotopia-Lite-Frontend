@@ -6,21 +6,28 @@ import { getUserFullname } from "@/lib/utils"
 import Username from "../username"
 import Message from "."
 import Time from "../time"
-import { CheckCheck } from "lucide-react"
+import { CheckCheck, LoaderCircle } from "lucide-react"
 import colors from "tailwindcss/colors"
 import { ReactNode, forwardRef } from "react"
+import CotopiaButton from "@/components/shared-ui/c-button"
+import ResendMessage from "./ResendMessage"
+import { UserMinimalType } from "@/types/user"
 
 interface Props {
   isMine: boolean
+  user?: UserMinimalType
   fullWidth?: boolean
   item: ChatItemType
   beforeNode?: ReactNode
 }
 
 const MessageBox = forwardRef(
-  ({ item, isMine, beforeNode, fullWidth = false }: Props, ref: any) => {
+  ({ item, isMine, beforeNode, fullWidth = false, user }: Props, ref: any) => {
     const isMessageEdited = !!item.is_edited
     const isMessageSeen = !!item.seen
+
+    const isSent = item?.is_sent
+    const isSendFailed = isSent !== undefined && item.is_sent === false
 
     const isDeleted = !!item?.deleted_at
 
@@ -31,6 +38,9 @@ const MessageBox = forwardRef(
       messageBoxClss += " opacity-55 select-none pointer-events-none"
     }
 
+    if (isSendFailed) {
+      messageBoxClss += " border border-destructive"
+    }
     if (fullWidth) messageBoxClss += " w-full"
     if (!fullWidth) messageBoxClss += " w-[200px]"
     if (isMine) messageBoxClss += " !bg-blue-500/10"
@@ -62,7 +72,7 @@ const MessageBox = forwardRef(
       <div
         ref={ref}
         data-id={`${item.id}`}
-        className="chat-item overflow-hidden relative flex flex-row my-2 items-start gap-x-2 select-text"
+        className="chat-item border-destructive overflow-hidden relative flex flex-col my-2 items-start gap-x-2 select-text"
       >
         <div className={messageBoxClss}>
           <div className="flex flex-col gap-y-2 w-full">
@@ -75,7 +85,7 @@ const MessageBox = forwardRef(
                 className="w-5 h-5"
                 title={getUserFullname(item?.user)?.[0]}
               />
-              <Username username={item.user.username} />
+              <Username username={item?.user?.username ?? ""} />
             </div>
             {beforeNode && beforeNode}
             <Message isMine={isMine} item={item} />
@@ -91,6 +101,9 @@ const MessageBox = forwardRef(
             </div>
           </div>
         </div>
+        {/** Resend message node */}
+        {isSendFailed && <ResendMessage user={user} message={item} />}
+        {/** Resend message node */}
       </div>
     )
   }

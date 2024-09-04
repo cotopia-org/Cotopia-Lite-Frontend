@@ -8,11 +8,13 @@ export type MessageType = {
   id: number
   deleted_at: number | null
   room?: WorkspaceRoomType
+  links: any[]
   text: string
-  user: UserType
+  user: UserType | null
   room_id: number
+  mentions: any[]
   created_at: number
-  reply_to: ChatItemType
-  updated_at?: number
+  reply_to: ChatItemType | null
+  updated_at?: number | null
   seen: boolean
 }

@@ -15,19 +15,21 @@ import {
   RoomEnvironmentType,
   useChatRoomCtx,
 } from "@/context/chat-room-context"
+import { UserMinimalType } from "@/types/user"
 
 type Props = {
   item: ChatItemType
   observer_user_id?: number
+  user?: UserMinimalType
   onFlagSelect?: () => void
 }
 const ChatItem = forwardRef(
-  ({ item, observer_user_id, onFlagSelect }: Props, ref: any) => {
+  ({ item, observer_user_id, onFlagSelect, user }: Props, ref: any) => {
     const { changeBulk, env } = useChatRoomCtx()
 
     const [deleteAnchor, setDeleteAnchor] = useState<boolean>(false)
 
-    let targetMessage = item.reply_to
+    let targetMessage = item?.reply_to
 
     const isMyMessage = item.user?.id === observer_user_id
 
@@ -40,7 +42,7 @@ const ChatItem = forwardRef(
         <TargetMessageAction
           className="!m-0"
           onSelect={onFlagSelect}
-          title={targetMessage.user.username}
+          title={targetMessage?.user?.username}
           description={targetMessage.text}
         />
       )

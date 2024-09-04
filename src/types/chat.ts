@@ -4,4 +4,5 @@ export type ChatItemType = MessageType & {
   isDelivered?: boolean
   is_edited?: boolean
   is_pinned?: boolean
+  is_sent?: boolean
 }
