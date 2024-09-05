@@ -1,5 +1,6 @@
 import { WorkspaceRoomShortType } from "@/types/room";
 import WorkspaceRoom from "./room";
+import TitleEl from "../../title-el";
 
 type Props = {
   rooms: WorkspaceRoomShortType[];
@@ -14,8 +15,7 @@ export default function WorkspaceRooms({
   if (rooms.length === 0) return null;
 
   return (
-    <div className='flex flex-col'>
-      <strong className='mb-2 text-gray-600'>Rooms</strong>
+    <TitleEl title='Rooms'>
       {rooms.map((room) => (
         <WorkspaceRoom
           selected_room_id={selected_room_id}
@@ -24,6 +24,6 @@ export default function WorkspaceRooms({
           room={room}
         />
       ))}
-    </div>
+    </TitleEl>
   );
 }

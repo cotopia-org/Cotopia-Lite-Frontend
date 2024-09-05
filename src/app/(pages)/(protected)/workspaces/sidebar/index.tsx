@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import WorkspaceRoomsHolder from "../[slug]/rooms";
 import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import WorkspaceParticipants from "../[slug]/participants";
 
 export default function WorkspaceSidebar() {
   const { slug: workspace_id, room_id } = useParams();
@@ -20,6 +21,7 @@ export default function WorkspaceSidebar() {
         Back to dashboard
       </a>
       <WorkspaceRoomsHolder workspace_id={workspace_id as string} />
+      <WorkspaceParticipants workspace_id={workspace_id as string} limit={12} />
     </div>
   );
 }
