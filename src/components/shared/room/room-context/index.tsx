@@ -11,7 +11,7 @@ import React, { createContext, ReactNode, useContext, useState } from "react";
 
 type Props = {
   children: ReactNode;
-  room_id?: string;
+  room_id: number;
   room?: WorkspaceRoomType;
   onRoomUpdated?: (item: WorkspaceRoomType) => void;
   workspace_id?: string;
@@ -19,7 +19,7 @@ type Props = {
 
 const RoomCtx = createContext<{
   room?: WorkspaceRoomType;
-  room_id?: string;
+  room_id: number;
   workspace_id?: string;
   livekit_token?: string;
   openSidebar: (node: ReactNode) => void;
@@ -36,7 +36,7 @@ const RoomCtx = createContext<{
 }>({
   room: undefined,
   livekit_token: undefined,
-  room_id: undefined,
+  room_id: 1,
   workspace_id: undefined,
   sidebar: undefined,
   updateUserCoords: (username, position) => {},
@@ -139,7 +139,7 @@ export default function RoomContext({
     <RoomCtx.Provider
       value={{
         room,
-        room_id,
+        room_id: +room_id,
         workspace_id,
         sidebar,
         closeSidebar,

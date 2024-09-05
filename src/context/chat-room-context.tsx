@@ -3,14 +3,11 @@ import { __VARS } from "@/app/const/vars";
 import { useRef } from "react";
 import { useChat } from "@/hooks/chat/use-chat";
 
-import { v4 as uuidv4 } from "uuid";
-
 import {
   RoomDetailsType,
   getInitMessages,
   getNextMessages,
   getPrevMessages,
-  sendMessage,
   updateMessagesAction,
 } from "@/store/redux/slices/room-slice";
 import { useAppDispatch, useAppSelector } from "@/store/redux/store";
@@ -26,6 +23,7 @@ import {
 
 import { dispatch as busDispatch } from "use-bus";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import { useChatSocket } from "@/hooks/chat/use-chat-socket";
 
 export type FlagType = "edit" | "reply" | "pin";
 
@@ -39,7 +37,7 @@ type InitCtxType = {
   messages: ChatItemType[] | undefined;
   targetMessage: ChatItemType | undefined;
   originMessage: ChatItemType | undefined;
-  roomId: string | undefined;
+  roomId: number | undefined;
   flag: FlagType | undefined;
   loading: boolean;
   navigateLoading: boolean;
@@ -140,7 +138,7 @@ const TEMP_MESSAGE: ChatItemType = {
   is_sent: true,
   updated_at: null,
   user: null,
-  nonce_id: uuidv4(),
+  nonce_id: null,
 };
 
 const ChatRoomCtxProvider = ({
@@ -150,8 +148,10 @@ const ChatRoomCtxProvider = ({
 }: {
   children: ReactNode;
   environment: RoomEnvironmentType;
-  room_id: string | undefined;
+  room_id: number;
 }) => {
+  const chat = useChatSocket(room_id, environment);
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const { user } = useProfile();
@@ -172,18 +172,27 @@ const ChatRoomCtxProvider = ({
   let selectedRoom: RoomDetailsType | undefined = undefined;
 
   //collect all chat room ids
-  const roomIds = chatRoom ? Object.keys(chatRoom) : [];
+  const roomIds = chatRoom ? Object.keys(chatRoom).map((x) => +x) : [];
   //check is room exist or not
   if (roomIds.includes(room_id)) {
     selectedRoom = chatRoom?.[room_id];
   }
+
   const upper_limit = selectedRoom?.upper_limit ?? UPPER_LIMIT_PAGE;
 
   const down_limit = selectedRoom?.down_limit ?? DOWN_LIMIT_PAGE;
 
   const isFirstFetch = selectedRoom === undefined;
 
-  const messages = selectedRoom?.messages ?? [];
+  let messages = selectedRoom?.messages ?? [];
+
+  //If we have queues please add it to end of the messages
+  if (chat.queues.length > 0) {
+    const currentRoomQueuesMessages = chat.queues.filter(
+      (x) => x.room_id === room_id
+    );
+    messages = [...currentRoomQueuesMessages, ...messages];
+  }
 
   useEffect(() => {
     const firstFetchMessages = async () => {
@@ -232,7 +241,7 @@ const ChatRoomCtxProvider = ({
         text,
         room_id: +room_id,
         user: user,
-        nonce_id: uuidv4(),
+        nonce_id: new Date().getTime(),
       };
 
       if (down_limit > 1) {
@@ -245,9 +254,11 @@ const ChatRoomCtxProvider = ({
         );
         busDispatch(_BUS.scrollEndChatBox);
       } else {
-        appDispatch(
-          sendMessage({ message: temp, hasLoading: hasLoading, userId })
-        );
+        chat.send(text);
+
+        // appDispatch(
+        //   sendMessage({ message: temp, hasLoading: hasLoading, userId })
+        // );
       }
     },
     [

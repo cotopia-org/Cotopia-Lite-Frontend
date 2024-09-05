@@ -16,7 +16,7 @@ export type RoomDetailsType = {
 };
 
 export type ChatRoomSliceType = {
-  [key: string]: RoomDetailsType;
+  [key: string | number]: RoomDetailsType;
 };
 
 export type InitialStateType = {
@@ -28,6 +28,7 @@ export type InitialStateType = {
   nextLoading: boolean;
   prevLoading: boolean;
   chatRoom: ChatRoomSliceType | undefined;
+  queues: ChatItemType[];
 };
 
 const initialState: InitialStateType = {
@@ -39,6 +40,7 @@ const initialState: InitialStateType = {
     directs: {},
     room: [],
   },
+  queues: [],
 };
 
 export const sendMessage = createAsyncThunk(
@@ -79,7 +81,7 @@ export const getInitMessages = createAsyncThunk(
     upper_limit,
     has_loading = false,
   }: {
-    room_id: string;
+    room_id: number;
     has_loading: boolean;
     upper_limit: number;
   }) => {
@@ -106,7 +108,7 @@ export const getNextMessages = createAsyncThunk(
     upper_limit,
     down_limit,
   }: {
-    room_id: string;
+    room_id: number;
     upper_limit: number;
     down_limit: number;
   }) => {
@@ -139,7 +141,7 @@ export const getPrevMessages = createAsyncThunk(
     upper_limit,
     down_limit,
   }: {
-    room_id: string;
+    room_id: number;
     upper_limit: number;
     down_limit: number;
   }) => {
@@ -272,8 +274,11 @@ const roomSlice = createSlice({
       const message = action.payload.message;
       const roomId = message.room_id;
       const prevMessages = state.chatRoom?.[roomId]?.messages ?? [];
-      const chatIds = prevMessages.map((x: any) => x.id);
-      const foundIndex = chatIds.indexOf(message.id);
+
+      const chatIds = prevMessages.map((x: any) => +x.nonce_id);
+      const foundIndex = message.nonce_id
+        ? chatIds.indexOf(message.nonce_id)
+        : -1;
 
       let newMessages = [...prevMessages];
       if (foundIndex > -1) {
@@ -282,6 +287,7 @@ const roomSlice = createSlice({
         newMessages = [message, ...prevMessages];
         //Badge on nav button should be handle here
       }
+
       return {
         ...state,
         chatRoom: {
@@ -365,6 +371,33 @@ const roomSlice = createSlice({
             messages: newMessages,
           },
         },
+      };
+    },
+    addToQueue: (state, action: PayloadAction<{ message: ChatItemType }>) => {
+      const room_id = action.payload.message.room_id;
+      if (state.chatRoom === undefined) return;
+
+      if (state?.chatRoom?.[room_id] === undefined) return;
+
+      state.chatRoom[room_id].messages.unshift(action.payload.message);
+    },
+    deleteFromQueue: (
+      state,
+      action: PayloadAction<{
+        room_id: number;
+        chat_nonce_id: ChatItemType["nonce_id"];
+      }>
+    ) => {
+      const room_id = action.payload.room_id;
+      if (state.chatRoom === undefined) return;
+
+      if (state?.chatRoom?.[room_id] === undefined) return;
+
+      state.chatRoom[room_id] = {
+        ...state.chatRoom[room_id],
+        messages: state.chatRoom[room_id].messages.filter(
+          (x) => x.nonce_id !== action.payload.chat_nonce_id
+        ),
       };
     },
   },
@@ -478,6 +511,7 @@ const roomSlice = createSlice({
           const messages = response.messages;
           return {
             ...state,
+            queues: [],
             loading: false,
             chatRoom: {
               ...(state?.chatRoom ?? {}),
@@ -602,6 +636,8 @@ export const {
   sendMessage: sendMessageAction,
   removeMessage: removeMessageAction,
   unreadMessages: unreadMessagesAction,
+  addToQueue: addToQueueAction,
+  deleteFromQueue: deleteFromQueueAction,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;
