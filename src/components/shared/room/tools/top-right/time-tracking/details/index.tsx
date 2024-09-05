@@ -1,24 +1,25 @@
-import { useApi } from "@/hooks/swr";
-import { convertMinutesToHHMMSS, urlWithQueryParams } from "@/lib/utils";
+import { convertMinutesToHHMMSS } from "@/lib/utils";
 import React from "react";
 import Timer from "../timer";
 import { useRoomContext } from "@/components/shared/room/room-context";
-import { LeaderboardType } from "@/types/leaderboard";
 import UserAvatar from "@/components/shared/user-avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Rank from "./rank";
-import FullLoading from "@/components/shared/full-loading";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import BlurFade from "@/components/magicui/blur-fade";
+import { useApi } from "@/hooks/swr";
+import { LeaderboardType } from "@/types/leaderboard";
 
 export default function TimeTrackingDetails() {
-  const { user } = useProfile();
-
   const { workspace_id } = useRoomContext();
 
-  const { data, isLoading } = useApi(`/workspaces/${workspace_id}/leaderboard`);
+  const { user } = useProfile();
 
-  const leaderboard: LeaderboardType[] = data?.data ?? [];
+  const { data: leaderboardData } = useApi(
+    `/workspaces/${workspace_id}/leaderboard`
+  );
+
+  const leaderboard: LeaderboardType[] = leaderboardData?.data ?? [];
 
   let content = (
     <>
@@ -67,13 +68,6 @@ export default function TimeTrackingDetails() {
         })}
     </>
   );
-
-  if (isLoading || data === undefined)
-    content = (
-      <div className='py-4'>
-        <FullLoading />
-      </div>
-    );
 
   return (
     <ScrollArea className='h-72 flex flex-col gap-y-4 w-[260px]'>

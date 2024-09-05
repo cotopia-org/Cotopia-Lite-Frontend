@@ -1,9 +1,11 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { useApi } from "@/hooks/swr";
 import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { useAppDispatch } from "@/store/redux/store";
+import { LeaderboardType } from "@/types/leaderboard";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { UserMinimalType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
@@ -61,7 +63,6 @@ export default function RoomContext({
   const socket = useSocket();
 
   const router = useRouter();
-  const appDispatch = useAppDispatch();
 
   const handleJoinRoom = async () => {
     const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
