@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 type Props = {
   item: GalleryItemType;
-  room_id: string;
+  room_id: number;
   workspace_id: string;
 };
 

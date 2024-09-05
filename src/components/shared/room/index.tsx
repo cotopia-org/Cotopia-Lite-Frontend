@@ -33,7 +33,7 @@ export const useRoomHolder = () => useContext(RoomHolderContext);
 type Props = {
   token: string;
   workspace_id: string;
-  room_id: string;
+  room_id: number;
   room?: WorkspaceRoomType;
   onRoomUpdated?: (item: WorkspaceRoomType) => void;
   isReConnecting?: boolean;

@@ -17,5 +17,5 @@ export type MessageType = {
   reply_to: ChatItemType | null;
   updated_at?: number | null;
   seen: boolean;
-  nonce_id: string;
+  nonce_id: number | null;
 };
