@@ -1,7 +1,7 @@
 import UserAvatar from "../user-avatar";
 
 type Props = {
-  items: { title: string; src: string }[];
+  items: { title: string; src?: string }[];
 };
 export default function Avatars({ items }: Props) {
   return (

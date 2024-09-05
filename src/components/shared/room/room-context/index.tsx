@@ -5,13 +5,7 @@ import { playSoundEffect } from "@/lib/sound-effects";
 import { useAppDispatch } from "@/store/redux/store";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useRouter } from "next/navigation";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 type Props = {
   children: ReactNode;
