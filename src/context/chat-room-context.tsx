@@ -36,7 +36,6 @@ type InitCtxType = {
   env: RoomEnvironmentType
   messages: ChatItemType[] | undefined
   targetMessage: ChatItemType | undefined
-  newMessages: number[]
   originMessage: ChatItemType | undefined
   roomId: string | undefined
   flag: FlagType | undefined
@@ -69,7 +68,6 @@ const initCtx: InitCtxType = {
   loading: false,
   navigateLoading: false,
   ref: undefined,
-  newMessages: [],
   flag: undefined,
   roomId: undefined,
   onAddMessage: () => {},
@@ -183,8 +181,6 @@ const ChatRoomCtxProvider = ({
   const isFirstFetch = selectedRoom === undefined
 
   const messages = selectedRoom?.messages ?? []
-
-  const newMessages = selectedRoom?.new_messages ?? []
 
   useEffect(() => {
     const firstFetchMessages = async () => {
@@ -356,7 +352,6 @@ const ChatRoomCtxProvider = ({
         env: environment,
         loading: loading || chatRoom === undefined,
         flag: state.flag,
-        newMessages,
         ref,
         roomId: room_id,
         upperLimit: upper_limit,

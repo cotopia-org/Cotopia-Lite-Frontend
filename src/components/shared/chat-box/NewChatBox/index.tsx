@@ -5,6 +5,7 @@ import { _BUS } from "@/app/const/bus"
 import useBus from "use-bus"
 import {
   FetchMessageType,
+  RoomEnvironmentType,
   UPPER_LIMIT_PAGE,
   useChatRoomCtx,
 } from "@/context/chat-room-context"
@@ -17,10 +18,7 @@ import { getFocusedMessage, getMiddleIndex } from "@/lib/utils"
 import NotFound from "../../layouts/not-found"
 import FullLoading from "../../full-loading"
 import RowItem from "./RowItem"
-import {
-  changeRoomItemAction,
-  getInitMessages,
-} from "@/store/redux/slices/room-slice"
+import { getInitMessages } from "@/store/redux/slices/room-slice"
 import CBadge from "@/components/shared-ui/c-badge"
 import { UserMinimalType } from "@/types/user"
 
@@ -45,11 +43,13 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     downLimit,
     flag,
     navigateLoading,
-    newMessages,
+    env,
     changeKey,
     changeBulk,
     roomId,
   } = useChatRoomCtx()
+
+  if (roomId === undefined) return null
 
   const prevFetchRef = useRef<boolean>(true)
   const nextFetchRef = useRef<boolean>(true)
@@ -59,9 +59,23 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
   const appDispatch = useAppDispatch()
   const [showGotoBottom, setShowGotoBottom] = useState(false)
 
-  const { nextLoading, prevLoading } = useAppSelector(
-    (state) => state.roomSlice
-  )
+  const roomSlice = useAppSelector((state) => state.roomSlice)
+
+  const nextLoading = roomSlice?.nextLoading ?? false
+  const prevLoading = roomSlice?.prevLoading ?? false
+
+  const unreadRoomMsgs = roomSlice?.messages_count?.room ?? []
+
+  const unreadDmMsgs = roomSlice?.messages_count?.directs?.[roomId] ?? []
+
+  let unreadMsgsLength = 0
+
+  if (env === RoomEnvironmentType.room) {
+    unreadMsgsLength = unreadRoomMsgs.length
+  }
+  if (env === RoomEnvironmentType.direct) {
+    unreadMsgsLength = unreadDmMsgs.length
+  }
 
   useEffect(() => {
     if (wheelDirection === "up") {
@@ -75,7 +89,7 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
         })
       }, 200)
     }
-  }, [newMessages, downLimit, messages])
+  }, [downLimit, messages])
 
   const isFirstView = upperLimit === __VARS.pagesLimitDiff
 
@@ -188,7 +202,7 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     backToFromNode = (
       <div className="absolute bottom-5 z-[5] right-5 animate-bounce">
         <CBadge
-          count={newMessages.length}
+          count={unreadMsgsLength}
           showAnimate={false}
           className="absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2"
           size="small"
@@ -448,19 +462,6 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     return <FullLoading className="py-3" />
   }
 
-  const onReachedEndHandler = useCallback(() => {
-    // if (newMessages === undefined || newMessages === 0) return
-    // setTimeout(() => {
-    //   appDispatch(
-    //     changeRoomItemAction({
-    //       roomId: Number(roomId),
-    //       key: "new_messages",
-    //       value: undefined,
-    //     })
-    //   )
-    // }, 500)
-  }, [roomId, newMessages])
-
   let content = (
     <Virtuoso
       className="[&_[data-testid=virtuoso-item-list]]:px-2 "
@@ -477,7 +478,6 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
         Footer: () => loadingNode(prevLoading),
         Header: () => loadingNode(nextLoading),
       }}
-      endReached={onReachedEndHandler}
       itemContent={(_, item) => (
         <RowItem
           user={user}
