@@ -20,14 +20,14 @@ const ReplyChatInput = ({ message, onAdd }: Props) => {
     changeBulk({ targetMessage: null, flag: undefined });
   };
 
-  const selectedMessageNode = (
+  const selectedMessageNode = user ? (
     <ReplyedMessageInfo
       messageId={id}
       title={`Reply to ${user.username}`}
       desc={text}
       onClose={closeReplyHandler}
     />
-  );
+  ) : null;
 
   return (
     <ChatUserInput
