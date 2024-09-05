@@ -11,6 +11,7 @@ import {
 import { DashboardWrapper } from "./dashboard-wrapper";
 import { useSocket } from "../protected-wrapper";
 import FullLoading from "@/components/shared/full-loading";
+import { LeaderboardType } from "@/types/leaderboard";
 
 type Props = {
   user?: UserType;
