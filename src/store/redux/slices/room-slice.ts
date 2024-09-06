@@ -1,12 +1,11 @@
 import { _BUS } from "@/app/const/bus"
 import { __VARS } from "@/app/const/vars"
 import { DOWN_LIMIT_PAGE } from "@/context/chat-room-context"
-import axiosInstance, { FetchDataType } from "@/lib/axios"
+import { PartialBy } from "@/hooks/chat/use-chat-socket"
+import axiosInstance from "@/lib/axios"
 import { urlWithQueryParams } from "@/lib/utils"
 import { ChatItemType } from "@/types/chat"
-import { MessageType } from "@/types/message"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { dispatch } from "use-bus"
 
 export type RoomDetailsType = {
   messages: ChatItemType[]
@@ -16,7 +15,7 @@ export type RoomDetailsType = {
 }
 
 export type ChatRoomSliceType = {
-  [key: string]: RoomDetailsType
+  [key: string | number]: RoomDetailsType
 }
 
 export type InitialStateType = {
@@ -28,6 +27,7 @@ export type InitialStateType = {
   nextLoading: boolean
   prevLoading: boolean
   chatRoom: ChatRoomSliceType | undefined
+  queues: ChatItemType[]
 }
 
 const initialState: InitialStateType = {
@@ -39,38 +39,8 @@ const initialState: InitialStateType = {
     directs: {},
     room: [],
   },
+  queues: [],
 }
-
-export const sendMessage = createAsyncThunk(
-  "room/sendMessage",
-  async ({
-    message,
-    hasLoading = false,
-    userId,
-  }: {
-    message: ChatItemType
-    hasLoading?: boolean
-    userId?: number
-  }) => {
-    const roomId = message.room_id
-
-    const isDirectMessage = !!userId
-
-    let resMessage: ChatItemType | undefined = undefined
-
-    let payload: { [key: string]: any } = { text: message.text }
-    if (isDirectMessage) payload["user_id"] = userId
-    if (!isDirectMessage) payload["room_id"] = roomId
-
-    const res = await axiosInstance.post<FetchDataType<MessageType>>(
-      `/messages`,
-      payload
-    )
-    resMessage = res?.data.data ?? undefined
-
-    return { message: resMessage, hasLoading }
-  }
-)
 
 export const getInitMessages = createAsyncThunk(
   "room/getInitMessages",
@@ -79,7 +49,7 @@ export const getInitMessages = createAsyncThunk(
     upper_limit,
     has_loading = false,
   }: {
-    room_id: string
+    room_id: number
     has_loading: boolean
     upper_limit: number
   }) => {
@@ -106,7 +76,7 @@ export const getNextMessages = createAsyncThunk(
     upper_limit,
     down_limit,
   }: {
-    room_id: string
+    room_id: number
     upper_limit: number
     down_limit: number
   }) => {
@@ -139,7 +109,7 @@ export const getPrevMessages = createAsyncThunk(
     upper_limit,
     down_limit,
   }: {
-    room_id: string
+    room_id: number
     upper_limit: number
     down_limit: number
   }) => {
@@ -201,6 +171,7 @@ const roomSlice = createSlice({
 
       const roomId = "" + message.room_id
 
+      const messageId = message.nonce_id as number
       const messageType = action.payload?.messageType ?? undefined
 
       let prevMsgsCount = state.messages_count
@@ -228,20 +199,20 @@ const roomSlice = createSlice({
         case "direct":
           if (!isMyMessage && !message.seen) {
             if (newDmIds.includes(roomId)) {
-              newDmRoomIds = [...currRoomIds, message.id]
+              newDmRoomIds = [...currRoomIds, messageId]
             } else {
-              newDmRoomIds = [message.id]
+              newDmRoomIds = [messageId]
             }
           }
           break
         case "room":
           if (!isMyMessage && !message.seen) {
-            newRoomIds = [...prevRoomMsgIds, message.id]
+            newRoomIds = [...prevRoomMsgIds, messageId]
           }
           break
         case "seen":
-          let isDmExist = newDmRoomIds.includes(message.id)
-          let isRoomExist = prevRoomMsgIds.includes(message.id)
+          let isDmExist = newDmRoomIds.includes(messageId)
+          let isRoomExist = prevRoomMsgIds.includes(messageId)
           if (isDmExist) {
             newDmRoomIds = newDmRoomIds.filter((msgId) => msgId !== message.id)
           } else if (isRoomExist) {
@@ -272,8 +243,10 @@ const roomSlice = createSlice({
       const message = action.payload.message
       const roomId = message.room_id
       const prevMessages = state.chatRoom?.[roomId]?.messages ?? []
-      const chatIds = prevMessages.map((x: any) => x.id)
-      const foundIndex = chatIds.indexOf(message.id)
+      const chatIds = prevMessages.map((x: any) => +x.nonce_id)
+      const foundIndex = message.nonce_id
+        ? chatIds.indexOf(+message.nonce_id)
+        : -1
       let newMessages = [...prevMessages]
       if (foundIndex > -1) {
         newMessages[foundIndex] = message
@@ -298,11 +271,10 @@ const roomSlice = createSlice({
       if (!state.chatRoom || roomId === undefined) return
 
       const prevMessages = state.chatRoom[roomId].messages ?? []
-      const messageText = message.text
-        .toLocaleLowerCase()
-        .replaceAll(" ", "")
-        .trim()
-      const msgIndex = prevMessages.findIndex((msg) => msg.text === messageText)
+      const msgIndex = prevMessages.findIndex(
+        (msg) => msg.nonce_id === message.nonce_id
+      )
+
       let newMessages = [...prevMessages]
       if (msgIndex >= 0) {
         newMessages[msgIndex] = message
@@ -350,7 +322,9 @@ const roomSlice = createSlice({
       const roomId = action.payload.message.room_id
       if (!state.chatRoom || roomId === undefined) return
       let prevMessages = state.chatRoom[roomId].messages ?? []
-      const msgIndex = prevMessages.findIndex((msg) => msg.id === message.id)
+      const msgIndex = prevMessages.findIndex(
+        (msg) => msg.nonce_id === message.nonce_id
+      )
       let newMessages = [...prevMessages]
       newMessages[msgIndex] = message
 
@@ -365,138 +339,72 @@ const roomSlice = createSlice({
         },
       }
     },
+    addToQueue: (
+      state,
+      action: PayloadAction<{ message: PartialBy<ChatItemType, "id"> }>
+    ) => {
+      const room_id = action.payload.message.room_id
+      if (state.chatRoom === undefined) return
+
+      if (state?.chatRoom?.[room_id] === undefined) return
+
+      state.chatRoom[room_id].messages.unshift(action.payload.message)
+    },
+    deleteFromQueue: (
+      state,
+      action: PayloadAction<{ message: ChatItemType }>
+    ) => {
+      const message = action.payload.message
+      const room_id = message.room_id
+      const chat_nonce_id = message.nonce_id
+
+      if (state.chatRoom === undefined) return
+
+      if (state?.chatRoom?.[room_id] === undefined) return
+
+      state.chatRoom[room_id] = {
+        ...state.chatRoom[room_id],
+        messages: state.chatRoom[room_id].messages.filter(
+          (x) => x.nonce_id !== chat_nonce_id
+        ),
+      }
+    },
   },
   extraReducers: (builder) => {
-    //SEND MESSAGE
+    //ADD_INIT_MESSAGES
     builder
-      .addCase(sendMessage.pending, (state, action) => {
-        const payload = action.meta.arg
-        const message = payload.message
-        const roomId = message.room_id
-        //check for is that we have is_sent field
-        const hasSent = message?.is_sent ?? undefined
-        const chatRoom = state?.chatRoom ?? {}
-        const currentRoom = chatRoom?.[roomId] ?? {}
-        if (chatRoom === undefined || currentRoom === undefined) return state
-        const prevMessages = currentRoom?.messages ?? []
-        let newMessages = [...prevMessages]
-        const messageText = message.text
-          .toLocaleLowerCase()
-          .replaceAll(" ", "")
-          .trim()
-        const msgIndex = prevMessages.findIndex(
-          (msg) => msg.text === messageText
-        )
-        if (msgIndex >= 0 && hasSent === undefined) {
-          newMessages[msgIndex] = message
+      .addCase(getInitMessages.pending, (state, action) => {
+        const meta = action.meta
+        if (meta.arg.has_loading) {
+          state.loading = true
         } else {
-          newMessages = [message, ...prevMessages]
-        }
-        dispatch(_BUS.scrollEndChatBox)
-        return {
-          ...state,
-          chatRoom: {
-            ...state.chatRoom,
-            [roomId]: {
-              ...currentRoom,
-              resend_loading: payload.hasLoading,
-              messages: newMessages,
-            },
-          },
+          state.loading = false
         }
       })
-      .addCase(sendMessage.rejected, (state, action) => {
-        const payload = action.meta.arg
-        const message = { ...payload.message, is_sent: false }
-        const roomId = message.room_id
-        const chatRoom = state?.chatRoom ?? {}
-        const currentRoom = chatRoom?.[roomId] ?? {}
-        if (chatRoom === undefined || currentRoom === undefined) return state
-        const prevMessages = [...currentRoom.messages]
-        const messageText = message.text
-          .toLocaleLowerCase()
-          .replaceAll(" ", "")
-          .trim()
-        const msgIndex = prevMessages.findIndex(
-          (msg) => msg.text === messageText
-        )
-        let newMessages = [...prevMessages]
-        newMessages[msgIndex] = message
-        dispatch(_BUS.scrollEndChatBox)
-        return {
-          ...state,
-          chatRoom: {
-            ...state.chatRoom,
-            [roomId]: {
-              ...currentRoom,
-              resend_loading: false,
-              messages: newMessages,
-            },
-          },
-        }
+      .addCase(getInitMessages.rejected, (state, action) => {
+        state.loading = false
       })
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        const message = action.payload.message
-        const roomId = message.room_id
-        const chatRoom = state?.chatRoom ?? {}
-        if (chatRoom === undefined || roomId === undefined) return
-        const currentRoom = chatRoom[roomId]
-        const prevMessages = currentRoom?.messages ?? []
-        const messageText = message.text
-          .toLocaleLowerCase()
-          .replaceAll(" ", "")
-          .trim()
-        const msgIndex = prevMessages.findIndex(
-          (msg) => msg.text === messageText
-        )
-        let newMessages = [...prevMessages]
-        newMessages[msgIndex] = message
-
+      .addCase(getInitMessages.fulfilled, (state, action) => {
+        const response = action.payload
+        const roomId = response.room_id
+        const upperLimit = response.upper_limit
+        const messages = response.messages
         return {
           ...state,
+          queues: [],
+          loading: false,
           chatRoom: {
-            ...state.chatRoom,
+            ...(state?.chatRoom ?? {}),
             [roomId]: {
-              ...currentRoom,
-              resend_loading: false,
-              messages: newMessages,
+              ...(state?.chatRoom?.[roomId] ?? {}),
+              isFetched: true,
+              messages,
+              upper_limit: upperLimit,
+              down_limit: 1,
             },
           },
         }
       }),
-      //ADD_INIT_MESSAGES
-      builder
-        .addCase(getInitMessages.pending, (state, action) => {
-          const meta = action.meta
-          if (meta.arg.has_loading) {
-            state.loading = true
-          } else {
-            state.loading = false
-          }
-        })
-        .addCase(getInitMessages.rejected, (state, action) => {
-          state.loading = false
-        })
-        .addCase(getInitMessages.fulfilled, (state, action) => {
-          const response = action.payload
-          const roomId = response.room_id
-          const upperLimit = response.upper_limit
-          const messages = response.messages
-          return {
-            ...state,
-            loading: false,
-            chatRoom: {
-              ...(state?.chatRoom ?? {}),
-              [roomId]: {
-                ...(state?.chatRoom?.[roomId] ?? {}),
-                isFetched: true,
-                messages,
-                upper_limit: upperLimit,
-                down_limit: 1,
-              },
-            },
-          }
-        }),
       //FETCH_NEXT_MESSAGES
       builder
         .addCase(getNextMessages.pending, (state, action) => {
@@ -608,6 +516,8 @@ export const {
   sendMessage: sendMessageAction,
   removeMessage: removeMessageAction,
   unreadMessages: unreadMessagesAction,
+  addToQueue: addToQueueAction,
+  deleteFromQueue: deleteFromQueueAction,
 } = roomSlice.actions
 
 export default roomSlice.reducer

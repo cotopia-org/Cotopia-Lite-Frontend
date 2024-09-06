@@ -5,7 +5,7 @@ import { UserType } from "./user"
 
 export type MessageType = {
   files: AttachmentFileType[]
-  id: number
+  id?: number
   deleted_at: number | null
   room?: WorkspaceRoomType
   links: any[]
@@ -17,4 +17,5 @@ export type MessageType = {
   reply_to: ChatItemType | null
   updated_at?: number | null
   seen: boolean
+  nonce_id: number | null
 }

@@ -4,7 +4,6 @@ import FullLoading from "@/components/shared/full-loading"
 import { _BUS } from "@/app/const/bus"
 import EditChatInput from "./EditChatInput"
 import ReplyChatInput from "./ReplyChatInput"
-import NotFound from "@/components/shared/layouts/not-found"
 import { useChatRoomCtx } from "@/context/chat-room-context"
 import NewChatBox from "@/components/shared/chat-box/NewChatBox"
 
@@ -25,7 +24,10 @@ export default function UserChatRoom() {
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (
-      <EditChatInput message={targetMessage} onAdd={onEditMessage} />
+      <EditChatInput
+        message={targetMessage}
+        onAdd={(textVal) => onEditMessage({ ...targetMessage, text: textVal })}
+      />
     )
   }
 

@@ -46,7 +46,7 @@ const ResendMessage = ({ message, user }: Props) => {
     <CotopiaButton
       loading={false}
       variant={"ghost"}
-      onClick={() => onAddMessage(message.text, userId, true)}
+      onClick={() => onAddMessage(message.text)}
       endIcon={iconNode}
       className="hover:bg-transparent !p-0"
     >

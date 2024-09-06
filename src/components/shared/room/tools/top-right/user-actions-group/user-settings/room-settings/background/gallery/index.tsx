@@ -5,7 +5,7 @@ import GalleryItem from "./gallery-item";
 import FullLoading from "@/components/shared/full-loading";
 
 type Props = {
-  room_id: string;
+  room_id: number;
   workspace_id: string;
 };
 export default function Gallery({ room_id, workspace_id }: Props) {
