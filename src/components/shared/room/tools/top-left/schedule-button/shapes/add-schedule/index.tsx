@@ -14,7 +14,7 @@ export default function AddScheduleButton() {
       )}
       className='w-[640px]'
     >
-      {(open, close) => <AddScheduleContent />}
+      {(open, close) => <AddScheduleContent onClose={close} />}
     </FullModalBox>
   );
 }
