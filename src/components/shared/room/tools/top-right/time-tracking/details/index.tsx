@@ -70,7 +70,7 @@ export default function TimeTrackingDetails() {
   );
 
   return (
-    <ScrollArea className='h-72 flex flex-col gap-y-4 w-[260px]'>
+    <ScrollArea className='h-72 flex flex-col gap-y-4 w-full'>
       {content}
     </ScrollArea>
   );

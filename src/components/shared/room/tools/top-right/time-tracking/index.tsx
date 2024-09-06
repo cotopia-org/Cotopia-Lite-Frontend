@@ -10,6 +10,7 @@ import { convertMinutesToHHMMSS, urlWithQueryParams } from "@/lib/utils";
 import PopupBox from "@/components/shared/popup-box";
 import TimeTrackingDetails from "./details";
 import TimeTrackingButton from "./button";
+import PopupBoxChild from "@/components/shared/popup-box/child";
 
 export default function TimeTrackingButtonTool() {
   const [seconds, setSeconds] = useState<undefined | number>();
@@ -44,12 +45,14 @@ export default function TimeTrackingButtonTool() {
     >
       {(style, open, close) => {
         return (
-          <div
-            className='bg-white rounded-lg fixed mt-4 py-2'
-            style={{ top: style.top, zIndex: style.zIndex }}
+          <PopupBoxChild
+            {...style}
+            onClose={close}
+            title='Leaderboard'
+            width={300}
           >
             <TimeTrackingDetails />
-          </div>
+          </PopupBoxChild>
         );
       }}
     </PopupBox>
