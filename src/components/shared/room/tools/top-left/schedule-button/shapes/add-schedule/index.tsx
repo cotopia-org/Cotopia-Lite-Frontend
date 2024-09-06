@@ -4,7 +4,12 @@ import { Plus } from "lucide-react";
 import React from "react";
 import AddScheduleContent from "./content";
 
-export default function AddScheduleButton() {
+type Props = {
+  onDelete: () => void;
+  onCreated: () => void;
+};
+
+export default function AddScheduleButton({ onDelete, onCreated }: Props) {
   return (
     <FullModalBox
       trigger={(open) => (
@@ -14,7 +19,15 @@ export default function AddScheduleButton() {
       )}
       className='w-[640px]'
     >
-      {(open, close) => <AddScheduleContent onClose={close} />}
+      {(open, close) => (
+        <AddScheduleContent
+          onClose={close}
+          onCreated={() => {
+            if (onCreated) onCreated();
+            close();
+          }}
+        />
+      )}
     </FullModalBox>
   );
 }

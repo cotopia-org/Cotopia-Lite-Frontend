@@ -5,10 +5,12 @@ import CotopiaSwitch from "@/components/shared-ui/c-switch";
 import { getDay } from "@/lib/utils";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { Plus, Trash } from "lucide-react";
+import { AvailabiltyType } from "@/types/calendar";
 
 type Props = {
-  day: ScheduleDayType;
+  day?: ScheduleDayType;
   onChange: (day: ScheduleDayType) => void;
+  index: number;
 };
 
 function DayPlus({ onClick }: { onClick: () => void }) {
@@ -29,9 +31,15 @@ function DayRemove({ onClick }: { onClick: () => void }) {
 
 const initTime = { from: "00:00", to: "23:30" };
 
-export default function Day({ day, onChange }: Props) {
-  const [value, setValue] = useState<ScheduleDayType>({ index: 0, times: [] });
+export default function Day({ day, onChange, index }: Props) {
+  const [value, setValue] = useState<ScheduleDayType>({
+    index: 0,
+    times: [{ from: "00:00", to: "23:30" }],
+    availability_type: AvailabiltyType.Voice,
+    selected: false,
+  });
   useEffect(() => {
+    console.log("day", day);
     if (day !== undefined) setValue(day);
   }, [day]);
 
@@ -77,10 +85,24 @@ export default function Day({ day, onChange }: Props) {
     });
   };
 
+  const handleToggleSelectDay = (value: boolean) => {
+    setValue((prev) => {
+      const nValue = { ...prev, selected: value };
+
+      if (onChange) onChange(nValue);
+
+      return nValue;
+    });
+  };
+
   return (
     <div className='flex flex-row items-start gap-x-2'>
       <div className='min-w-[200px] mt-2'>
-        <CotopiaSwitch label={getDay(day.index)} />
+        <CotopiaSwitch
+          label={getDay(index)}
+          checked={value.selected}
+          onCheckedChange={handleToggleSelectDay}
+        />
       </div>
       <div className='flex flex-col gap-y-4 w-full'>
         {value?.times.map((item, key) => (
