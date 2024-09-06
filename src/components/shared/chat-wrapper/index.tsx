@@ -55,7 +55,7 @@ export default function ChatWrapper({ children }: Props) {
     );
   });
   useSocket("messageReceived", (data) => {
-    console.log(data, "RECEIVED DATA");
+    console.log(data, "RECEIVxxED DATA");
   });
 
   useSocket("messageSeen", (data) => {
