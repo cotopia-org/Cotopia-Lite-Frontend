@@ -69,6 +69,7 @@ export const useChatSocket = (id: number, user: UserType) => {
         message: tempMessage,
       })
     );
+
     //Now message added to queue
     socket?.emit("sendMessage", tempMessage, (message: ChatItemType) => {
       appDispatch(

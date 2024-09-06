@@ -6,13 +6,14 @@ import { useApi } from "@/hooks/swr";
 import { LeaderboardType } from "@/types/leaderboard";
 import { UserMinimalType } from "@/types/user";
 import React, { useState } from "react";
+import { useSocket } from "../../../protected-wrapper";
 
 type Props = {
   workspace_id: string;
   limit?: number;
 };
 export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
-  const { data: leaderboardData } = useApi(
+  const { data: leaderboardData, mutate: leaderboardMutate } = useApi(
     `/workspaces/${workspace_id}/leaderboard`
   );
 
@@ -24,7 +25,21 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
 
   const [isExpand, setIsExpand] = useState(false);
 
-  const { data, isLoading } = useApi(`/workspaces/${workspace_id}/users`);
+  const {
+    data,
+    isLoading,
+    mutate: userMutate,
+  } = useApi(`/workspaces/${workspace_id}/users`);
+
+  useSocket("userLeft", () => {
+    leaderboardMutate();
+    userMutate();
+  });
+
+  useSocket("userJoined", () => {
+    leaderboardMutate();
+    userMutate();
+  });
 
   const participants: UserMinimalType[] = data !== undefined ? data?.data : [];
 
@@ -43,7 +58,7 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
   if (finalParticipants.length === 0) return;
 
   return (
-    <TitleEl title='Participants' className='flex-col items-start'>
+    <TitleEl title='Offline' className='flex-col items-start'>
       <Participants participants={finalParticipants} />
       {!!limit && allOfflineParticipants.length > limit && (
         <CotopiaButton
