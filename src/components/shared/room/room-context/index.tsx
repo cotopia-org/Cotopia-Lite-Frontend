@@ -99,22 +99,30 @@ export default function RoomContext({
   ) => {
     if (room === undefined) return;
 
-    const updatedPartValues = {
-      participants: room.participants.map((x) => {
-        if (x.username.toLowerCase() === username.toLowerCase()) {
-          x.coordinates = `${position.x},${position.y}`;
-        }
+    console.log("username", username);
+    console.log("position", position);
 
-        return x;
-      }),
-    };
+    setLocalRoom((prev) => {
+      const participants = prev?.participants ?? [];
 
-    const newRoom = {
-      ...room,
-      ...updatedPartValues,
-    };
+      const participant_index = participants.findIndex(
+        (x) => x.username === username
+      );
 
-    if (onRoomUpdated) onRoomUpdated(newRoom);
+      if (participant_index === -1) return prev;
+
+      participants[participant_index] = {
+        ...participants[participant_index],
+        coordinates: `${position.x},${position.y}`,
+      };
+
+      console.log("participants", participants);
+
+      return {
+        ...prev,
+        participants,
+      } as WorkspaceRoomType;
+    });
   };
 
   useSocket(
@@ -122,16 +130,7 @@ export default function RoomContext({
     (data) => {
       const position = data?.coordinates?.split(",");
 
-      if (!data?.username) return;
-
-      if (position?.length !== 2) return;
-
-      updateUserCoords(data.username, { x: +position?.[0], y: +position?.[1] });
-    },
-    [updateUserCoords]
-  );
-
-  const [sidebar, setSidebar] = useState<ReactNode>(<></>);
+  const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
 

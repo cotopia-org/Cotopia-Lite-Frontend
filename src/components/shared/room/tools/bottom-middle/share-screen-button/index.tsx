@@ -1,22 +1,12 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { ScreenShare } from "lucide-react";
-import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
-import { useCallback, useState } from "react";
-import {
-  createLocalScreenTracks,
-  createLocalVideoTrack,
-  LocalVideoTrack,
-  Track,
-} from "livekit-client";
+import { useRoomContext } from "@livekit/components-react";
+import { useCallback } from "react";
 import useBus from "use-bus";
 import { _BUS } from "@/app/const/bus";
 
 export default function ShareScreenButtonTool() {
-  const [screenTrack, setScreenTrack] = useState<any>(null);
-
   const room = useRoomContext();
-
-  const { localParticipant } = useLocalParticipant();
 
   const startScreenShare = useCallback(async () => {
     if (!room) return;
@@ -33,7 +23,7 @@ export default function ShareScreenButtonTool() {
     } catch (err) {
       console.error("Error sharing screen:", err);
     }
-  }, [room, screenTrack]);
+  }, [room]);
 
   useBus(_BUS.stopMyScreenSharing, () => {
     stopScreenShare();

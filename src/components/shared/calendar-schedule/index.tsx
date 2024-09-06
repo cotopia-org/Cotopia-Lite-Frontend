@@ -7,12 +7,6 @@ type Props = {
   calendar: CalendarType;
 };
 export default function CalendarSchedule({ calendar }: Props) {
-  // const { data, isLoading: getCalendarLoading } = useApi<
-  //   FetchDataType<CalendarType>
-  // >(`/calendars/${calendar.id}`);
-
-  // const calendarData = data !== undefined ? data?.data : undefined;
-
   // const [hasChanged, setHasChanged] = useState(false);
 
   // const [date, setDate] = useState<DateRange | undefined>({

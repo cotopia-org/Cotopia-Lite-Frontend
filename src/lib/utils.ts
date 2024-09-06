@@ -155,3 +155,16 @@ export const getFocusedMessage = ({
 
   return { focusHandler: findFocusedMessage }
 }
+
+export function convertCoordinateString(coords: string) {
+  if (!coords) return;
+
+  if (!coords.includes(",")) return;
+
+  const coordsObject = coords.split(",");
+
+  return {
+    x: coordsObject[0] ? +coordsObject[0] : 0,
+    y: coordsObject[1] ? +coordsObject[1] : 0,
+  };
+}

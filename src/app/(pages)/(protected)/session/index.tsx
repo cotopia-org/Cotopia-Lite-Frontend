@@ -4,8 +4,10 @@ import {
   ParticipantContext,
   ParticipantTileProps,
   TrackRefContext,
+  TrackReferenceOrPlaceholder,
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
+  useTrackRefContext,
 } from "@livekit/components-react";
 import { createContext, useContext, useMemo } from "react";
 import { TrackReferenceType } from "@/types/track-reference";
@@ -28,8 +30,12 @@ function SpacialParticipantContextIfNeeded(
   );
 }
 
-const SessionContext = createContext<{ track?: TrackReferenceType }>({
+const SessionContext = createContext<{
+  track?: TrackReferenceType;
+  draggable: boolean;
+}>({
   track: undefined,
+  draggable: false,
 });
 
 export const useUserTile = () => useContext(SessionContext);
@@ -49,8 +55,20 @@ function TrackRefContextIfNeeded(
   );
 }
 
-type Props = ParticipantTileProps;
-export default function UserSession({ trackRef }: Props) {
+type Props = {
+  participant?: Participant;
+  track?: TrackReferenceOrPlaceholder;
+  draggable?: boolean;
+  isDragging?: boolean;
+};
+export default function UserSession({
+  participant,
+  track,
+  draggable = false,
+  isDragging = false,
+}: Props) {
+  const trackRef = track ? track : useTrackRefContext();
+
   const maybeTrackRef = useMaybeTrackRefContext();
 
   const trackReference: TrackReferenceType = useMemo(() => {
@@ -66,10 +84,10 @@ export default function UserSession({ trackRef }: Props) {
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>
       <SpacialParticipantContextIfNeeded
-        participant={trackReference.participant}
+        participant={participant ?? trackReference.participant}
       >
-        <SessionContext.Provider value={{ track: trackReference }}>
-          <DraggableCircle />
+        <SessionContext.Provider value={{ track: trackReference, draggable }}>
+          <DraggableCircle defaultIsDragging={isDragging} />
         </SessionContext.Provider>
       </SpacialParticipantContextIfNeeded>
     </TrackRefContextIfNeeded>
