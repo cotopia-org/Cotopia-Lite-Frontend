@@ -40,6 +40,7 @@ export default function Message({ item, isMine }: Props) {
     if (
       isVisible &&
       item?.seen === false &&
+      item?.created_at &&
       item?.deleted_at === null &&
       item?.nonce_id !== null &&
       !isMine
