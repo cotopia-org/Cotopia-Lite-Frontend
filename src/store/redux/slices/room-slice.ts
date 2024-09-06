@@ -241,6 +241,7 @@ const roomSlice = createSlice({
     ) => {
       if (state?.chatRoom === undefined) return
       const message = action.payload.message
+      console.log(message, "MESSAGE")
       const roomId = message.room_id
       const prevMessages = state.chatRoom?.[roomId]?.messages ?? []
       const chatIds = prevMessages.map((x: any) => +x.nonce_id)
@@ -344,11 +345,21 @@ const roomSlice = createSlice({
       action: PayloadAction<{ message: PartialBy<ChatItemType, "id"> }>
     ) => {
       const room_id = action.payload.message.room_id
+      console.log(action.payload.message, "MESSAGE")
       if (state.chatRoom === undefined) return
 
       if (state?.chatRoom?.[room_id] === undefined) return
 
-      state.chatRoom[room_id].messages.unshift(action.payload.message)
+      const prevMessages = state.chatRoom[room_id].messages
+
+      return {
+        ...state,
+        ...(state?.chatRoom ?? {}),
+        [room_id]: {
+          ...state.chatRoom[room_id],
+          messages: [action.payload.message, ...prevMessages],
+        },
+      }
     },
     deleteFromQueue: (
       state,
