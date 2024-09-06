@@ -131,7 +131,7 @@ export default function RoomContext({
     [updateUserCoords]
   );
 
-  const [sidebar, setSidebar] = useState<ReactNode>();
+  const [sidebar, setSidebar] = useState<ReactNode>(<></>);
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
 

@@ -1,25 +1,27 @@
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
-import { ChatItemType } from "@/types/chat"
-import { useAppDispatch, useAppSelector } from "@/store/redux/store"
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { ChatItemType } from "@/types/chat";
+import { useAppDispatch, useAppSelector } from "@/store/redux/store";
 import {
   addToQueueAction,
   deleteFromQueueAction,
   updateMessagesAction,
-} from "@/store/redux/slices/room-slice"
-import { RoomEnvironmentType } from "@/context/chat-room-context"
+} from "@/store/redux/slices/room-slice";
+import { UserMinimalType, UserType } from "@/types/user";
 
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 function messageCreator({
   text,
   room_id,
   reply_to = null,
+  user,
 }: {
-  text: string
-  room_id?: number
-  reply_to?: ChatItemType | null
+  text: string;
+  room_id?: number;
+  reply_to?: ChatItemType | null;
+  user: UserType;
 }) {
   //Check the user id - TODO
 
@@ -37,53 +39,55 @@ function messageCreator({
     text,
     is_sent: true,
     updated_at: null,
-    user: null,
+    user,
     nonce_id: new Date().getTime(),
-  } as PartialBy<ChatItemType, "id">
+  } as PartialBy<ChatItemType, "id">;
 }
 
 //id is always room id
-export const useChatSocket = (id: number) => {
-  const appDispatch = useAppDispatch()
+export const useChatSocket = (id: number, user: UserType) => {
+  const appDispatch = useAppDispatch();
 
-  const socket = useSocket()
+  const socket = useSocket();
 
   const send = async ({
     message,
     replyTo,
   }: {
-    message: string
-    replyTo?: ChatItemType
+    message: string;
+    replyTo?: ChatItemType;
   }) => {
     const tempMessage = messageCreator({
       text: message,
       room_id: id,
       reply_to: replyTo,
-    })
+      user,
+    });
 
     appDispatch(
       addToQueueAction({
         message: tempMessage,
       })
-    )
+    );
+
     //Now message added to queue
     socket?.emit("sendMessage", tempMessage, (message: ChatItemType) => {
       appDispatch(
         deleteFromQueueAction({
           message,
         })
-      )
-    })
-  }
+      );
+    });
+  };
   const edit = async ({ message }: { message: ChatItemType }) => {
     appDispatch(
       updateMessagesAction({
         message: { ...message, is_edited: true },
       })
-    )
+    );
     //Now message added to queue
-    socket?.emit("updateMessage", message, (message: ChatItemType) => {})
-  }
+    socket?.emit("updateMessage", message, (message: ChatItemType) => {});
+  };
 
-  return { send, edit }
-}
+  return { send, edit };
+};
