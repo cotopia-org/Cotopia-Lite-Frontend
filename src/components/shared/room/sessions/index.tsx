@@ -11,44 +11,18 @@ import { RoomAudioRenderer } from "./room-audio-renderer";
 import { ReactNode } from "react";
 
 type Props = {
-  children?: (tracks: TrackReferenceOrPlaceholder[]) => void;
+  children?: ReactNode;
 };
 
 export default function UserSessions({ children }: Props) {
   const { state } = useRoomContext();
 
-  const tracks = useTracks(
-    [
-      { source: Track.Source.Camera, withPlaceholder: true },
-      { source: Track.Source.ScreenShare, withPlaceholder: false },
-    ],
-    {
-      updateOnlyOn: [
-        RoomEvent.ActiveSpeakersChanged,
-        RoomEvent.Reconnected,
-        RoomEvent.Reconnecting,
-        RoomEvent.MediaDevicesChanged,
-        RoomEvent.LocalTrackPublished,
-        RoomEvent.TrackUnsubscribed,
-      ],
-      onlySubscribed: true,
-    }
-  );
-
   if (state !== "connected") return <FullLoading />;
 
   return (
-    <SpcialLayout tracks={tracks}>
-      <>
-        {children ? (
-          <>{children(tracks)}</>
-        ) : (
-          <>
-            <UserSession />
-          </>
-        )}
-        <RoomAudioRenderer />
-      </>
-    </SpcialLayout>
+    <>
+      {children}
+      <RoomAudioRenderer />
+    </>
   );
 }

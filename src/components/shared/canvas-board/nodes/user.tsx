@@ -1,11 +1,32 @@
 import React, { useMemo } from "react";
 import UserSession from "@/app/(pages)/(protected)/session";
-import { useParticipants, useTracks } from "@livekit/components-react";
+import {
+  TrackRefContext,
+  useParticipants,
+  useTracks,
+} from "@livekit/components-react";
+import { RoomEvent, Track } from "livekit-client";
 
 const UserNode = (props: any) => {
   const { data, dragging } = props;
 
-  const tracks = useTracks();
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    {
+      updateOnlyOn: [
+        RoomEvent.ActiveSpeakersChanged,
+        RoomEvent.Reconnected,
+        RoomEvent.Reconnecting,
+        RoomEvent.MediaDevicesChanged,
+        RoomEvent.LocalTrackPublished,
+        RoomEvent.TrackUnsubscribed,
+      ],
+      onlySubscribed: true,
+    }
+  );
   const participants = useParticipants();
   const track = useMemo(() => {
     if (!data?.username) return undefined;
@@ -21,13 +42,17 @@ const UserNode = (props: any) => {
     return participants.find((x) => x.identity === data.username);
   }, [participants, data.username]);
 
+  // if (track === undefined) return;
+
   return (
-    <UserSession
-      participant={participant}
-      track={track}
-      draggable={data?.draggable ?? false}
-      isDragging={dragging}
-    />
+    <>
+      <UserSession
+        participant={participant}
+        track={track}
+        draggable={data?.draggable ?? false}
+        isDragging={dragging}
+      />
+    </>
   );
 };
 

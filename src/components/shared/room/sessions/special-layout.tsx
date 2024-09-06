@@ -1,14 +1,6 @@
-import { isScreenShareExist } from "@/lib/utils";
-import {
-  TrackRefContext,
-  TrackReference,
-  TrackReferenceOrPlaceholder,
-} from "@livekit/components-react";
+import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Children, ReactNode, cloneElement, isValidElement } from "react";
-import DraggableComponent from "../../draggable";
-import ScreenShareCard from "../components/screen-share-card";
-
 type Props = {
   tracks: TrackReferenceOrPlaceholder[];
   children: ReactNode;
@@ -37,28 +29,7 @@ export const cloneSingleChild = (
 };
 
 const SpcialLayout = ({ tracks, children }: Props) => {
-  let finalTracks: TrackReferenceOrPlaceholder[] = [...tracks];
-
-  let content = (
-    <>
-      {/* {finalTracks
-        .filter((x) => x.source === Track.Source.ScreenShare)
-        .map((track, key) => (
-          <ScreenShareCard track={track as TrackReference} key={key} />
-        ))} */}
-      {finalTracks
-        .filter((x) => x.source !== Track.Source.ScreenShare)
-        .map((track, key) => {
-          return (
-            <TrackRefContext.Provider value={track} key={key}>
-              {cloneSingleChild(children)}
-            </TrackRefContext.Provider>
-          );
-        })}
-    </>
-  );
-
-  return <>{content}</>;
+  return <>{cloneSingleChild(children)}</>;
 };
 
 export default SpcialLayout;

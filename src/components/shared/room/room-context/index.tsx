@@ -99,36 +99,27 @@ export default function RoomContext({
   ) => {
     if (room === undefined) return;
 
-    console.log("username", username);
-    console.log("position", position);
+    if (onRoomUpdated === undefined) return;
 
-    setLocalRoom((prev) => {
-      const participants = prev?.participants ?? [];
+    const participants = room?.participants ?? [];
 
-      const participant_index = participants.findIndex(
-        (x) => x.username === username
-      );
+    const participant_index = participants.findIndex(
+      (x: any) => x.username === username
+    );
 
-      if (participant_index === -1) return prev;
+    if (participant_index === -1) return onRoomUpdated(room);
 
-      participants[participant_index] = {
-        ...participants[participant_index],
-        coordinates: `${position.x},${position.y}`,
-      };
+    participants[participant_index] = {
+      ...participants[participant_index],
+      coordinates: `${position.x},${position.y}`,
+    };
 
-      console.log("participants", participants);
-
-      return {
-        ...prev,
-        participants,
-      } as WorkspaceRoomType;
-    });
+    if (onRoomUpdated) onRoomUpdated({ ...room, participants });
   };
 
-  useSocket(
-    "updateCoordinates",
-    (data) => {
-      const position = data?.coordinates?.split(",");
+  useSocket("updateCoordinates", (data) => {
+    const position = data?.coordinates?.split(",");
+  });
 
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);

@@ -67,7 +67,7 @@ export default function UserSession({
   draggable = false,
   isDragging = false,
 }: Props) {
-  const trackRef = track ? track : useTrackRefContext();
+  const trackRef = track;
 
   const maybeTrackRef = useMaybeTrackRefContext();
 
@@ -84,7 +84,7 @@ export default function UserSession({
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>
       <SpacialParticipantContextIfNeeded
-        participant={participant ?? trackReference.participant}
+        participant={participant ?? trackReference?.participant}
       >
         <SessionContext.Provider value={{ track: trackReference, draggable }}>
           <DraggableCircle defaultIsDragging={isDragging} />

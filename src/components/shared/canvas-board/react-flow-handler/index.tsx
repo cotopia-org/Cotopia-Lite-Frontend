@@ -25,7 +25,6 @@ import { __VARS } from "@/app/const/vars";
 import { Track } from "livekit-client";
 import ShareScreen from "../nodes/share-screen";
 import { convertCoordinateString } from "@/lib/utils";
-import { WorkspaceRoomShortType } from "@/types/room";
 import { UserMinimalType } from "@/types/user";
 // import { useCanvas } from "..";
 
@@ -291,11 +290,6 @@ function ReactFlowHandler({ tracks }: Props) {
       onViewportChange={setViewPort}
       fitView
     >
-      {/* {!!viewPort && (
-        <div className='fixed top-4 right-4 z-[10]'>
-          <NodesPreview viewport={viewPort} nodes={nodes} />
-        </div>
-      )} */}
       <MiniMap />
       <Background />
     </ReactFlow>
