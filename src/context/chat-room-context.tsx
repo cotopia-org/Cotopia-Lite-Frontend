@@ -134,7 +134,7 @@ const ChatRoomCtxProvider = ({
 }) => {
   const { user } = useProfile()
 
-  const chat = useChatSocket(room_id, user)
+  const chat = useChatSocket(room_id, user, environment)
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -158,9 +158,7 @@ const ChatRoomCtxProvider = ({
   if (roomIds.includes(room_id)) {
     selectedRoom = chatRoom?.[room_id]
   }
-
   const upper_limit = selectedRoom?.upper_limit ?? UPPER_LIMIT_PAGE
-
   const down_limit = selectedRoom?.down_limit ?? DOWN_LIMIT_PAGE
 
   let isFirstFetch = selectedRoom === undefined
@@ -224,7 +222,7 @@ const ChatRoomCtxProvider = ({
         busDispatch(_BUS.scrollEndChatBox)
       }
     },
-    [room_id, down_limit]
+    [room_id, down_limit, environment]
   )
 
   const editMessageHandler = useCallback(

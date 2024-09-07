@@ -13,62 +13,25 @@ import {
 import { useAppDispatch } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
 import { ReactNode } from "react"
-import { toast } from "sonner"
 
 type Props = {
   children: ReactNode
 }
 export default function ChatWrapper({ children }: Props) {
-  const { user } = useProfile()
-
   const appDispatch = useAppDispatch()
 
-  // useSocket("messageReceived", (data: ChatItemType) => {
-  //   if (user.id !== data.user?.id) playSoundEffect("newMessage2")
-  //   appDispatch(
-  //     updateMessagesAction({
-  //       message: data,
-  //     })
-  //   )
-  //   appDispatch(
-  //     unreadMessagesAction({
-  //       message: data,
-  //       messageType: "room",
-  //       myAccountId: user.id,
-  //     })
-  //   )
-  // })
-
-  useSocket("directMessages", (data) => {
-    if (user.id !== data.user?.id) {
-      playSoundEffect("newMessage2")
-      appDispatch(
-        unreadMessagesAction({
-          message: data,
-          messageType: "direct",
-        })
-      )
-    }
+  useSocket("messageReceived", (data: ChatItemType) => {
+    const isDirect = data?.is_direct
+    playSoundEffect("newMessage2")
     appDispatch(
       updateMessagesAction({
         message: data,
       })
     )
-  })
-
-  useSocket("roomMessages", (data) => {
-    if (user.id !== data.user?.id) {
-      playSoundEffect("newMessage2")
-      appDispatch(
-        unreadMessagesAction({
-          message: data,
-          messageType: "room",
-        })
-      )
-    }
     appDispatch(
-      updateMessagesAction({
+      unreadMessagesAction({
         message: data,
+        messageType: isDirect ? "direct" : "room",
       })
     )
   })

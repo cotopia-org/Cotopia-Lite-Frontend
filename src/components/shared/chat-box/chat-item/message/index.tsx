@@ -1,5 +1,9 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
-import { unreadMessagesAction } from "@/store/redux/slices/room-slice"
+import { useChatRoomCtx } from "@/context/chat-room-context"
+import {
+  unreadMessagesAction,
+  updateMessagesAction,
+} from "@/store/redux/slices/room-slice"
 import { useAppDispatch } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
 import { useEffect, useRef, useState } from "react"
@@ -11,6 +15,13 @@ type Props = {
 }
 export default function Message({ item, isMine }: Props) {
   const divRef = useRef<HTMLDivElement>(null)
+
+  const isDirect = item?.is_direct
+
+  let channel = `room-${item.room_id}`
+  if (isDirect) {
+    channel = `direct-${item.room_id}`
+  }
 
   const appDispatch = useAppDispatch()
 
@@ -49,10 +60,12 @@ export default function Message({ item, isMine }: Props) {
           message: item,
           nonce_id: item.nonce_id,
           room_id: item.room_id,
+          channel,
         })
         appDispatch(
           unreadMessagesAction({ message: item, messageType: "seen" })
         )
+        appDispatch(updateMessagesAction({ message: { ...item, seen: true } }))
       }
     }
   }, [item, isVisible, isMine, socket])

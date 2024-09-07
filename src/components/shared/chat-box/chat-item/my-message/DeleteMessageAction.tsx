@@ -20,9 +20,9 @@ interface Props {
 
 const DeleteMessageAction = ({ message, onClose }: Props) => {
   const { user } = useProfile()
-  const { roomId } = useChatRoomCtx()
+  const { roomId, env } = useChatRoomCtx()
 
-  const { remove } = useChatSocket(roomId, user)
+  const { remove } = useChatSocket(roomId, user, env)
 
   const appDispatch = useAppDispatch()
 
