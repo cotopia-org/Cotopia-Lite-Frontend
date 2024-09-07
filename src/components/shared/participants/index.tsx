@@ -1,10 +1,13 @@
-import { UserMinimalType } from "@/types/user";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import Avatars from "../avatars";
 
+type ParticipantType = WorkspaceUserType | UserMinimalType;
+
 type Props = {
-  participants: UserMinimalType[];
+  participants: ParticipantType[];
+  customTitle?: (user: ParticipantType) => string;
 };
-export default function Participants({ participants }: Props) {
+export default function Participants({ participants, customTitle }: Props) {
   if (participants.length === 0) return;
 
   return (
@@ -14,6 +17,8 @@ export default function Participants({ participants }: Props) {
           items={participants.map((x) => ({
             src: x?.avatar?.url,
             title: x?.name ?? "",
+            toolTipTitle:
+              customTitle !== undefined ? customTitle(x) : undefined,
           }))}
         />
       </div>

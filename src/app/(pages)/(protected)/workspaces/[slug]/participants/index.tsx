@@ -4,9 +4,10 @@ import Participants from "@/components/shared/participants";
 import TitleEl from "@/components/shared/title-el";
 import { useApi } from "@/hooks/swr";
 import { LeaderboardType } from "@/types/leaderboard";
-import { UserMinimalType } from "@/types/user";
+import { WorkspaceUserType } from "@/types/user";
 import React, { useState } from "react";
 import { useSocket } from "../../../protected-wrapper";
+import moment from "moment";
 
 type Props = {
   workspace_id: string;
@@ -41,7 +42,8 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
     userMutate();
   });
 
-  const participants: UserMinimalType[] = data !== undefined ? data?.data : [];
+  const participants: WorkspaceUserType[] =
+    data !== undefined ? data?.data : [];
 
   if (isLoading || data === undefined) return <FullLoading />;
 
@@ -51,6 +53,10 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
 
   let finalParticipants = [...allOfflineParticipants];
 
+  finalParticipants = finalParticipants
+    .filter((x) => x.last_login !== null)
+    .sort((a, b) => moment(b.last_login).unix() - moment(a.last_login).unix());
+
   if (limit && isExpand === false) {
     finalParticipants = finalParticipants.slice(0, limit);
   }
@@ -59,7 +65,14 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
 
   return (
     <TitleEl title='Offline' className='flex-col items-start'>
-      <Participants participants={finalParticipants} />
+      <Participants
+        participants={finalParticipants}
+        customTitle={(x) => {
+          const fromNow = moment((x as WorkspaceUserType).last_login).fromNow();
+
+          return `${x.name} (${fromNow})`;
+        }}
+      />
       {!!limit && allOfflineParticipants.length > limit && (
         <CotopiaButton
           variant={"outline"}

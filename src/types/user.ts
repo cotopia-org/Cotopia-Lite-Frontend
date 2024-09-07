@@ -32,3 +32,13 @@ export type UserMinimalType = {
   screenshare_coordinates: null | string;
   screenshare_size: null | string;
 };
+
+export type WorkspaceUserType = {
+  avatar: AttachmentFileType;
+  coordinates: string;
+  id: number;
+  last_login: string;
+  name: string;
+  status: string;
+  username: string;
+};

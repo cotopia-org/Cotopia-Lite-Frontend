@@ -3,11 +3,12 @@ import CotopiaTooltip from "../shared-ui/c-tooltip";
 
 type Props = {
   title: string;
+  toolTipTitle?: string;
   src?: string;
 };
-export default function UserAvatar({ title, src }: Props) {
+export default function UserAvatar({ title, toolTipTitle, src }: Props) {
   return (
-    <CotopiaTooltip title={title}>
+    <CotopiaTooltip title={toolTipTitle ? toolTipTitle : title}>
       <CotopiaAvatar
         className='w-8 h-8'
         src={src}
