@@ -79,14 +79,6 @@ const LiveKitAudioManager = () => {
     }
   };
 
-  useSocket("userLeftFromRoom", (data) => {
-    checkBoundaries();
-  });
-
-  useSocket("userJoinedToRoom", (data) => {
-    checkBoundaries();
-  });
-
   useSocket("updateCoordinates", (data) => {
     checkBoundaries();
   });
