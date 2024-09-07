@@ -203,7 +203,7 @@ const roomSlice = createSlice({
                 [roomId]: [...newDirects[roomId], messageId],
               }
             } else {
-              newDirects = { ...newDirects, [roomId]: [...[messageId]] }
+              newDirects = { ...newDirects, [roomId]: [messageId] }
             }
           }
           break
@@ -230,7 +230,7 @@ const roomSlice = createSlice({
           }
           if (isRoomExist) {
             RoomChecked = true
-            newRoomIds = newRoomIds.filter((y) => y !== messageId)
+            newRoomIds = newRoomIds.filter((y) => +y !== messageId)
           }
           break
         default:
@@ -243,7 +243,9 @@ const roomSlice = createSlice({
         isDirectChecked: directChecked,
         messages_count: {
           room: newRoomIds,
-          directs: newDirects,
+          directs: Object.entries(newDirects)
+            .filter(([_, value]) => value.length > 0)
+            .reduce((acc, [key, value]) => ({ ...acc, [+key]: value }), {}),
         },
       }
     },
