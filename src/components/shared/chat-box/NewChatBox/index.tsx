@@ -1,39 +1,39 @@
-import { ChatItemType } from "@/types/chat";
-import { UIEvent, memo, useCallback, useEffect, useRef, useState } from "react";
-import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
-import { _BUS } from "@/app/const/bus";
-import useBus from "use-bus";
+import { ChatItemType } from "@/types/chat"
+import { UIEvent, memo, useCallback, useEffect, useRef, useState } from "react"
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
+import { _BUS } from "@/app/const/bus"
+import useBus from "use-bus"
 import {
   FetchMessageType,
   RoomEnvironmentType,
   UPPER_LIMIT_PAGE,
   useChatRoomCtx,
-} from "@/context/chat-room-context";
-import { ChevronDown } from "lucide-react";
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import { toast } from "sonner";
-import { __VARS } from "@/app/const/vars";
-import { useAppDispatch, useAppSelector } from "@/store/redux/store";
-import { getFocusedMessage, getMiddleIndex } from "@/lib/utils";
-import NotFound from "../../layouts/not-found";
-import FullLoading from "../../full-loading";
-import RowItem from "./RowItem";
-import { getInitMessages } from "@/store/redux/slices/room-slice";
-import CBadge from "@/components/shared-ui/c-badge";
-import { UserMinimalType } from "@/types/user";
+} from "@/context/chat-room-context"
+import { ChevronDown } from "lucide-react"
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
+import { toast } from "sonner"
+import { __VARS } from "@/app/const/vars"
+import { useAppDispatch, useAppSelector } from "@/store/redux/store"
+import { getFocusedMessage, getMiddleIndex } from "@/lib/utils"
+import NotFound from "../../layouts/not-found"
+import FullLoading from "../../full-loading"
+import RowItem from "./RowItem"
+import { getInitMessages } from "@/store/redux/slices/room-slice"
+import CBadge from "@/components/shared-ui/c-badge"
+import { UserMinimalType } from "@/types/user"
 
 type Props = {
-  observer_user_id?: number;
-  user?: UserMinimalType;
-  className?: string;
-};
+  observer_user_id?: number
+  user?: UserMinimalType
+  className?: string
+}
 
-export const SCROLL_THRESHOLD = 200;
+export const SCROLL_THRESHOLD = 200
 
 function NewChatBox({ observer_user_id, user, className = "" }: Props) {
-  let clss = "relative";
+  let clss = "relative"
 
-  const [wheelDirection, setWheelDirections] = useState<"down" | "up">("down");
+  const [wheelDirection, setWheelDirections] = useState<"down" | "up">("down")
 
   const {
     messages,
@@ -47,60 +47,63 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     changeKey,
     changeBulk,
     roomId,
-  } = useChatRoomCtx();
+  } = useChatRoomCtx()
 
-  if (roomId === undefined) return null;
+  if (roomId === undefined) return null
 
-  const prevFetchRef = useRef<boolean>(true);
-  const nextFetchRef = useRef<boolean>(true);
-  const totalLength = (__VARS.defaultPerPage / 2) * __VARS.pagesLimitDiff;
-  const [isFirst, setIsFirst] = useState(true);
+  const prevFetchRef = useRef<boolean>(true)
+  const nextFetchRef = useRef<boolean>(true)
+  const totalLength = (__VARS.defaultPerPage / 2) * __VARS.pagesLimitDiff
+  const [isFirst, setIsFirst] = useState(true)
 
-  const appDispatch = useAppDispatch();
-  const [showGotoBottom, setShowGotoBottom] = useState(false);
+  const appDispatch = useAppDispatch()
+  const [showGotoBottom, setShowGotoBottom] = useState(false)
 
-  const roomSlice = useAppSelector((state) => state.roomSlice);
+  const roomSlice = useAppSelector((state) => state.roomSlice)
 
-  const nextLoading = roomSlice?.nextLoading ?? false;
-  const prevLoading = roomSlice?.prevLoading ?? false;
+  const nextLoading = roomSlice?.nextLoading ?? false
+  const prevLoading = roomSlice?.prevLoading ?? false
 
-  const unreadRoomMsgs = roomSlice?.messages_count?.room ?? [];
+  const unreadRoomMsgs = roomSlice?.messages_count ?? {
+    room: [],
+    directs: {},
+  }
 
-  const unreadDmMsgs = roomSlice?.messages_count?.directs?.[roomId] ?? [];
+  const unreadDmMsgs = unreadRoomMsgs.directs?.[roomId] ?? []
 
-  let unreadMsgsLength = 0;
+  let unreadMsgsLength = 0
 
   if (env === RoomEnvironmentType.room) {
-    unreadMsgsLength = unreadRoomMsgs.length;
+    unreadMsgsLength = unreadRoomMsgs.room.length
   }
   if (env === RoomEnvironmentType.direct) {
-    unreadMsgsLength = unreadDmMsgs.length;
+    unreadMsgsLength = unreadDmMsgs.length
   }
 
   useEffect(() => {
     if (wheelDirection === "up") {
-      setShowGotoBottom(true);
+      setShowGotoBottom(true)
     } else {
       setTimeout(() => {
-        if (!scrollerRef.current) return;
+        if (!scrollerRef.current) return
         scrollerRef.current.scrollTo({
           top: scrollerRef.current.scrollHeight,
           behavior: "instant",
-        });
-      }, 200);
+        })
+      }, 200)
     }
-  }, [downLimit, messages]);
+  }, [downLimit, messages])
 
-  const isFirstView = upperLimit === __VARS.pagesLimitDiff;
+  const isFirstView = upperLimit === __VARS.pagesLimitDiff
 
-  let finalMsg = [...(messages as ChatItemType[])].reverse();
+  let finalMsg = [...(messages as ChatItemType[])].reverse()
 
   const startMessageIndex = isFirstView
     ? finalMsg.length - 1
-    : getMiddleIndex(totalLength);
+    : getMiddleIndex(totalLength)
 
-  const virtousoRef = useRef<VirtuosoHandle>(null);
-  const scrollerRef = useRef<HTMLDivElement>();
+  const virtousoRef = useRef<VirtuosoHandle>(null)
+  const scrollerRef = useRef<HTMLDivElement>()
 
   const backToBottom = (type: "smooth" | "instant" = "smooth") => {
     if (scrollerRef?.current)
@@ -108,91 +111,84 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
         top:
           scrollerRef.current?.scrollHeight + scrollerRef.current?.clientHeight,
         behavior: type,
-      });
-  };
+      })
+  }
 
   const backToMessageHandler = useCallback(async () => {
     if (!!originMessage && flag === "reply") {
       const findedIndex = finalMsg.findIndex(
         (msg) => msg.id === originMessage.id
-      );
-      changeBulk({ flag: undefined, originMessage: undefined });
+      )
+      changeBulk({ flag: undefined, originMessage: undefined })
 
       if (findedIndex >= 0) {
         virtousoRef.current?.scrollToIndex({
           index: findedIndex,
           align: "end",
           behavior: "smooth",
-        });
+        })
       } else {
         if (originMessage === undefined || messages === undefined)
-          return toast.error("Origin message not found");
+          return toast.error("Origin message not found")
         try {
-          let finded = false;
-          let ul = upperLimit;
-          let dl = downLimit;
-          const flatIndex = totalLength - __VARS.defaultPerPage;
-          let finalItems: ChatItemType[] = [...messages].reverse();
+          let finded = false
+          let ul = upperLimit
+          let dl = downLimit
+          const flatIndex = totalLength - __VARS.defaultPerPage
+          let finalItems: ChatItemType[] = [...messages].reverse()
           changeKey({
             key: "navigateLoading",
             value: true,
-          });
+          })
           while (!finded) {
-            const { items } = await onLoadMessage(
-              FetchMessageType.Prev,
-              ul,
-              dl
-            );
-            ul--;
-            dl--;
+            const { items } = await onLoadMessage(FetchMessageType.Prev, ul, dl)
+            ul--
+            dl--
             virtousoRef.current?.scrollToIndex({
               index: 30,
               behavior: "auto",
               align: "center",
-            });
+            })
 
-            let newItems = [];
+            let newItems = []
             if (ul === __VARS.pagesLimitDiff) {
-              newItems = [...items].reverse();
+              newItems = [...items].reverse()
             } else {
-              newItems = [
-                ...items,
-                ...finalItems.slice(0, flatIndex),
-              ].reverse();
+              newItems = [...items, ...finalItems.slice(0, flatIndex)].reverse()
             }
-            finalItems = [...newItems].reverse();
+            finalItems = [...newItems].reverse()
             const findedIndex = newItems.findIndex(
               (msg) => msg.id === originMessage.id
-            );
+            )
             if (findedIndex >= 0 || ul < __VARS.pagesLimitDiff) {
-              changeKey({ key: "navigateLoading", value: false });
-              finded = true;
+              changeKey({ key: "navigateLoading", value: false })
+              finded = true
               virtousoRef.current?.scrollToIndex({
                 index: findedIndex,
                 behavior: "auto",
                 align: "center",
-              });
-              break;
+              })
+              break
             } else {
-              await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust delay as needed
+              await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
             }
           }
         } catch (error) {}
       }
     } else if (downLimit > 1) {
-      if (roomId === undefined) return;
+      if (roomId === undefined) return
       await appDispatch(
         getInitMessages({
           has_loading: false,
           room_id: roomId,
           upper_limit: UPPER_LIMIT_PAGE,
         })
-      );
-      backToBottom("instant");
+      )
+      backToBottom("instant")
     } else {
-      backToBottom();
+      backToBottom()
     }
-    setShowGotoBottom(false);
+    setShowGotoBottom(false)
   }, [
     finalMsg,
     originMessage,
@@ -201,286 +197,282 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     showGotoBottom,
     totalLength,
     upperLimit,
-  ]);
+  ])
 
-  let backToFromNode = null;
+  let backToFromNode = null
 
   if (showGotoBottom) {
     backToFromNode = (
-      <div className='absolute bottom-5 z-[5] right-5 animate-bounce'>
+      <div className="absolute bottom-5 z-[5] right-5 animate-bounce">
         <CBadge
           count={unreadMsgsLength}
           showAnimate={false}
-          className='absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2'
-          size='small'
+          className="absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2"
+          size="small"
         />
         <CotopiaIconButton
           onClick={backToMessageHandler}
-          className='w-8 h-8 shadow-md opacity-50 hover:!opacity-100 !bg-primary right-5 '
+          className="w-8 h-8 shadow-md opacity-50 hover:!opacity-100 !bg-primary right-5 "
         >
           <ChevronDown />
         </CotopiaIconButton>
       </div>
-    );
+    )
   }
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
-      setIsFirst(false);
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, []);
+      setIsFirst(false)
+    }, 500)
+    return () => clearTimeout(timeout)
+  }, [])
 
   useEffect(() => {
     if (!nextFetchRef.current) {
-      nextFetchRef.current = true;
+      nextFetchRef.current = true
     }
-  }, [upperLimit]);
+  }, [upperLimit])
 
   useEffect(() => {
     if (!prevFetchRef.current) {
-      prevFetchRef.current = true;
+      prevFetchRef.current = true
     }
-  }, [downLimit]);
+  }, [downLimit])
 
   const loadMoreMessages = useCallback(
     async (type: FetchMessageType, targetIdx: number) => {
-      if (!scrollerRef.current) return;
-      const { items } = await onLoadMessage(type);
-      if (items.length === 0) return;
+      if (!scrollerRef.current) return
+      const { items } = await onLoadMessage(type)
+      if (items.length === 0) return
       setTimeout(() => {
         virtousoRef?.current?.scrollToIndex({
           index: targetIdx,
           align: "center",
-        });
-      }, 100);
+        })
+      }, 100)
     },
     [onLoadMessage, virtousoRef.current, scrollerRef.current]
-  );
+  )
 
   useBus(
     _BUS.scrollEndChatBox,
     (data) => {
       setTimeout(() => {
-        if (!scrollerRef.current) return;
+        if (!scrollerRef.current) return
         scrollerRef.current.scrollTo({
           top: scrollerRef.current.scrollHeight,
           behavior: "instant",
-        });
-      }, 200);
+        })
+      }, 200)
     },
     [scrollerRef?.current]
-  );
+  )
 
   const focusOnFlagHandler = useCallback(
     async (message: ChatItemType) => {
-      if (!!message.deleted_at) return;
-      if (message.reply_to === null) return;
-      if (!scrollerRef.current || !finalMsg || messages === undefined) return;
+      if (!!message.deleted_at) return
+      if (message.reply_to === null) return
+      if (!scrollerRef.current || !finalMsg || messages === undefined) return
       const sharedClsses = [
         "[&_.message-box]:!bg-blue-500/20",
         "[&_.message-box]:animate-pulse",
-      ];
+      ]
       //find index of messages that we want to focus
-      let msgIndex = finalMsg.findIndex((m) => m.id === message.reply_to?.id);
+      let msgIndex = finalMsg.findIndex((m) => m.id === message.reply_to?.id)
       changeBulk({
         flag: "reply",
         originMessage: message,
-      });
+      })
       //find scroller parent box
       let virEl = document.querySelector(
         `[data-testid="virtuoso-scroller"] [data-testid="virtuoso-item-list"]`
-      ) as HTMLDivElement;
+      ) as HTMLDivElement
       const { focusHandler } = getFocusedMessage({
         message: virEl,
         changingClass: sharedClsses,
         targetIndex: msgIndex,
-      });
+      })
       if (msgIndex >= 0) {
         virtousoRef.current?.scrollToIndex({
           index: msgIndex,
           behavior: "auto",
           align: "center",
-        });
-        focusHandler();
+        })
+        focusHandler()
       } else {
         try {
-          let finded = false;
-          let ul = upperLimit;
-          let dl = downLimit;
-          let finalItems: ChatItemType[] = [...messages].reverse();
+          let finded = false
+          let ul = upperLimit
+          let dl = downLimit
+          let finalItems: ChatItemType[] = [...messages].reverse()
           changeKey({
             key: "navigateLoading",
             value: true,
-          });
+          })
           while (!finded) {
-            const { items } = await onLoadMessage(
-              FetchMessageType.Next,
-              ul,
-              dl
-            );
-            ul++;
-            dl++;
+            const { items } = await onLoadMessage(FetchMessageType.Next, ul, dl)
+            ul++
+            dl++
             virtousoRef.current?.scrollToIndex({
               index: 30,
               behavior: "auto",
               align: "center",
-            });
+            })
             let newItems = [
               ...finalItems.slice(__VARS.defaultPerPage),
               ...items,
-            ].reverse();
-            finalItems = [...newItems];
+            ].reverse()
+            finalItems = [...newItems]
             const findedIndex = newItems.findIndex(
               (msg) => msg.id === message.reply_to?.id
-            );
+            )
 
             if (items.length === 0) {
-              finded = true;
+              finded = true
               try {
-                let xFinded = false;
-                let xul = ul;
-                let xdl = dl;
-                const flatIndex = totalLength - __VARS.defaultPerPage;
-                let finalItems: ChatItemType[] = [...newItems];
+                let xFinded = false
+                let xul = ul
+                let xdl = dl
+                const flatIndex = totalLength - __VARS.defaultPerPage
+                let finalItems: ChatItemType[] = [...newItems]
                 changeKey({
                   key: "navigateLoading",
                   value: true,
-                });
+                })
                 while (!xFinded) {
                   const { items } = await onLoadMessage(
                     FetchMessageType.Prev,
                     xul,
                     xdl
-                  );
-                  xul--;
-                  xdl--;
+                  )
+                  xul--
+                  xdl--
                   virtousoRef.current?.scrollToIndex({
                     index: 30,
                     behavior: "auto",
                     align: "center",
-                  });
+                  })
 
-                  let newItems = [];
+                  let newItems = []
                   if (xul === __VARS.pagesLimitDiff) {
-                    newItems = [...items].reverse();
+                    newItems = [...items].reverse()
                   } else {
                     newItems = [
                       ...items,
                       ...finalItems.slice(0, flatIndex),
-                    ].reverse();
+                    ].reverse()
                   }
-                  finalItems = [...newItems].reverse();
+                  finalItems = [...newItems].reverse()
                   const findedIndex = newItems.findIndex(
                     (msg) => msg.id === message.id
-                  );
+                  )
                   if (findedIndex >= 0 || xul < __VARS.pagesLimitDiff) {
-                    changeKey({ key: "navigateLoading", value: false });
-                    xFinded = false;
+                    changeKey({ key: "navigateLoading", value: false })
+                    xFinded = false
                     virtousoRef.current?.scrollToIndex({
                       index: findedIndex,
                       behavior: "auto",
                       align: "center",
-                    });
-                    break;
+                    })
+                    break
                   } else {
-                    await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust delay as needed
+                    await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
                   }
                 }
               } catch (error) {}
             }
             if (findedIndex >= 0) {
-              changeKey({ key: "navigateLoading", value: false });
-              finded = true;
+              changeKey({ key: "navigateLoading", value: false })
+              finded = true
               const { focusHandler } = getFocusedMessage({
                 message: virEl,
                 changingClass: sharedClsses,
                 targetIndex: findedIndex,
-              });
+              })
               virtousoRef.current?.scrollToIndex({
                 index: findedIndex,
                 behavior: "auto",
                 align: "center",
-              });
-              focusHandler();
-              break;
+              })
+              focusHandler()
+              break
             } else {
-              await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust delay as needed
+              await new Promise((resolve) => setTimeout(resolve, 100)) // Adjust delay as needed
             }
           }
         } catch (error) {}
       }
     },
     [onLoadMessage, finalMsg, upperLimit]
-  );
+  )
 
   const onScrollHandler = useCallback(
     (e: UIEvent<HTMLDivElement>) => {
-      const element = e.currentTarget;
+      const element = e.currentTarget
 
-      const x = e.currentTarget.offsetHeight;
+      const x = e.currentTarget.offsetHeight
       const y = Math.floor(
         e.currentTarget.scrollHeight - e.currentTarget.scrollTop
-      );
-      const diff = y - x;
+      )
+      const diff = y - x
 
-      const targeIndex = __VARS.defaultPerPage;
-      const topIndex = targeIndex;
-      const bottomIndex = totalLength - targeIndex;
+      const targeIndex = __VARS.defaultPerPage
+      const topIndex = targeIndex
+      const bottomIndex = totalLength - targeIndex
 
       //check is scroll getting top of the chat box
       if (element.scrollTop <= 0) {
         if (nextFetchRef.current) {
-          nextFetchRef.current = false;
-          loadMoreMessages(FetchMessageType.Next, topIndex);
+          nextFetchRef.current = false
+          loadMoreMessages(FetchMessageType.Next, topIndex)
         }
       }
 
       if (wheelDirection === "up") {
-        setShowGotoBottom((crt) => (!!crt ? crt : true));
+        setShowGotoBottom((crt) => (!!crt ? crt : true))
       }
       if (wheelDirection === "down") {
-        setShowGotoBottom(false);
+        setShowGotoBottom(false)
       }
 
       if (wheelDirection === "down" && downLimit > 1) {
         if (prevFetchRef.current) {
-          prevFetchRef.current = false;
-          loadMoreMessages(FetchMessageType.Prev, bottomIndex);
-          setShowGotoBottom(false);
+          prevFetchRef.current = false
+          loadMoreMessages(FetchMessageType.Prev, bottomIndex)
+          setShowGotoBottom(false)
         }
       }
 
       if (diff > 50) {
-        if (wheelDirection === "up") return;
-        setWheelDirections("up");
+        if (wheelDirection === "up") return
+        setWheelDirections("up")
       }
       if (diff < 50) {
-        if (wheelDirection === "down") return;
-        setWheelDirections("down");
+        if (wheelDirection === "down") return
+        setWheelDirections("down")
       }
 
       if (diff <= 0) {
-        e.cancelable;
-        e.isDefaultPrevented;
+        e.cancelable
+        e.isDefaultPrevented
       }
     },
     [onLoadMessage, wheelDirection]
-  );
+  )
 
   const loadingNode = (loading: boolean) => {
-    if (!loading) return null;
-    return <FullLoading className='py-3' />;
-  };
+    if (!loading) return null
+    return <FullLoading className="py-3" />
+  }
 
   let content = (
     <Virtuoso
-      className='[&_[data-testid=virtuoso-item-list]]:px-2 '
+      className="[&_[data-testid=virtuoso-item-list]]:px-2 "
       style={{ scrollbarWidth: isFirst ? "none" : "initial" }}
       ref={virtousoRef}
       scrollerRef={(xRef) => {
-        if (!!!xRef) return;
-        scrollerRef.current = xRef as HTMLDivElement;
+        if (!!!xRef) return
+        scrollerRef.current = xRef as HTMLDivElement
       }}
       initialTopMostItemIndex={startMessageIndex}
       data={finalMsg}
@@ -499,22 +491,22 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
       )}
       onScroll={onScrollHandler}
     />
-  );
+  )
 
-  if (messages?.length === 0) content = <NotFound title='No messages found!' />;
+  if (messages?.length === 0) content = <NotFound title="No messages found!" />
 
   return (
     <div className={`${clss} ${className}`}>
       {(navigateLoading && (
-        <div className='absolute top-0 bg-white/60 z-[6] m-auto flex h-full w-full'>
-          <FullLoading className='justify-center' />
+        <div className="absolute top-0 bg-white/60 z-[6] m-auto flex h-full w-full">
+          <FullLoading className="justify-center" />
         </div>
       )) ||
         null}
       {backToFromNode}
       {content}
     </div>
-  );
+  )
 }
 
-export default memo(NewChatBox);
+export default memo(NewChatBox)

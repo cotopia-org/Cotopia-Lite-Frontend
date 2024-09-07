@@ -3,6 +3,7 @@
 import { __VARS } from "@/app/const/vars"
 import axiosInstance from "@/lib/axios"
 import socket from "@/lib/socket"
+import ReduxWrapper from "@/store/redux/Wrapper"
 import { UserType } from "@/types/user"
 import {
   createContext,
@@ -78,8 +79,10 @@ export default function ProtectedWrapper({ children, token, user }: Props) {
   if (!tokenSet) return
 
   return (
-    <ProfileContext.Provider value={{ user, socketState, token }}>
-      {children}
-    </ProfileContext.Provider>
+    <ReduxWrapper>
+      <ProfileContext.Provider value={{ user, socketState, token }}>
+        {children}
+      </ProfileContext.Provider>
+    </ReduxWrapper>
   )
 }

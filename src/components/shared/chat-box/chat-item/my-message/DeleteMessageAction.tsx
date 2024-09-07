@@ -1,52 +1,49 @@
-"use client";
+"use client"
 
-import CotopiaPrompt from "@/components/shared-ui/c-prompt";
-import { useChat } from "@/hooks/chat/use-chat";
-import useLoading from "@/hooks/use-loading";
-import { removeMessageAction } from "@/store/redux/slices/room-slice";
-import { useAppDispatch } from "@/store/redux/store";
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
+import CotopiaPrompt from "@/components/shared-ui/c-prompt"
+import { useChatRoomCtx } from "@/context/chat-room-context"
+import { useChat } from "@/hooks/chat/use-chat"
+import { useChatSocket } from "@/hooks/chat/use-chat-socket"
+import useLoading from "@/hooks/use-loading"
+import { removeMessageAction } from "@/store/redux/slices/room-slice"
+import { useAppDispatch } from "@/store/redux/store"
 
-import { ChatItemType } from "@/types/chat";
-import { useCallback } from "react";
-import { toast } from "sonner";
+import { ChatItemType } from "@/types/chat"
+import { useCallback } from "react"
+import { toast } from "sonner"
 
 interface Props {
-  message: ChatItemType;
-  onClose: () => void;
+  message: ChatItemType
+  onClose: () => void
 }
 
 const DeleteMessageAction = ({ message, onClose }: Props) => {
-  const { isLoading, startLoading, stopLoading } = useLoading();
+  const { user } = useProfile()
+  const { roomId, env } = useChatRoomCtx()
 
-  const { deleteMessage } = useChat();
+  const { remove } = useChatSocket(roomId, user, env)
 
-  const appDispatch = useAppDispatch();
+  const appDispatch = useAppDispatch()
 
   const deleteMessageHandler = useCallback(async () => {
     try {
-      startLoading();
-      const res = await deleteMessage(message.nonce_id as number);
-      appDispatch(removeMessageAction({ message: res }));
-      toast.success("Your message has been deleted successfully");
-      stopLoading();
-      onClose();
-    } catch (error) {
-      stopLoading();
-    }
-  }, [message, onClose, appDispatch]);
+      await remove({ message })
+      onClose()
+    } catch (error) {}
+  }, [message, onClose, appDispatch])
 
   return (
     <CotopiaPrompt
       open
-      title='Delete Message'
-      submitText='Delete'
-      loading={isLoading}
-      description='Do you want to delete this message?'
+      title="Delete Message"
+      submitText="Delete"
+      description="Do you want to delete this message?"
       onSubmit={deleteMessageHandler}
       onClose={onClose}
       isPortal={false}
     />
-  );
-};
+  )
+}
 
-export default DeleteMessageAction;
+export default DeleteMessageAction

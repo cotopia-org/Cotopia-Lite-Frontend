@@ -6,6 +6,7 @@ import {
 } from "@/app/(pages)/(protected)/protected-wrapper"
 import { playSoundEffect } from "@/lib/sound-effects"
 import {
+  removeMessageAction,
   unreadMessagesAction,
   updateMessagesAction,
 } from "@/store/redux/slices/room-slice"
@@ -17,30 +18,11 @@ type Props = {
   children: ReactNode
 }
 export default function ChatWrapper({ children }: Props) {
-  const { user } = useProfile()
-
   const appDispatch = useAppDispatch()
 
   useSocket("messageReceived", (data: ChatItemType) => {
-    if (user.id !== data.user?.id) playSoundEffect("newMessage2")
-
-    appDispatch(
-      updateMessagesAction({
-        message: data,
-      })
-    )
-
-    appDispatch(
-      unreadMessagesAction({
-        message: data,
-        messageType: "room",
-        myAccountId: user.id,
-      })
-    )
-  })
-
-  useSocket("directMessages", (data) => {
-    if (user.id !== data.user?.id) playSoundEffect("newMessage2")
+    const isDirect = data?.is_direct
+    playSoundEffect("newMessage2")
     appDispatch(
       updateMessagesAction({
         message: data,
@@ -49,13 +31,9 @@ export default function ChatWrapper({ children }: Props) {
     appDispatch(
       unreadMessagesAction({
         message: data,
-        messageType: "direct",
-        myAccountId: user.id,
+        messageType: isDirect ? "direct" : "room",
       })
     )
-  })
-  useSocket("messageReceived", (data) => {
-    console.log(data, "RECEIVxxED DATA")
   })
 
   useSocket("messageSeen", (data) => {
@@ -72,7 +50,7 @@ export default function ChatWrapper({ children }: Props) {
     appDispatch(updateMessagesAction({ message: data }))
   })
   useSocket("messageDeleted", (data) => {
-    appDispatch(updateMessagesAction({ message: data }))
+    appDispatch(removeMessageAction({ message: data }))
   })
 
   return <>{children}</>
