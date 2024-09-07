@@ -31,12 +31,12 @@ export default function WorkspaceParticipants({ workspace_id, limit }: Props) {
     mutate: userMutate,
   } = useApi(`/workspaces/${workspace_id}/users`);
 
-  useSocket("userLeft", () => {
+  useSocket("userLeftFromRoom", () => {
     leaderboardMutate();
     userMutate();
   });
 
-  useSocket("userJoined", () => {
+  useSocket("userJoinedToRoom", () => {
     leaderboardMutate();
     userMutate();
   });

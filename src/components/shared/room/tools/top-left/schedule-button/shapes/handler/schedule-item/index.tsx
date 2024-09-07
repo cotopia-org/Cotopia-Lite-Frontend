@@ -21,7 +21,7 @@ export default function ScheduleItem({ schedule, onDelete }: Props) {
         </strong>
         <div className='flex flex-row items-center gap-x-2'>
           <EditButton schedule={schedule} onDelete={onDelete} />
-          {schedule.is_recurrence && (
+          {!!schedule.is_recurrence && (
             <CotopiaTooltip title='Recurrence'>
               <Repeat size={12} className='text-black/60' />
             </CotopiaTooltip>

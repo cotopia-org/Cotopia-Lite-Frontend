@@ -3,6 +3,9 @@ import React from "react";
 import { useRoomContext } from "../room-context";
 
 export default function Background() {
+  // const [roomBackground, setRoomBackground] = useState("")
+  // useEffect(() => {}, [])
+
   const { room } = useRoomContext();
 
   return (

@@ -40,7 +40,7 @@ const SessionContext = createContext<{
 
 export const useUserTile = () => useContext(SessionContext);
 
-function TrackRefContextIfNeeded(
+export function TrackRefContextIfNeeded(
   props: React.PropsWithChildren<{
     trackRef?: TrackReferenceType;
   }>

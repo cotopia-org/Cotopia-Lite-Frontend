@@ -1,11 +1,20 @@
 // Canvas.tsx
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import UserSessions from "../room/sessions";
 import ReactFlowHandler from "./react-flow-handler";
-import { TrackRefContext, useTracks } from "@livekit/components-react";
+import {
+  TrackRefContext,
+  TrackReferenceOrPlaceholder,
+  useTracks,
+} from "@livekit/components-react";
 import { RoomEvent, Track } from "livekit-client";
+import FullLoading from "../full-loading";
 
 const Canvas: React.FC = () => {
+  const [init, setInit] = useState(false);
+
+  const [track, setTrack] = useState<TrackReferenceOrPlaceholder>();
+
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -24,9 +33,26 @@ const Canvas: React.FC = () => {
     }
   );
 
+  useEffect(() => {
+    if (tracks.length === 0) return;
+
+    if (init === true) return;
+    setTrack(tracks?.[0]);
+
+    setInit(true);
+
+    const t = setTimeout(() => {
+      setTrack(undefined);
+    }, 1000);
+
+    return () => clearTimeout(t);
+  }, [tracks, init]);
+
+  if (init === false) return <FullLoading />;
+
   return (
     <div className='w-[1920px] h-[1080px]'>
-      <TrackRefContext.Provider value={tracks[0]}>
+      <TrackRefContext.Provider value={track}>
         <UserSessions>
           <ReactFlowHandler tracks={tracks} />
         </UserSessions>

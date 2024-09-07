@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useReactFlow, Node, ReactFlowInstance, Viewport } from "@xyflow/react";
+import useWindowSize from "@/hooks/use-window-size";
 
 type Props = {
   nodes: Node[];
@@ -7,14 +8,18 @@ type Props = {
 };
 
 const NodesPreview: React.FC<Props> = ({ nodes, viewport }) => {
+  const {
+    windowSize: { windowWidth, windowHeight },
+  } = useWindowSize();
+
   const [outOfViewNodes, setOutOfViewNodes] = useState<Node[]>([]);
 
   useEffect(() => {
     const calculateOutOfViewNodes = () => {
       const minX = -viewport.x / viewport.zoom;
-      const maxX = (window.innerWidth - viewport.x) / viewport.zoom;
+      const maxX = (windowWidth - viewport.x) / viewport.zoom;
       const minY = -viewport.y / viewport.zoom;
-      const maxY = (window.innerHeight - viewport.y) / viewport.zoom;
+      const maxY = (windowHeight - viewport.y) / viewport.zoom;
 
       const outOfViewNodes = nodes
         .filter((x) => x.type !== "backgroundNode")
@@ -39,34 +44,70 @@ const NodesPreview: React.FC<Props> = ({ nodes, viewport }) => {
     };
   }, [nodes, viewport]);
 
+  if (outOfViewNodes.length === 0) return;
+
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: 10,
-        top: 10,
-        backgroundColor: "white",
-        padding: 10,
-        borderRadius: 5,
-      }}
-    >
-      {outOfViewNodes.length === 0 ? (
-        <p>All nodes are in the viewport</p>
-      ) : (
-        <ul className='text-base'>
-          {outOfViewNodes.map((node) => (
-            <li key={node.id} style={{ marginBottom: 5 }}>
-              <div>
-                <strong></strong>
-              </div>
-              <div style={{ fontSize: "0.8em", color: "#888" }}>
-                Position: ({node.position.x}, {node.position.y})
-              </div>
-              {/* Optionally, include a thumbnail or other preview of the node */}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className='fixed z-40'>
+      {outOfViewNodes.map((node) => {
+        const objX = node.position.x;
+        const objY = node.position.y;
+        const zoom = viewport.zoom;
+        let previewX, previewY;
+
+        // Determine if the object is out of the viewport
+        const isLeft = objX < viewport.x;
+        const isRight = objX > viewport.x + windowWidth / zoom;
+        const isAbove = objY < viewport.y;
+        const isBelow = objY > viewport.y + windowHeight / zoom;
+
+        if (!isLeft && !isRight && !isAbove && !isBelow) return null;
+
+        if (isLeft) {
+          previewX = 0;
+          previewY = Math.min(
+            Math.max((objX - viewport.y) * zoom, 0),
+            windowHeight - 50
+          );
+        } else if (isRight) {
+          previewX = windowWidth - 50;
+          previewY = Math.min(
+            Math.max((objY - viewport.y) * zoom, 0),
+            windowHeight - 50
+          );
+        } else if (isAbove) {
+          previewX = Math.min(
+            Math.max((objX - viewport.x) * zoom, 0),
+            windowWidth - 50
+          );
+          previewY = 0;
+        } else if (isBelow) {
+          previewX = Math.min(
+            Math.max((objX - viewport.x) * zoom, 0),
+            windowWidth - 50
+          );
+          previewY = windowHeight - 50;
+        }
+
+        return (
+          <div
+            key={node.id}
+            style={{
+              position: "fixed",
+              left: previewX,
+              top: previewY,
+              width: 50,
+              height: 50,
+              background: "lightgray",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1px solid black",
+            }}
+          >
+            {/* Custom rendering of the preview */}H
+          </div>
+        );
+      })}
     </div>
   );
 };
