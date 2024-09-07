@@ -25,10 +25,10 @@ export default function DraggableRoom({ children, ...rest }: Props) {
 
   return (
     <DraggableComponent
-      positionOffset={{
-        x: (-1 * finalWidth) / 2,
-        y: (-1 * height) / 2,
-      }}
+      // positionOffset={{
+      //   x: (-1 * finalWidth) / 2,
+      //   y: (-1 * height) / 2,
+      // }}
       bounds={{
         top: 0,
         left: leftDashboardColWidth ?? 0,

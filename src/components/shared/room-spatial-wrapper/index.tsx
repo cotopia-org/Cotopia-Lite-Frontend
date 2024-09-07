@@ -103,7 +103,7 @@ export default function RoomSpatialWrapper({
     return <ModalDisconnected onReTry={handleConnectToSocket} />
 
   return (
-    <div className="overflow-hidden max-h-screen">
+    <div className='max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}

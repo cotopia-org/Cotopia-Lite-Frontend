@@ -99,39 +99,29 @@ export default function RoomContext({
   ) => {
     if (room === undefined) return
 
-    const updatedPartValues = {
-      participants: room.participants.map((x) => {
-        if (x.username.toLowerCase() === username.toLowerCase()) {
-          x.coordinates = `${position.x},${position.y}`
-        }
+    if (onRoomUpdated === undefined) return
 
-        return x
-      }),
+    const participants = room?.participants ?? []
+
+    const participant_index = participants.findIndex(
+      (x: any) => x.username === username
+    )
+
+    if (participant_index === -1) return onRoomUpdated(room)
+
+    participants[participant_index] = {
+      ...participants[participant_index],
+      coordinates: `${position.x},${position.y}`,
     }
 
-    const newRoom = {
-      ...room,
-      ...updatedPartValues,
-    }
-
-    if (onRoomUpdated) onRoomUpdated(newRoom)
+    if (onRoomUpdated) onRoomUpdated({ ...room, participants })
   }
 
-  useSocket(
-    "updateCoordinates",
-    (data) => {
-      const position = data?.coordinates?.split(",")
+  useSocket("updateCoordinates", (data) => {
+    const position = data?.coordinates?.split(",")
+  })
 
-      if (!data?.username) return
-
-      if (position?.length !== 2) return
-
-      updateUserCoords(data.username, { x: +position?.[0], y: +position?.[1] })
-    },
-    [updateUserCoords]
-  )
-
-  const [sidebar, setSidebar] = useState<ReactNode>(<></>)
+  const [sidebar, setSidebar] = useState<ReactNode>()
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar)
   const closeSidebar = () => setSidebar(undefined)
 

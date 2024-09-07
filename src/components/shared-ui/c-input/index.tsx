@@ -26,7 +26,7 @@ export default function CotopiaInput({
   const contentInput = <Input {...rest} className={inputClasss} />;
 
   return (
-    <div className='flex flex-col gap-y-2 w-full'>
+    <div className='flex flex-col items-start gap-y-2 w-full'>
       {label && (
         <strong className='font-semibold text-black/[.87] text-base'>
           {label}

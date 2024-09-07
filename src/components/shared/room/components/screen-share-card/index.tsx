@@ -1,15 +1,14 @@
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import { _BUS } from "@/app/const/bus";
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import DraggableComponent from "@/components/shared/draggable";
 import { doCirclesMeet } from "@/lib/utils";
 import { TrackReference, VideoTrack } from "@livekit/components-react";
 import { Expand, Maximize2, Minimize, Minimize2, X } from "lucide-react";
 import { useState } from "react";
 import { dispatch } from "use-bus";
 import { useRoomContext } from "../../room-context";
-import DraggableRoom from "../draggable-room";
 import useKeyPress from "@/hooks/use-key-press";
+import { createPortal } from "react-dom";
 
 type Props = {
   track: TrackReference;
@@ -85,11 +84,7 @@ export default function ScreenShareCard({ track }: Props) {
     </div>
   );
 
-  return isFullScreen ? (
-    content
-  ) : (
-    <DraggableRoom x={400} y={200}>
-      {content}
-    </DraggableRoom>
-  );
+  return isFullScreen
+    ? createPortal(content, document.getElementById("portal") as any)
+    : content;
 }
