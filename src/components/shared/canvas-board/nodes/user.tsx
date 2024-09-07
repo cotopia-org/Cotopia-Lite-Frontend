@@ -1,10 +1,6 @@
 import React, { useMemo } from "react";
 import UserSession from "@/app/(pages)/(protected)/session";
-import {
-  TrackRefContext,
-  useParticipants,
-  useTracks,
-} from "@livekit/components-react";
+import { useParticipants, useTracks } from "@livekit/components-react";
 import { RoomEvent, Track } from "livekit-client";
 
 const UserNode = (props: any) => {
@@ -28,6 +24,11 @@ const UserNode = (props: any) => {
     }
   );
   const participants = useParticipants();
+
+  const allRoomParticipantUsername = useMemo(() => {
+    return participants?.map((x) => x.identity) ?? [];
+  }, [participants]);
+
   const track = useMemo(() => {
     if (!data?.username) return undefined;
 
@@ -42,7 +43,7 @@ const UserNode = (props: any) => {
     return participants.find((x) => x.identity === data.username);
   }, [participants, data.username]);
 
-  // if (track === undefined) return;
+  if (!allRoomParticipantUsername.includes(data?.username)) return;
 
   return (
     <>

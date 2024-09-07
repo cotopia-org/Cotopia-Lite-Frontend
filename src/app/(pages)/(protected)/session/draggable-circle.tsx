@@ -214,6 +214,8 @@ export const ParticipantTile = React.forwardRef<
 
   // if (!videoState) showAvatar = true;
 
+  if (targetUser === undefined) return;
+
   return (
     <CotopiaTooltip title={userFullName}>
       <VoiceAreaHearing isDragging={isDragging} />
