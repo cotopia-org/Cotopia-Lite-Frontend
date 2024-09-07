@@ -29,12 +29,12 @@ function DayRemove({ onClick }: { onClick: () => void }) {
   );
 }
 
-const initTime = { from: "00:00", to: "23:30" };
+export const initSheduleTimes = { from: "06:00", to: "23:30" };
 
 export default function Day({ day, onChange, index }: Props) {
   const [value, setValue] = useState<ScheduleDayType>({
     index: 0,
-    times: [{ from: "00:00", to: "23:30" }],
+    times: [initSheduleTimes],
     availability_type: AvailabiltyType.Voice,
     selected: false,
   });
@@ -47,7 +47,7 @@ export default function Day({ day, onChange, index }: Props) {
     setValue((prev) => {
       const nValue = {
         ...prev,
-        times: [...(prev?.times ?? []), initTime],
+        times: [...(prev?.times ?? []), initSheduleTimes],
       };
 
       if (onChange) onChange(nValue);
