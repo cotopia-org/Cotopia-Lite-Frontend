@@ -22,8 +22,10 @@ export default function WorkspaceRoom({
   const router = useRouter();
 
   const joinRoomHandler = async () => {
-    socket?.emit("leaveRoom");
-    router.push(`/workspaces/${workspace_id}/rooms/${room.id}`);
+    if (selected_room_id !== room.id) {
+      socket?.emit("leaveRoom");
+      router.push(`/workspaces/${workspace_id}/rooms/${room.id}`);
+    }
   };
 
   const isSelected = selected_room_id ? room?.id === selected_room_id : false;
