@@ -24,8 +24,9 @@ import BackgroundNode from "../nodes/background";
 import { __VARS } from "@/app/const/vars";
 import { Track } from "livekit-client";
 import ShareScreen from "../nodes/share-screen";
-import { convertCoordinateString } from "@/lib/utils";
 import { UserMinimalType } from "@/types/user";
+import NodesPreview from "../nodes-preview";
+import JailNode from "../nodes/jail-node";
 // import { useCanvas } from "..";
 
 type Props = {
@@ -35,6 +36,7 @@ type Props = {
 const nodeTypes = {
   userNode: UserNode,
   backgroundNode: BackgroundNode,
+  jailNode: JailNode,
   shareSreenCard: ShareScreen,
 };
 
@@ -48,28 +50,6 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const [rf, setRf] = useState<ReactFlowInstance>();
   const { user } = useProfile();
-
-  useEffect(() => {
-    if (!rf) return;
-
-    if (!user?.coordinates) return;
-
-    const position = convertCoordinateString(user.coordinates);
-
-    if (!position) return;
-
-    const mainRoomHolder = document.getElementById("main-room-holder");
-
-    if (!mainRoomHolder) return;
-
-    const mainRoomHolderObject = mainRoomHolder.getBoundingClientRect();
-
-    setViewPort({
-      x: -1 * position?.x + mainRoomHolderObject.width / 2,
-      y: -1 * position?.y + mainRoomHolderObject.height / 2,
-      zoom: rf.getZoom(),
-    });
-  }, [user?.coordinates, rf]);
 
   const { room, updateUserCoords, room_id } = useRoomContext();
 
@@ -115,10 +95,23 @@ function ReactFlowHandler({ tracks }: Props) {
       {
         id: "4214242141",
         position: {
-          x: 0,
-          y: 0,
+          x: -500,
+          y: -700,
         },
         type: "backgroundNode",
+        draggable: false,
+        data: {},
+        focusable: false,
+        deletable: false,
+        selectable: false,
+      },
+      {
+        id: "78412641267",
+        position: {
+          x: -400,
+          y: -400,
+        },
+        type: "jailNode",
         draggable: false,
         data: {},
         focusable: false,
@@ -157,7 +150,7 @@ function ReactFlowHandler({ tracks }: Props) {
           isDragging: false,
         },
         position: { x: xcoord, y: ycoord },
-        parentId: "4214242141",
+        parentId: "78412641267",
         extent: "parent",
       };
 
@@ -199,7 +192,7 @@ function ReactFlowHandler({ tracks }: Props) {
                 x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
                 y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
               },
-              parentId: "4214242141",
+              parentId: "78412641267",
               extent: "parent",
             } as Node)
         ),
@@ -279,24 +272,31 @@ function ReactFlowHandler({ tracks }: Props) {
   };
 
   return (
-    <ReactFlow
-      style={{ width: "100%", height: "100%" }}
-      nodesDraggable={true}
-      onNodeDragStop={onNodeDragStop}
-      onNodesChange={handleNodesChange}
-      panOnDrag={true}
-      zoomOnScroll={true}
-      zoomOnPinch={true}
-      nodes={nodes}
-      nodeTypes={nodeTypes}
-      onInit={setRf}
-      viewport={viewPort}
-      onViewportChange={setViewPort}
-      fitView
-    >
-      <MiniMap />
-      <Background />
-    </ReactFlow>
+    <>
+      <ReactFlow
+        style={{ width: "100%", height: "100%" }}
+        nodesDraggable={true}
+        onNodeDragStop={onNodeDragStop}
+        onNodesChange={handleNodesChange}
+        panOnDrag={true}
+        zoomOnScroll={true}
+        zoomOnPinch={true}
+        nodes={nodes}
+        nodeTypes={nodeTypes}
+        onInit={setRf}
+        viewport={viewPort}
+        onViewportChange={setViewPort}
+        fitView
+        translateExtent={[
+          [-500, -500],
+          [4000, 1600],
+        ]}
+      >
+        <MiniMap />
+        <Background />
+      </ReactFlow>
+      {/* {!!viewPort && <NodesPreview nodes={nodes} viewport={viewPort} />} */}
+    </>
   );
 }
 
