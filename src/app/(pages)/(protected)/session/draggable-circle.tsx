@@ -24,14 +24,14 @@ import { Participant, Track } from "livekit-client";
 import { isTrackReferencePlaceholder } from "@livekit/components-core";
 import SessionWrapper from "./wrapper";
 import { useUserTile } from ".";
-import { useProfile, useSocket } from "../protected-wrapper";
-import { UserMinimalType } from "@/types/user";
-import { useRoomContext } from "@/components/shared/room/room-context";
+import { useProfile } from "../protected-wrapper";
 import CotopiaAvatar from "@/components/shared-ui/c-avatar";
 import { doCirclesMeet, getUserFullname } from "@/lib/utils";
 import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { __VARS } from "@/app/const/vars";
+import { useRoomContext } from "@/components/shared/room/room-context";
+import { WorkspaceRoomType } from "@/types/room";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -152,6 +152,7 @@ export const ParticipantTile = React.forwardRef<
   const isMyUser = user?.username === livekitIdentity;
 
   const { room } = useRoomContext();
+
   const participants = room?.participants;
 
   const updatedMyUser = participants?.find(
