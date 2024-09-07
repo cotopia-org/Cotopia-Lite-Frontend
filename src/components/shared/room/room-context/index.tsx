@@ -3,8 +3,11 @@ import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { UserMinimalType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import React, { createContext, ReactNode, useContext, useState } from "react";
+
+type LeftJoinType = { room_id: number; user: UserMinimalType };
 
 type Props = {
   children: ReactNode;
@@ -114,9 +117,39 @@ export default function RoomContext({
     if (onRoomUpdated) onRoomUpdated({ ...room, participants });
   };
 
-  useSocket("updateCoordinates", (data) => {
-    const position = data?.coordinates?.split(",");
-  });
+  useSocket(
+    "userLeftFromRoom",
+    (data: LeftJoinType) => {
+      if (room === undefined) return;
+
+      if (room_id !== data.room_id) return;
+
+      const participants = room?.participants ?? [];
+
+      const newParticipants = participants.filter((x) => x.id !== data.user.id);
+
+      room.participants = newParticipants;
+
+      if (onRoomUpdated) onRoomUpdated(room);
+    },
+    [room]
+  );
+
+  useSocket(
+    "userJoinedToRoom",
+    (data: LeftJoinType) => {
+      if (room === undefined) return;
+
+      if (room_id !== data.room_id) return;
+
+      const participants = room?.participants ?? [];
+
+      room.participants = [...participants, data.user];
+
+      if (onRoomUpdated) onRoomUpdated(room);
+    },
+    [room]
+  );
 
   const [sidebar, setSidebar] = useState<ReactNode>();
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);

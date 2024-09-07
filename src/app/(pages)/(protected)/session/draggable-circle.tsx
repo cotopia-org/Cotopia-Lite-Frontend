@@ -31,7 +31,6 @@ import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { __VARS } from "@/app/const/vars";
 import { useRoomContext } from "@/components/shared/room/room-context";
-import { WorkspaceRoomType } from "@/types/room";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -216,6 +215,10 @@ export const ParticipantTile = React.forwardRef<
   //   showAvatar = false;
 
   // if (!videoState) showAvatar = true;
+
+  console.log(targetUser?.username, targetUser);
+
+  if (targetUser === undefined) return;
 
   return (
     <CotopiaTooltip title={userFullName}>
