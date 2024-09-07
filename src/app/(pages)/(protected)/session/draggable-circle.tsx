@@ -148,8 +148,6 @@ export const ParticipantTile = React.forwardRef<
 
   const { user } = useProfile();
 
-  const isMyUser = user?.username === livekitIdentity;
-
   const { room } = useRoomContext();
 
   const participants = room?.participants;
@@ -215,10 +213,6 @@ export const ParticipantTile = React.forwardRef<
   //   showAvatar = false;
 
   // if (!videoState) showAvatar = true;
-
-  console.log(targetUser?.username, targetUser);
-
-  if (targetUser === undefined) return;
 
   return (
     <CotopiaTooltip title={userFullName}>
