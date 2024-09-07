@@ -216,8 +216,6 @@ export const ParticipantTile = React.forwardRef<
 
   // if (!videoState) showAvatar = true;
 
-  console.log(targetUser?.username, targetUser);
-
   if (targetUser === undefined) return;
 
   return (
