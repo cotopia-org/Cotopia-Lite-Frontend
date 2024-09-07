@@ -48,8 +48,6 @@ const Canvas: React.FC = () => {
     return () => clearTimeout(t);
   }, [tracks, init]);
 
-  console.log("track", track);
-
   if (init === false) return <FullLoading />;
 
   return (
