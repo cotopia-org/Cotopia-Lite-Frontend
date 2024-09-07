@@ -1,3 +1,4 @@
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import CotopiaButton from "@/components/shared-ui/c-button";
 import Avatars from "@/components/shared/avatars";
 import Participants from "@/components/shared/participants";
@@ -16,9 +17,12 @@ export default function WorkspaceRoom({
   room,
   selected_room_id,
 }: Props) {
+  const socket = useSocket();
+
   const router = useRouter();
 
   const joinRoomHandler = async () => {
+    socket?.emit("leaveRoom");
     router.push(`/workspaces/${workspace_id}/rooms/${room.id}`);
   };
 
@@ -31,7 +35,7 @@ export default function WorkspaceRoom({
   return (
     <div className='flex flex-col gap-y-2'>
       <CotopiaButton
-        onClick={joinRoomHandler}
+        onClick={() => joinRoomHandler()}
         className={clss}
         variant={isSelected ? "default" : "ghost"}
         startIcon={<Cast className='mr-2' size={16} />}
