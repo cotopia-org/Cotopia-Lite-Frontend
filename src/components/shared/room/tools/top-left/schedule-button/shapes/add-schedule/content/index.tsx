@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Day from "./day";
 import CotopiaButton from "@/components/shared-ui/c-button";
-import { Save, Trash } from "lucide-react";
+import { Save } from "lucide-react";
 import useLoading from "@/hooks/use-loading";
 import TitleEl from "@/components/shared/title-el";
 import AvailabilityType from "./availability";
@@ -11,6 +11,9 @@ import { AvailabiltyType } from "@/types/calendar";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import DeleteEvent from "../delete-event";
+import CotopiaSwitch from "@/components/shared-ui/c-switch";
+import CDateInput from "@/components/shared-ui/c-date-input";
+import moment from "moment";
 
 export type ScheduleDayType = {
   index: number;
@@ -25,6 +28,9 @@ type Props = {
   defaultValue?: {
     availability_type: AvailabiltyType;
     days: { [key: number]: ScheduleDayType };
+    is_recurrence?: boolean;
+    recurrence_start?: string;
+    recurrence_end?: string;
   };
   onDelete?: () => void;
   onCreated?: () => void;
@@ -38,6 +44,13 @@ export default function AddScheduleContent({
   onCreated,
 }: Props) {
   const isEdit = defaultValue !== undefined && defaultId !== undefined;
+
+  const [recurrenceDates, setRecurrenceDates] = useState<{
+    start_at?: string;
+    ends_at?: string;
+  }>();
+
+  const [isRecurrence, setIsRecurrence] = useState<boolean>(false);
 
   const [availability, setAvailability] = useState<AvailabiltyType>(
     AvailabiltyType.Voice
@@ -53,6 +66,18 @@ export default function AddScheduleContent({
 
       setAvailability(availability_type);
       setDaysValue(days);
+
+      setIsRecurrence(defaultValue?.is_recurrence ?? false);
+      if (defaultValue?.recurrence_end)
+        setRecurrenceDates((prev) => ({
+          ...prev,
+          ends_at: defaultValue?.recurrence_end,
+        }));
+      if (defaultValue?.recurrence_start)
+        setRecurrenceDates((prev) => ({
+          ...prev,
+          start_at: defaultValue?.recurrence_start,
+        }));
     }
   }, [defaultValue]);
 
@@ -76,14 +101,25 @@ export default function AddScheduleContent({
   const handleSubmitEvent = () => {
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+    console.log("daysValue", daysValue);
+
     if (daysValue === undefined) return;
 
     startLoading();
     let payload: { [key: string]: any } = {
-      is_recurrence: true,
+      is_recurrence: isRecurrence,
       timezone: userTimeZone,
       availability_type: availability,
     };
+
+    if (isRecurrence) {
+      if (recurrenceDates?.start_at)
+        payload["recurrence_start_at"] = recurrenceDates?.start_at;
+      if (recurrenceDates?.ends_at)
+        payload["recurrence_end_at"] = recurrenceDates?.ends_at;
+    }
+
+    console.log("payload", payload);
 
     const daysArray = Object.keys(daysValue)
       .map((x) => ({ day: daysValue[+x], dayIndex: x }))
@@ -122,7 +158,7 @@ export default function AddScheduleContent({
       <TitleEl title='Availability Type'>
         <AvailabilityType value={availability} onChange={setAvailability} />
       </TitleEl>
-      <TitleEl title='Times'>
+      <TitleEl title='Days'>
         <div className='flex flex-col gap-y-6'>
           {days.map((dayNumber, index) => {
             const day = daysValue?.[dayNumber];
@@ -139,6 +175,49 @@ export default function AddScheduleContent({
             );
           })}
         </div>
+      </TitleEl>
+      <TitleEl title='Times' className='flex flex-col gap-y-4'>
+        <CotopiaSwitch
+          label='Is this event recurrence?'
+          checked={isRecurrence}
+          onCheckedChange={setIsRecurrence}
+        />
+        {isRecurrence && (
+          <>
+            <CDateInput
+              inputProps={{
+                label: "Start at",
+              }}
+              defaultDate={
+                recurrenceDates?.start_at
+                  ? moment(recurrenceDates.start_at).toDate()
+                  : undefined
+              }
+              onChange={(date) =>
+                setRecurrenceDates((prev) => ({
+                  ...prev,
+                  start_at: moment(date).format("YYYY-MM-DD HH:mm:ss"),
+                }))
+              }
+            />
+            <CDateInput
+              inputProps={{
+                label: "Ends at",
+              }}
+              defaultDate={
+                recurrenceDates?.ends_at
+                  ? moment(recurrenceDates.ends_at).toDate()
+                  : undefined
+              }
+              onChange={(date) =>
+                setRecurrenceDates((prev) => ({
+                  ...prev,
+                  ends_at: moment(date).format("YYYY-MM-DD HH:mm:ss"),
+                }))
+              }
+            />
+          </>
+        )}
       </TitleEl>
       <div className='flex flex-row justify-end gap-x-2'>
         <CotopiaButton
@@ -159,6 +238,7 @@ export default function AddScheduleContent({
           startIcon={<Save size={16} />}
           className='min-w-[160px]'
           loading={isLoading}
+          disabled={daysValue === undefined}
         >
           {`${isEdit ? "Update" : "Create"} Event`}
         </CotopiaButton>

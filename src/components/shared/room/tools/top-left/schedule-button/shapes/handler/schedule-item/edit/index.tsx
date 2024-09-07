@@ -14,12 +14,6 @@ type Props = {
 };
 export default function EditButton({ schedule, onDelete }: Props) {
   const defaultValue = useMemo(() => {
-    const scheduleDays = schedule.days.map((x) => x.day);
-    const days = Array.from(Array(7).keys());
-
-    console.log("scheduleDays", scheduleDays);
-    console.log("days", days);
-
     const finalDays: { [key: number]: ScheduleDayType } = {};
 
     for (let item of schedule.days) {
@@ -34,6 +28,9 @@ export default function EditButton({ schedule, onDelete }: Props) {
     return {
       availability_type: schedule.availability_type,
       days: finalDays,
+      is_recurrence: schedule.is_recurrence === 1,
+      recurrence_start: schedule.recurrence_start_at ?? undefined,
+      recurrence_end: schedule.recurrence_end_at ?? undefined,
     };
   }, [schedule]);
 
