@@ -10,6 +10,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 export type RoomDetailsType = {
   messages: ChatItemType[]
   resend_loading?: boolean
+
   upper_limit: number
   down_limit: number
 }
@@ -20,26 +21,28 @@ export type ChatRoomSliceType = {
 
 export type InitialStateType = {
   loading: boolean
+  isRoomChecked: boolean
+  isDirectChecked: boolean
   messages_count: {
-    directs: { [key: string]: number[] }
+    directs: { [key: number]: number[] }
     room: number[]
   }
   nextLoading: boolean
   prevLoading: boolean
   chatRoom: ChatRoomSliceType | undefined
-  queues: ChatItemType[]
 }
 
 const initialState: InitialStateType = {
   loading: false,
   nextLoading: false,
+  isRoomChecked: false,
+  isDirectChecked: false,
   prevLoading: false,
   chatRoom: undefined,
   messages_count: {
     directs: {},
     room: [],
   },
-  queues: [],
 }
 
 export const getInitMessages = createAsyncThunk(
@@ -163,73 +166,84 @@ const roomSlice = createSlice({
       action: PayloadAction<{
         message: ChatItemType
         messageType: "direct" | "room" | "seen"
-
-        myAccountId?: number
       }>
     ) => {
       const message = action.payload.message
 
-      const roomId = "" + message.room_id
+      if (message.nonce_id === null) return
 
-      const messageId = message.nonce_id as number
+      const roomId = message.room_id
+
+      const messageId = message.nonce_id
+
       const messageType = action.payload?.messageType ?? undefined
 
-      let prevMsgsCount = state.messages_count
-      /**handle notifications count here */
-      const isMyMessage = message?.user?.id === action.payload.myAccountId
+      //get all room or direct messages collected ids
+      let unreadsCollection = state.messages_count
 
-      //collect all last room messages ids
-      let prevRoomMsgIds = prevMsgsCount?.room ?? []
+      let directMsgs: { [key: number]: number[] } = unreadsCollection.directs
 
-      let newRoomIds = [...prevRoomMsgIds]
+      let roomIds: number[] = unreadsCollection.room
 
-      //select prev dm messages object
-      let prevDmMsg = prevMsgsCount.directs
+      let directChecked = state.isDirectChecked
+      let RoomChecked = state.isRoomChecked
 
-      let currRoomIds = prevDmMsg?.[roomId] ?? []
-      //collect all last direct messages ids
-      let prevDmMsgIds = Object.keys(prevDmMsg) ?? []
-
-      //collect add dm message ids
-      let newDmIds = [...prevDmMsgIds]
-
-      let newDmRoomIds = [...currRoomIds]
+      let newDirects = { ...directMsgs }
+      let newRoomIds = [...roomIds]
 
       switch (messageType) {
         case "direct":
-          if (!isMyMessage && !message.seen) {
-            if (newDmIds.includes(roomId)) {
-              newDmRoomIds = [...currRoomIds, messageId]
+          //get all msg ids that are in desired room
+          let directMsgIds = directMsgs?.[roomId]
+          //collect all existing direct message ids
+          if (!message.seen) {
+            if (directMsgIds?.length > 0) {
+              newDirects = {
+                ...newDirects,
+                [roomId]: [...newDirects[roomId], messageId],
+              }
             } else {
-              newDmRoomIds = [messageId]
+              newDirects = { ...newDirects, [roomId]: [...[messageId]] }
             }
           }
           break
         case "room":
-          if (!isMyMessage && !message.seen) {
-            newRoomIds = [...prevRoomMsgIds, messageId]
+          if (!message.seen) {
+            newRoomIds = [...newRoomIds, messageId]
           }
           break
         case "seen":
-          let isDmExist = newDmRoomIds.includes(messageId)
-          let isRoomExist = prevRoomMsgIds.includes(messageId)
-          if (isDmExist) {
-            newDmRoomIds = newDmRoomIds.filter((msgId) => msgId !== message.id)
-          } else if (isRoomExist) {
-            newRoomIds = prevRoomMsgIds.filter((msgId) => msgId !== message.id)
+          let currentDmIds = directMsgs?.[roomId]
+          //check the seen message is related to directs or not
+          const isDirectExist = currentDmIds !== undefined
+          //check the seen message is related to room messages or not
+          const isRoomExist = roomIds.includes(messageId)
+          if (isDirectExist) {
+            directChecked = true
+            let filteredDirect = newDirects[roomId].filter((x) => {
+              return +x !== +messageId
+            })
+            newDirects = {
+              ...newDirects,
+              [roomId]: filteredDirect,
+            }
+          }
+          if (isRoomExist) {
+            RoomChecked = true
+            newRoomIds = newRoomIds.filter((y) => y !== messageId)
           }
           break
         default:
           break
       }
+
       return {
         ...state,
+        isRoomChecked: RoomChecked,
+        isDirectChecked: directChecked,
         messages_count: {
           room: newRoomIds,
-          directs: {
-            ...prevDmMsg,
-            [roomId]: newDmRoomIds,
-          },
+          directs: newDirects,
         },
       }
     },
@@ -323,9 +337,11 @@ const roomSlice = createSlice({
       const roomId = action.payload.message.room_id
       if (!state.chatRoom || roomId === undefined) return
       let prevMessages = state.chatRoom[roomId].messages ?? []
-      const msgIndex = prevMessages.findIndex(
-        (msg) => msg.nonce_id === message.nonce_id
-      )
+      const msgIndex = message.nonce_id
+        ? prevMessages.findIndex(
+            (msg) => Number(msg.nonce_id) === +Number(message.nonce_id)
+          )
+        : -1
       let newMessages = [...prevMessages]
       newMessages[msgIndex] = message
 
@@ -351,12 +367,15 @@ const roomSlice = createSlice({
 
       const prevMessages = state.chatRoom[room_id].messages
 
+      let newMessages = [...prevMessages]
       return {
         ...state,
-        ...(state?.chatRoom ?? {}),
-        [room_id]: {
-          ...state.chatRoom[room_id],
-          messages: [action.payload.message, ...prevMessages],
+        chatRoom: {
+          ...(state?.chatRoom ?? {}),
+          [room_id]: {
+            ...state.chatRoom[room_id],
+            messages: [action.payload.message, ...newMessages],
+          },
         },
       }
     },
@@ -369,14 +388,23 @@ const roomSlice = createSlice({
       const chat_nonce_id = message.nonce_id
 
       if (state.chatRoom === undefined) return
-
       if (state?.chatRoom?.[room_id] === undefined) return
-
       state.chatRoom[room_id] = {
         ...state.chatRoom[room_id],
-        messages: state.chatRoom[room_id].messages.filter(
+        messages: state.chatRoom[room_id]?.messages?.filter(
           (x) => x.nonce_id !== chat_nonce_id
         ),
+      }
+    },
+    changeBulkRoomValues: (
+      state,
+      action: PayloadAction<{ values: { [key: string]: any } }>
+    ) => {
+      const values = action.payload.values
+
+      return {
+        ...state,
+        ...values,
       }
     },
   },
@@ -398,17 +426,17 @@ const roomSlice = createSlice({
         const response = action.payload
         const roomId = response.room_id
         const upperLimit = response.upper_limit
-        const messages = response.messages
+        let messages = response.messages
+
         return {
           ...state,
-          queues: [],
           loading: false,
+          isRoomChecked: true,
           chatRoom: {
             ...(state?.chatRoom ?? {}),
             [roomId]: {
               ...(state?.chatRoom?.[roomId] ?? {}),
-              isFetched: true,
-              messages,
+              messages: [...messages],
               upper_limit: upperLimit,
               down_limit: 1,
             },
@@ -528,6 +556,7 @@ export const {
   unreadMessages: unreadMessagesAction,
   addToQueue: addToQueueAction,
   deleteFromQueue: deleteFromQueueAction,
+  changeBulkRoomValues: changeBulkRoomValuesAction,
 } = roomSlice.actions
 
 export default roomSlice.reducer

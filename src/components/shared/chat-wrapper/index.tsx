@@ -6,12 +6,14 @@ import {
 } from "@/app/(pages)/(protected)/protected-wrapper"
 import { playSoundEffect } from "@/lib/sound-effects"
 import {
+  removeMessageAction,
   unreadMessagesAction,
   updateMessagesAction,
 } from "@/store/redux/slices/room-slice"
 import { useAppDispatch } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
 import { ReactNode } from "react"
+import { toast } from "sonner"
 
 type Props = {
   children: ReactNode
@@ -21,41 +23,54 @@ export default function ChatWrapper({ children }: Props) {
 
   const appDispatch = useAppDispatch()
 
-  useSocket("messageReceived", (data: ChatItemType) => {
-    if (user.id !== data.user?.id) playSoundEffect("newMessage2")
-
-    appDispatch(
-      updateMessagesAction({
-        message: data,
-      })
-    )
-
-    appDispatch(
-      unreadMessagesAction({
-        message: data,
-        messageType: "room",
-        myAccountId: user.id,
-      })
-    )
-  })
+  // useSocket("messageReceived", (data: ChatItemType) => {
+  //   if (user.id !== data.user?.id) playSoundEffect("newMessage2")
+  //   appDispatch(
+  //     updateMessagesAction({
+  //       message: data,
+  //     })
+  //   )
+  //   appDispatch(
+  //     unreadMessagesAction({
+  //       message: data,
+  //       messageType: "room",
+  //       myAccountId: user.id,
+  //     })
+  //   )
+  // })
 
   useSocket("directMessages", (data) => {
-    if (user.id !== data.user?.id) playSoundEffect("newMessage2")
+    if (user.id !== data.user?.id) {
+      playSoundEffect("newMessage2")
+      appDispatch(
+        unreadMessagesAction({
+          message: data,
+          messageType: "direct",
+        })
+      )
+    }
     appDispatch(
       updateMessagesAction({
         message: data,
       })
     )
+  })
+
+  useSocket("roomMessages", (data) => {
+    if (user.id !== data.user?.id) {
+      playSoundEffect("newMessage2")
+      appDispatch(
+        unreadMessagesAction({
+          message: data,
+          messageType: "room",
+        })
+      )
+    }
     appDispatch(
-      unreadMessagesAction({
+      updateMessagesAction({
         message: data,
-        messageType: "direct",
-        myAccountId: user.id,
       })
     )
-  })
-  useSocket("messageReceived", (data) => {
-    console.log(data, "RECEIVxxED DATA")
   })
 
   useSocket("messageSeen", (data) => {
@@ -72,7 +87,7 @@ export default function ChatWrapper({ children }: Props) {
     appDispatch(updateMessagesAction({ message: data }))
   })
   useSocket("messageDeleted", (data) => {
-    appDispatch(updateMessagesAction({ message: data }))
+    appDispatch(removeMessageAction({ message: data }))
   })
 
   return <>{children}</>

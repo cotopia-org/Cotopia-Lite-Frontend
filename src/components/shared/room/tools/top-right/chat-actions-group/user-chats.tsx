@@ -16,14 +16,20 @@ export default function UserChatsSettingsButtonTool() {
 
   const roomSlice = useAppSelector((state) => state.roomSlice)
 
-  const messages = roomSlice?.messages_count?.room ?? []
+  const messagesCount = roomSlice?.messages_count ?? { room: [], objects: {} }
+
+  const roomIds = messagesCount.room
+  const directsIds = Object.values(messagesCount.directs).flatMap(
+    (item) => item
+  )
+
+  const totalCount = roomIds.length + directsIds.length
 
   return (
     <div className="relative">
       <CBadge
-        count={messages.length}
-        showAnimate={false}
-        className="absolute right-1/2 text-xs top-[-10px] z-[2] translate-x-1/2"
+        count={totalCount}
+        className="absolute right-[1px] text-xs top-[1px] z-[2] "
         size="small"
       />
       <CotopiaIconButton className="text-black" onClick={handleOpenChat}>
