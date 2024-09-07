@@ -241,6 +241,8 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user } = data;
 
+    console.log("test left event", data);
+
     if (room_id === undefined) return;
 
     if (gotRoomId !== +room_id) return;
@@ -250,6 +252,8 @@ function ReactFlowHandler({ tracks }: Props) {
 
   useSocket("userJoinedToRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user } = data;
+
+    console.log("test joined event", data);
 
     if (room_id === undefined) return;
 
