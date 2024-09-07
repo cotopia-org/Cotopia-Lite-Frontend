@@ -8,18 +8,11 @@ import colors from "tailwindcss/colors"
 interface Props {
   title: string
   desc: string
-  messageId: number
   onSelect?: () => void
   onClose: () => void
 }
 
-const ReplyedMessageInfo = ({
-  desc,
-  title,
-  onClose,
-  onSelect,
-  messageId,
-}: Props) => {
+const ReplyedMessageInfo = ({ desc, title, onClose, onSelect }: Props) => {
   const selectInfoHandler = useCallback(() => {
     if (onSelect) onSelect()
   }, [onSelect])

@@ -19,7 +19,7 @@ export default function UserChatsSettingsButtonTool() {
   const messagesCount = roomSlice?.messages_count ?? { room: [], objects: {} }
 
   const roomIds = messagesCount.room
-  const directsIds = Object.values(messagesCount.directs).flatMap(
+  const directsIds = Object?.values(messagesCount.directs).flatMap(
     (item) => item
   )
 

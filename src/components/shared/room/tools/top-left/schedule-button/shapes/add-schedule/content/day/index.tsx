@@ -39,7 +39,6 @@ export default function Day({ day, onChange, index }: Props) {
     selected: false,
   });
   useEffect(() => {
-    console.log("day", day);
     if (day !== undefined) setValue(day);
   }, [day]);
 

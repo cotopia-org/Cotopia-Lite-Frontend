@@ -48,13 +48,7 @@ export default function Message({ item, isMine }: Props) {
   }, [])
 
   useEffect(() => {
-    if (
-      isVisible &&
-      item?.seen === false &&
-      item?.created_at &&
-      item?.nonce_id !== null &&
-      !isMine
-    ) {
+    if (isVisible && item?.seen === false && !isMine) {
       if (socket) {
         socket.emit("seenMessage", {
           message: item,
@@ -62,11 +56,12 @@ export default function Message({ item, isMine }: Props) {
           room_id: item.room_id,
           channel,
         })
-        appDispatch(
-          unreadMessagesAction({ message: item, messageType: "seen" })
-        )
+
         appDispatch(updateMessagesAction({ message: { ...item, seen: true } }))
       }
+    }
+    if (isVisible) {
+      appDispatch(unreadMessagesAction({ message: item, messageType: "seen" }))
     }
   }, [item, isVisible, isMine, socket])
 
