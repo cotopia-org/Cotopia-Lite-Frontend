@@ -83,9 +83,9 @@ const LiveKitAudioManager = () => {
     checkBoundaries();
   });
 
-  useEffect(() => {
-    checkBoundaries();
-  }, [room?.participants]);
+  // useEffect(() => {
+  //   checkBoundaries();
+  // }, [room?.participants]);
 
   return null;
 };
