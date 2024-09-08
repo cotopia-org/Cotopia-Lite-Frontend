@@ -65,23 +65,24 @@ export default function RoomContext({
   const router = useRouter();
 
   const handleJoinRoom = async () => {
-    const res = await axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-      `/rooms/${room_id}/join`
-    );
-
     //Join user to the room by socket request
-    if (socket) socket.emit("joinedRoom", room_id);
+    if (socket)
+      socket.emit("joinedRoom", room_id, () => {
+        axiosInstance
+          .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
+          .then((res) => {
+            const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
-    const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+            playSoundEffect("joined");
 
-    playSoundEffect("joined");
-
-    if (livekitToken) {
-      router.push(
-        `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
-      );
-      return;
-    }
+            if (livekitToken) {
+              router.push(
+                `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
+              );
+              return;
+            }
+          });
+      });
   };
 
   const [permissionState, setPermissionState] = useState({
