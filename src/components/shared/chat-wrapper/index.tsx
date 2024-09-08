@@ -21,6 +21,7 @@ export default function ChatWrapper({ children }: Props) {
   const appDispatch = useAppDispatch()
 
   useSocket("messageReceived", (data: ChatItemType) => {
+    console.log(data, "RECEIVED DATA")
     const isDirect = data?.is_direct
     playSoundEffect("newMessage2")
     appDispatch(
