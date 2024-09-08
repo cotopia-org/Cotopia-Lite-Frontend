@@ -13,7 +13,7 @@ export default function ChatActionsGroup() {
       ) : (
         <>
           <UserChatsSettingsButtonTool />
-          <UserCalendarSettingsButtonTool />
+          {/* <UserCalendarSettingsButtonTool /> */}
         </>
       )}
     </div>

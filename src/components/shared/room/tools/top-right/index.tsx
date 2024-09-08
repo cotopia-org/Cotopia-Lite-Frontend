@@ -1,6 +1,6 @@
 import React from "react";
 import InviteButtonTool from "./Invite";
-import MeetButtonTool from "./meet";
+// import MeetButtonTool from "./meet";
 import UserActionsGroup from "./user-actions-group";
 import ChatActionsGroup from "./chat-actions-group";
 import TimeTrackingButtonTool from "./time-tracking";
