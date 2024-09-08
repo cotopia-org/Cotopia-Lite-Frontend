@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useParticipants } from "@livekit/components-react";
 import { useRoomContext } from "../../room-context";
@@ -82,6 +82,10 @@ const LiveKitAudioManager = () => {
   useSocket("updateCoordinates", (data) => {
     checkBoundaries();
   });
+
+  useEffect(() => {
+    checkBoundaries();
+  }, [room?.participants]);
 
   return null;
 };

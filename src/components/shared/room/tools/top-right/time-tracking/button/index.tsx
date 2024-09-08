@@ -22,7 +22,9 @@ export default function TimeTrackingButton({
       onClick={onClick}
     >
       <div className='absolute top-2 right-2 w-2 h-2 bg-red-600 rounded-full animate-pulse'></div>
-      <Timer initialSeconds={defaultSeconds}>{(time) => time}</Timer>
+      <Timer initialSeconds={defaultSeconds}>
+        {(time) => <span className='min-w-[60px]'>{time}</span>}
+      </Timer>
     </CotopiaButton>
   );
 }
