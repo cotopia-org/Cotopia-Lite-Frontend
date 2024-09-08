@@ -6,6 +6,7 @@ import EditChatInput from "./EditChatInput"
 import ReplyChatInput from "./ReplyChatInput"
 import { useChatRoomCtx } from "@/context/chat-room-context"
 import NewChatBox from "@/components/shared/chat-box/NewChatBox"
+import MentionableChatInput from "@/components/shared/chat-box/user-input/mentionable-chat-input"
 
 export default function UserChatRoom() {
   const { user } = useProfile()
@@ -20,7 +21,7 @@ export default function UserChatRoom() {
     onReplyMessage,
   } = useChatRoomCtx()
 
-  let chatInputNode = <ChatUserInput onAdd={onAddMessage} />
+  let chatInputNode = <MentionableChatInput />
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (

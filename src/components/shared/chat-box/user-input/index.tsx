@@ -1,72 +1,95 @@
-import React, { FormEvent, ReactNode, useEffect, useRef } from "react";
-import EmojiButton from "./emoji";
-import SendButton from "./send";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+} from "react"
+import EmojiButton from "./emoji"
+import SendButton from "./send"
 
 type Props = {
-  onAdd: (message: string) => void;
-  defaultValue?: string;
-  beforeNode?: ReactNode;
-  isReplyState?: boolean;
-};
+  onAdd: (message: string) => void
+  className?: string
+  defaultValue?: string
+  beforeNode?: ReactNode
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
+  isReplyState?: boolean
+}
 
 export default function ChatUserInput({
   onAdd,
+  className = "",
   beforeNode,
   defaultValue,
   isReplyState,
+  onChange,
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLTextAreaElement>()
   const handleAddMessage = () => {
-    if (!inputRef.current) return;
+    if (!inputRef.current) return
 
-    const value = inputRef.current?.value;
+    const value = inputRef.current?.value
 
     if (!value) {
-      return;
+      return
     }
 
-    if (onAdd) onAdd(value);
+    if (onAdd) onAdd(value)
 
-    inputRef.current.value = "";
-    inputRef.current.focus();
-  };
+    inputRef.current.value = ""
+    inputRef.current.focus()
+  }
 
   const handleSubmitForm = (e: FormEvent<HTMLFormElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    handleAddMessage();
-  };
+    e.stopPropagation()
+    e.preventDefault()
+    handleAddMessage()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault() // Prevents the newline from being added
+      e.currentTarget.form?.requestSubmit() // Submits the form programmatically
+    }
+  }
 
   useEffect(() => {
     if (isReplyState === true && inputRef.current !== undefined) {
       setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
+        inputRef.current?.focus()
+      }, 300)
     }
-  }, [isReplyState, inputRef?.current]);
+  }, [isReplyState, inputRef?.current])
 
   return (
-    <div className='flex flex-col bg-black/10 relative rounded-xl '>
+    <div
+      className={`flex flex-col bg-black/10 relative rounded-xl ${className}`}
+    >
       {beforeNode && beforeNode}
       <form
         onSubmit={handleSubmitForm}
-        className='flex flex-row items-center gap-x-2 pr-2'
+        className="flex flex-row items-center gap-x-2 pr-2"
       >
-        <input
+        <textarea
+          id="chat-input"
           defaultValue={defaultValue}
-          dir='auto'
+          onKeyDown={handleKeyDown}
+          dir="auto"
+          rows={1}
           ref={(x) => {
-            if (x === null) return;
-            inputRef.current = x;
+            if (x === null) return
+            inputRef.current = x
           }}
-          placeholder='Type a message...'
-          className='w-full bg-transparent !outline-none focus-visible:!ring-offset-0 !ring-transparent !ring-0 p-4 !h-auto !border-0 !shadow-none'
+          onChange={onChange}
+          placeholder="Type a message..."
+          className="w-full  resize-none bg-transparent !outline-none focus-visible:!ring-offset-0 !ring-transparent !ring-0 p-4 min-h-[56px] !border-0 !shadow-none"
         />
-        <div className='flex flex-row items-center'>
+        <div className="flex flex-row items-center">
           <EmojiButton />
           <SendButton onClick={handleAddMessage} />
         </div>
       </form>
     </div>
-  );
+  )
 }

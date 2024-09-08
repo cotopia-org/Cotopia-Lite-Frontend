@@ -1,51 +1,51 @@
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
-import { useChatRoomCtx } from "@/context/chat-room-context";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 import {
   unreadMessagesAction,
   updateMessagesAction,
-} from "@/store/redux/slices/room-slice";
-import { useAppDispatch } from "@/store/redux/store";
-import { ChatItemType } from "@/types/chat";
-import { useEffect, useRef, useState } from "react";
-import Linkify from "react-linkify";
+} from "@/store/redux/slices/room-slice"
+import { useAppDispatch } from "@/store/redux/store"
+import { ChatItemType } from "@/types/chat"
+import { useEffect, useRef, useState } from "react"
+import Linkify from "react-linkify"
 
 type Props = {
-  isMine: boolean;
-  item: ChatItemType;
-};
+  isMine: boolean
+  item: ChatItemType
+}
 export default function Message({ item, isMine }: Props) {
-  const divRef = useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null)
 
-  const isDirect = item?.is_direct;
+  const isDirect = item?.is_direct
 
-  let channel = `room-${item.room_id}`;
+  let channel = `room-${item.room_id}`
   if (isDirect) {
-    channel = `direct-${item.room_id}`;
+    channel = `direct-${item.room_id}`
   }
 
-  const appDispatch = useAppDispatch();
+  const appDispatch = useAppDispatch()
 
-  const socket = useSocket();
-  const [isVisible, setIsVisible] = useState(false);
+  const socket = useSocket()
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        setIsVisible(entry.isIntersecting)
       },
       { threshold: 0.5 } // Trigger when 50% of the element is visible
-    );
+    )
 
     if (divRef.current) {
-      observer.observe(divRef.current);
+      observer.observe(divRef.current)
     }
 
     return () => {
       if (divRef.current) {
-        observer.unobserve(divRef.current);
+        observer.unobserve(divRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   useEffect(() => {
     //Should remove item.nonce_id !== 0 in the feuture (just for legacy messages)
@@ -56,20 +56,20 @@ export default function Message({ item, isMine }: Props) {
           nonce_id: item.nonce_id,
           room_id: item.room_id,
           channel,
-        });
+        })
 
-        appDispatch(updateMessagesAction({ message: { ...item, seen: true } }));
+        appDispatch(updateMessagesAction({ message: { ...item, seen: true } }))
       }
     }
     if (isVisible) {
-      appDispatch(unreadMessagesAction({ message: item, messageType: "seen" }));
+      appDispatch(unreadMessagesAction({ message: item, messageType: "seen" }))
     }
-  }, [item, isVisible, isMine, socket]);
+  }, [item, isVisible, isMine, socket])
 
   return (
     <div
-      className='text-wrap mb-3 w-full'
-      dir='auto'
+      className="text-wrap mb-3 w-full"
+      dir="auto"
       style={{ overflowWrap: "break-word" }}
       ref={divRef}
     >
@@ -78,22 +78,48 @@ export default function Message({ item, isMine }: Props) {
           decoratedHref: string,
           decoratedText: string,
           key: number
-        ) => (
-          <a
-            href={decoratedHref}
-            key={key}
-            target='_blank'
-            className='text-blue-600 hover:underline whitespace-pre-wrap'
-            style={{
-              overflowWrap: "break-word",
-            }}
-          >
-            {decoratedText}
-          </a>
-        )}
+        ) => {
+          const mentionRegex = /@[a-zA-Z0-9._-]*|@/g
+          const match = mentionRegex.exec(decoratedText)
+          let targetHref = decoratedHref
+          let targetText = decoratedText
+
+          console.log(match, "MATCH")
+          let content = (
+            <a
+              href={targetHref}
+              key={key}
+              target="_blank"
+              className="text-blue-600 hover:underline whitespace-pre-wrap"
+              style={{
+                overflowWrap: "break-word",
+              }}
+            >
+              {targetText}
+            </a>
+          )
+
+          if (match) {
+            content = (
+              <a
+                href={"#"}
+                key={key}
+                target="_blank"
+                className="text-blue-600 hover:underline whitespace-pre-wrap"
+                style={{
+                  overflowWrap: "break-word",
+                }}
+              >
+                {targetText}
+              </a>
+            )
+          }
+
+          return content
+        }}
       >
         {item?.text}
       </Linkify>
     </div>
-  );
+  )
 }

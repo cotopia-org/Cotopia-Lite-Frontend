@@ -80,19 +80,19 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     unreadMsgsLength = unreadDmMsgs.length
   }
 
-  useEffect(() => {
-    if (wheelDirection === "up") {
-      setShowGotoBottom(true)
-    } else {
-      setTimeout(() => {
-        if (!scrollerRef.current) return
-        scrollerRef.current.scrollTo({
-          top: scrollerRef.current.scrollHeight,
-          behavior: "instant",
-        })
-      }, 200)
-    }
-  }, [downLimit, messages])
+  // useEffect(() => {
+  //   if (wheelDirection === "up") {
+  //     setShowGotoBottom(true)
+  //   } else {
+  //     setTimeout(() => {
+  //       if (!scrollerRef.current) return
+  //       scrollerRef.current.scrollTo({
+  //         top: scrollerRef.current.scrollHeight,
+  //         behavior: "instant",
+  //       })
+  //     }, 200)
+  //   }
+  // }, [downLimit, messages])
 
   const isFirstView = upperLimit === __VARS.pagesLimitDiff
 
@@ -244,12 +244,10 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
       if (!scrollerRef.current) return
       const { items } = await onLoadMessage(type)
       if (items.length === 0) return
-      setTimeout(() => {
-        virtousoRef?.current?.scrollToIndex({
-          index: targetIdx,
-          align: "center",
-        })
-      }, 100)
+      virtousoRef?.current?.scrollToIndex({
+        index: targetIdx,
+        align: "center",
+      })
     },
     [onLoadMessage, virtousoRef.current, scrollerRef.current]
   )
@@ -416,9 +414,9 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
       )
       const diff = y - x
 
-      const targeIndex = __VARS.defaultPerPage
-      const topIndex = targeIndex
-      const bottomIndex = totalLength - targeIndex
+      const targetIndex = __VARS.defaultPerPage
+      const topIndex = targetIndex
+      const bottomIndex = totalLength - targetIndex
 
       //check is scroll getting top of the chat box
       if (element.scrollTop <= 0) {
@@ -443,19 +441,19 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
         }
       }
 
-      if (diff > 50) {
+      if (diff > 100) {
         if (wheelDirection === "up") return
         setWheelDirections("up")
       }
-      if (diff < 50) {
+      if (diff < 100) {
         if (wheelDirection === "down") return
         setWheelDirections("down")
       }
 
-      if (diff <= 0) {
-        e.cancelable
-        e.isDefaultPrevented
-      }
+      // if (diff <= 100) {
+      //   e.cancelable
+      //   e.isDefaultPrevented
+      // }
     },
     [onLoadMessage, wheelDirection]
   )
