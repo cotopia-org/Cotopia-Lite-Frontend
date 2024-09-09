@@ -1,34 +1,64 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
+import CotopiaInput from "@/components/shared-ui/c-input";
 import CotopiaTextarea from "@/components/shared-ui/c-textarea";
+import TitleEl from "@/components/shared/title-el";
+import UploaderList from "@/components/shared/uploader-list";
+import axiosInstance from "@/lib/axios";
+import { AttachmentFileType } from "@/types/file";
 import { useFormik } from "formik";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
-export default function BugReportForm() {
-  const { isSubmitting, touched, errors, getFieldProps, handleSubmit } =
-    useFormik({
-      enableReinitialize: true,
-      initialValues: {
-        report: "",
-      },
-      validationSchema: Yup.object().shape({
-        report: Yup.string().required("Report is required"),
-      }),
-      onSubmit: (values, actions) => {
-        // actions.setSubmitting(true);
-        // axiosInstance
-        //   .put(`/users/update`, {
-        //     name: values.name,
-        //   })
-        //   .then((res) => {
-        //     actions.setSubmitting(false);
-        //     toast.success("Your information has been updated.");
-        //     router.refresh();
-        //   })
-        //   .catch((err) => {
-        //     actions.setSubmitting(false);
-        //   });
-      },
-    });
+type Props = {
+  onSubmitted: () => void;
+  model_id: string;
+  model_type: string;
+};
+
+export default function BugReportForm({
+  onSubmitted,
+  model_id,
+  model_type,
+}: Props) {
+  const {
+    values,
+    isSubmitting,
+    touched,
+    errors,
+    getFieldProps,
+    handleSubmit,
+    setFieldValue,
+  } = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      title: "",
+      description: "",
+      files: [] as AttachmentFileType[],
+    },
+    validationSchema: Yup.object().shape({
+      description: Yup.string().required("Report is required"),
+    }),
+    onSubmit: (values, actions) => {
+      const { files, ...rest } = values;
+
+      actions.setSubmitting(true);
+      axiosInstance
+        .post(`/reports`, {
+          ...rest,
+          files: files.map((x) => x.id),
+          model_id,
+          model_type,
+        })
+        .then((res) => {
+          actions.setSubmitting(false);
+          toast.success("Your report has been submitted.");
+          if (onSubmitted) onSubmitted();
+        })
+        .catch((err) => {
+          actions.setSubmitting(false);
+        });
+    },
+  });
 
   return (
     <div className='p-6 flex flex-col gap-y-4 w-full'>
@@ -43,13 +73,31 @@ export default function BugReportForm() {
               We will review your problem as soon as possible.
             </p>
           </div>
-          <CotopiaTextarea
-            {...getFieldProps("report")}
-            placeholder="Eg: updating profile doesn't work properly ..."
+          <CotopiaInput
+            {...getFieldProps("title")}
+            placeholder='Subject'
             // label='Your report'
-            hasError={!!touched.report && !!errors.report}
-            helperText={!!touched.report && !!errors.report && errors.report}
+            hasError={!!touched.title && !!errors.title}
+            helperText={!!touched.title && !!errors.title && errors.title}
           />
+          <CotopiaTextarea
+            {...getFieldProps("description")}
+            placeholder="Eg: updating profile doesn't work properly ..."
+            // label='Your description'
+            hasError={!!touched.description && !!errors.description}
+            helperText={
+              !!touched.description &&
+              !!errors.description &&
+              errors.description
+            }
+          />
+          <TitleEl title='Attachments'>
+            <UploaderList
+              isMultiple
+              files={values.files}
+              onChange={(files) => setFieldValue("files", files)}
+            />
+          </TitleEl>
         </div>
         <CotopiaButton
           loading={isSubmitting}

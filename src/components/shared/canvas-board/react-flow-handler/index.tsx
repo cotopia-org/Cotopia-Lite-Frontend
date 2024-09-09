@@ -62,29 +62,6 @@ function ReactFlowHandler({ tracks }: Props) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
 
   const handleNodesChange = (changes: NodeChange[]) => {
-    changes.forEach((change) => {
-      switch (change.type) {
-        case "position":
-          const positionChange = change as NodePositionChange;
-          // console.log(
-          //   `Node with ID ${positionChange.id} has been moved to position`,
-          //   positionChange.position
-          // );
-          break;
-        case "select":
-          const selectionChange = change as NodeSelectionChange;
-          // console.log(
-          //   `Node with ID ${selectionChange.id} was ${
-          //     selectionChange.selected ? "selected" : "deselected"
-          //   }`
-          // );
-          break;
-        // Handle other change types like 'dimensions', 'remove', etc.
-        default:
-        // console.log(`Unhandled change type: ${change.type}`);
-      }
-    });
-
     // Always apply the changes to keep the nodes state updated
     onNodesChange(changes);
   };
@@ -246,11 +223,11 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket("userJoinedToRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user } = data;
 
-    console.log("test joined event", data);
-
     if (room_id === undefined) return;
 
     if (gotRoomId !== +room_id) return;
+
+    console.log("test joined event", data);
 
     setNodes((prev) => [...prev, ...addParticipants([user])]);
   });
