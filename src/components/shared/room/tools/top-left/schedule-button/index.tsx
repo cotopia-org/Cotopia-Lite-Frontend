@@ -1,7 +1,7 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
 import PopupBox from "@/components/shared/popup-box";
 import PopupBoxChild from "@/components/shared/popup-box/child";
-import { Timer } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import React from "react";
 import ShapesHandler from "./shapes/handler";
 
@@ -11,7 +11,7 @@ export default function ScheduleButton() {
       trigger={(open) => (
         <CotopiaButton
           onClick={open}
-          startIcon={<Timer />}
+          startIcon={<CalendarDays />}
           className='bg-white hover:bg-white text-black rounded-xl'
         >
           Schedule
