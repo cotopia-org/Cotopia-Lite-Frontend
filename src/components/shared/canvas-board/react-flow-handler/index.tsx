@@ -176,36 +176,33 @@ function ReactFlowHandler({ tracks }: Props) {
     ]);
   }, [tracks]);
 
-  const updateUserCoordinate = useCallback(
-    (data: UserMinimalType) => {
-      const username = data?.username;
-      const coordinates = data?.coordinates;
+  const updateUserCoordinate = (data: UserMinimalType) => {
+    const username = data?.username;
+    const coordinates = data?.coordinates;
 
-      if (!username) {
-        return;
-      }
+    if (!username) {
+      return;
+    }
 
-      if (!coordinates) {
-        return;
-      }
+    if (!coordinates) {
+      return;
+    }
 
-      const coords_array = coordinates.split(",");
+    const coords_array = coordinates.split(",");
 
-      if (coords_array.length !== 2) return;
+    if (coords_array.length !== 2) return;
 
-      let x = coords_array[0];
-      let y = coords_array[1];
+    let x = coords_array[0];
+    let y = coords_array[1];
 
-      updateUserCoords(username, { x: +x, y: +y });
+    updateUserCoords(username, { x: +x, y: +y });
 
-      setNodes((nds) => {
-        return nds.map((node) =>
-          node.id === username ? { ...node, position: { x: +x, y: +y } } : node
-        );
-      });
-    },
-    [setNodes]
-  );
+    setNodes((nds) => {
+      return nds.map((node) =>
+        node.id === username ? { ...node, position: { x: +x, y: +y } } : node
+      );
+    });
+  };
 
   useSocket(
     "updateCoordinates",
