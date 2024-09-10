@@ -14,15 +14,39 @@ import { RoomEnvironmentType } from "@/context/chat-room-context"
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
+export type MessageMentionType = {
+  start_position: number
+  model_type: string
+  model_id: number
+}
+export type MessageLinkType = {
+  start_position: number
+  url: string
+  text: string
+}
+
+export type MessagePayloadType = {
+  text: string
+  mentions?: MessageMentionType[]
+  links?: MessageLinkType[]
+  replyTo?: ChatItemType
+  mentioned_everyone?: boolean
+}
+
 function messageCreator({
   text,
   room_id,
   reply_to = null,
   is_direct,
-
+  mentioned_everyone = false,
+  mentions,
+  links,
   user,
 }: {
   text: string
+  mentions?: MessageMentionType[]
+  mentioned_everyone?: boolean
+  links?: MessageLinkType[]
   room_id?: number
   reply_to?: ChatItemType | null
   is_direct?: boolean
@@ -36,14 +60,15 @@ function messageCreator({
     files: [],
     is_edited: false,
     is_pinned: false,
-    links: [],
-    mentions: [],
+    mentions: mentions ?? [],
+    links: links ?? [],
     reply_to,
     room_id,
     is_direct,
     seen: false,
     text,
     updated_at: null,
+    ...(mentioned_everyone ? { mentioned_everyone: true } : {}),
     user,
     nonce_id: Math.floor(Math.random() * 100000) * new Date().getTime(),
   } as PartialBy<ChatItemType, "id">
@@ -65,18 +90,15 @@ export const useChatSocket = (
   }
   const socket = useSocket()
 
-  const send = async ({
-    message,
-    replyTo,
-  }: {
-    message: string
-    replyTo?: ChatItemType
-  }) => {
+  const send = async ({ payload }: { payload: MessagePayloadType }) => {
     let tempMessage = messageCreator({
-      text: message,
+      text: payload?.text ?? "",
       room_id: id,
-      reply_to: replyTo,
+      reply_to: payload?.replyTo ?? null,
       user,
+      mentioned_everyone: payload?.mentioned_everyone ?? false,
+      mentions: payload?.mentions ?? [],
+      links: payload?.links ?? [],
     })
 
     tempMessage["channel"] = channel
@@ -89,7 +111,9 @@ export const useChatSocket = (
     )
 
     //Now message added to queue
-    socket?.emit("sendMessage", tempMessage, (message: ChatItemType) => {})
+    socket?.emit("sendMessage", tempMessage, (message: ChatItemType) => {
+      console.log(message, "MESSAGE")
+    })
   }
   const edit = async ({ message }: { message: ChatItemType }) => {
     appDispatch(

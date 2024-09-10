@@ -80,19 +80,15 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
     unreadMsgsLength = unreadDmMsgs.length
   }
 
-  // useEffect(() => {
-  //   if (wheelDirection === "up") {
-  //     setShowGotoBottom(true)
-  //   } else {
-  //     setTimeout(() => {
-  //       if (!scrollerRef.current) return
-  //       scrollerRef.current.scrollTo({
-  //         top: scrollerRef.current.scrollHeight,
-  //         behavior: "instant",
-  //       })
-  //     }, 200)
-  //   }
-  // }, [downLimit, messages])
+  useEffect(() => {
+    setTimeout(() => {
+      if (!scrollerRef.current) return
+      scrollerRef.current.scrollTo({
+        top: scrollerRef.current.scrollHeight,
+        behavior: "instant",
+      })
+    }, 200)
+  }, [])
 
   const isFirstView = upperLimit === __VARS.pagesLimitDiff
 

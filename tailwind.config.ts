@@ -84,14 +84,14 @@ const config = {
         },
         "slide-up": {
           from: { transform: "translateY(100%)", opacity: "0" },
-          "30%": { transform: "translateY(0)", opacity: "1" },
+          to: { transform: "translateY(0)", opacity: "1" },
         },
       },
       animation: {
         "scale-custom": "scale-up 0.3s ease-in-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "slide-up": "slide-up 0.5s ease-in-out",
+        "slide-up": "slide-up 0.2s ease-in-out",
       },
       screens: {
         xs: "495px",

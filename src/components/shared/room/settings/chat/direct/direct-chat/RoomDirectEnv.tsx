@@ -5,9 +5,9 @@ import FullLoading from "@/components/shared/full-loading"
 import { UserMinimalType } from "@/types/user"
 import DirectChatBox from "."
 import { useChatRoomCtx } from "@/context/chat-room-context"
-import ChatUserInput from "@/components/shared/chat-box/user-input"
 import EditChatInput from "../../room/EditChatInput"
 import ReplyChatInput from "../../room/ReplyChatInput"
+import MentionableChatInput from "@/components/shared/chat-box/user-input/mentionable-chat-input"
 
 interface Props {
   user?: UserMinimalType
@@ -27,24 +27,20 @@ const RoomDirectEnv = ({ onBack, user }: Props) => {
 
   if (user === undefined) return null
 
-  let chatInputNode = <ChatUserInput onAdd={(text) => onAddMessage(text)} />
+  let chatInputNode = <MentionableChatInput onAdd={onAddMessage} />
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (
       <EditChatInput
         message={targetMessage}
-        onAdd={(textVal) => onEditMessage({ ...targetMessage, text: textVal })}
+        onAdd={(payload) => onEditMessage({ ...targetMessage, ...payload })}
       />
     )
   }
+
   if (flag === "reply" && targetMessage) {
     chatInputNode = (
-      <ReplyChatInput
-        message={targetMessage}
-        onAdd={(message) => {
-          onReplyMessage(message, user.id)
-        }}
-      />
+      <ReplyChatInput message={targetMessage} onAdd={onReplyMessage} />
     )
   }
 

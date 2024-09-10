@@ -1,5 +1,5 @@
+"use client"
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper"
-import { useChatRoomCtx } from "@/context/chat-room-context"
 import {
   unreadMessagesAction,
   updateMessagesAction,
@@ -7,12 +7,15 @@ import {
 import { useAppDispatch } from "@/store/redux/store"
 import { ChatItemType } from "@/types/chat"
 import { useEffect, useRef, useState } from "react"
-import Linkify from "react-linkify"
+import Linkify from "linkify-react"
+
+import "linkify-plugin-mention"
 
 type Props = {
   isMine: boolean
   item: ChatItemType
 }
+
 export default function Message({ item, isMine }: Props) {
   const divRef = useRef<HTMLDivElement>(null)
 
@@ -66,6 +69,32 @@ export default function Message({ item, isMine }: Props) {
     }
   }, [item, isVisible, isMine, socket])
 
+  const linkElement = (
+    attributes: { [attr: string]: any },
+    content: string,
+    type: "mention" | "link"
+  ) => {
+    let clss = "text-blue-600 whitespace-pre-wrap"
+    if (type === "link") {
+      clss += " hover:underline"
+    }
+
+    let view = content
+
+    return (
+      <a
+        className={clss}
+        style={{
+          overflowWrap: "break-word",
+        }}
+        target={type === "link" ? "_blank" : "_self"}
+        {...attributes}
+      >
+        {view}
+      </a>
+    )
+  }
+
   return (
     <div
       className="text-wrap mb-3 w-full"
@@ -74,51 +103,20 @@ export default function Message({ item, isMine }: Props) {
       ref={divRef}
     >
       <Linkify
-        componentDecorator={(
-          decoratedHref: string,
-          decoratedText: string,
-          key: number
-        ) => {
-          const mentionRegex = /@[a-zA-Z0-9._-]*|@/g
-          const match = mentionRegex.exec(decoratedText)
-          let targetHref = decoratedHref
-          let targetText = decoratedText
-
-          console.log(match, "MATCH")
-          let content = (
-            <a
-              href={targetHref}
-              key={key}
-              target="_blank"
-              className="text-blue-600 hover:underline whitespace-pre-wrap"
-              style={{
-                overflowWrap: "break-word",
-              }}
-            >
-              {targetText}
-            </a>
-          )
-
-          if (match) {
-            content = (
-              <a
-                href={"#"}
-                key={key}
-                target="_blank"
-                className="text-blue-600 hover:underline whitespace-pre-wrap"
-                style={{
-                  overflowWrap: "break-word",
-                }}
-              >
-                {targetText}
-              </a>
-            )
-          }
-
-          return content
+        options={{
+          nl2br: true,
+          render: {
+            url: ({ attributes, content }) =>
+              linkElement(attributes, content, "link"),
+            mention: ({ attributes, content }) =>
+              linkElement(attributes, content, "mention"),
+          },
+          formatHref: {
+            mention: () => "#",
+          },
         }}
       >
-        {item?.text}
+        {item.text}
       </Linkify>
     </div>
   )

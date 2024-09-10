@@ -5,12 +5,13 @@ import EditMessageInfo from "@/components/shared/chat-box/chat-item/TargetMessag
 import ChatUserInput from "@/components/shared/chat-box/user-input"
 import MentionableChatInput from "@/components/shared/chat-box/user-input/mentionable-chat-input"
 import { useChatRoomCtx } from "@/context/chat-room-context"
+import { MessagePayloadType } from "@/hooks/chat/use-chat-socket"
 import { ChatItemType } from "@/types/chat"
 import { useState } from "react"
 
 interface Props {
   message: ChatItemType
-  onAdd: (message: string) => void
+  onAdd: (payload:MessagePayloadType) => void
 }
 
 const EditChatInput = ({ message, onAdd }: Props) => {
@@ -32,7 +33,7 @@ const EditChatInput = ({ message, onAdd }: Props) => {
     />
   )
 
-  return <MentionableChatInput beforeNode={selectedMessageNode} />
+  return <MentionableChatInput onAdd={onAdd} beforeNode={selectedMessageNode} />
 }
 
 export default EditChatInput

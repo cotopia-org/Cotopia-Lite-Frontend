@@ -1,4 +1,3 @@
-import ChatUserInput from "@/components/shared/chat-box/user-input"
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
 import FullLoading from "@/components/shared/full-loading"
 import { _BUS } from "@/app/const/bus"
@@ -16,18 +15,18 @@ export default function UserChatRoom() {
     messages,
     flag,
     targetMessage,
-    onAddMessage,
     onEditMessage,
     onReplyMessage,
+    onAddMessage,
   } = useChatRoomCtx()
 
-  let chatInputNode = <MentionableChatInput />
+  let chatInputNode = <MentionableChatInput onAdd={onAddMessage} />
 
   if (flag === "edit" && targetMessage) {
     chatInputNode = (
       <EditChatInput
         message={targetMessage}
-        onAdd={(textVal) => onEditMessage({ ...targetMessage, text: textVal })}
+        onAdd={(payload) => onEditMessage({ ...targetMessage, ...payload })}
       />
     )
   }

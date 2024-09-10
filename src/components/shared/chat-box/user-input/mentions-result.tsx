@@ -12,7 +12,7 @@ import UserCardItem from "../../user-selector/list/item"
 
 interface Props {
   search?: string
-  onSelect: (user: UserMinimalType) => void
+  onSelect: (user: UserMinimalType | { username: string }) => void
 }
 
 export type MentionResultType = {
@@ -31,8 +31,6 @@ const MentionResultViewer = ({ search = "", onSelect }: Props) => {
       key: `/messages/searchMention?q=${search}`,
     }
   )
-
-  console.log(data, "DATA")
 
   const mentionItems: any = (data && data.data) ?? {
     users: [],
@@ -66,7 +64,12 @@ const MentionResultViewer = ({ search = "", onSelect }: Props) => {
             case "users":
               view = (
                 <div className="flex w-full flex-col gap-y-1">
-                  <CotopiaButton variant={"outline"}>Everyone</CotopiaButton>
+                  <CotopiaButton
+                    onClick={() => onSelect({ username: "everyone" })}
+                    variant={"outline"}
+                  >
+                    Everyone
+                  </CotopiaButton>
                   {modelItems.map((user: UserMinimalType) => {
                     return (
                       <UserCardItem
@@ -98,7 +101,7 @@ const MentionResultViewer = ({ search = "", onSelect }: Props) => {
   }
   return (
     <div
-      className={`flex w-full overflow-y-auto  flex-col animate-slide-up items-center justify-center p-4 bg-white text-center absolute bottom-full mb-1 rounded-lg shadow-md border `}
+      className={`flex w-full overflow-y-auto flex-col items-center justify-center p-4 bg-white text-center absolute bottom-full mb-1 rounded-lg shadow-md border `}
     >
       {content}
     </div>
