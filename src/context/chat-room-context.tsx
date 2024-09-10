@@ -23,7 +23,7 @@ import {
 
 import { dispatch as busDispatch } from "use-bus"
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
-import { useChatSocket } from "@/hooks/chat/use-chat-socket"
+import { MessagePayloadType, useChatSocket } from "@/hooks/chat/use-chat-socket"
 
 export type FlagType = "edit" | "reply" | "pin"
 
@@ -48,8 +48,8 @@ type InitCtxType = {
     upLimit?: number,
     downLimit?: number
   ) => Promise<{ items: ChatItemType[] }>
-  onAddMessage: (text: string) => void
-  onReplyMessage: (text: string, userId?: number) => void
+  onAddMessage: (payload: MessagePayloadType) => void
+  onReplyMessage: (payload: MessagePayloadType) => void
   onEditMessage: (message: ChatItemType) => void
   ref: any
   changeKey: (value: { key: string; value: any }) => void
@@ -206,8 +206,9 @@ const ChatRoomCtxProvider = ({
   )
 
   const addMessageHandler = useCallback(
-    async (text: string) => {
+    async (payload: MessagePayloadType) => {
       if (!room_id) return
+
       if (down_limit > 1) {
         await appDispatch(
           getInitMessages({
@@ -218,7 +219,7 @@ const ChatRoomCtxProvider = ({
         )
         busDispatch(_BUS.scrollEndChatBox)
       } else {
-        chat.send({ message: text })
+        chat.send({ payload })
         busDispatch(_BUS.scrollEndChatBox)
       }
     },
@@ -238,7 +239,7 @@ const ChatRoomCtxProvider = ({
   )
 
   const replyMessageHandler = useCallback(
-    async (text: string) => {
+    async (payload: MessagePayloadType) => {
       dispatch({
         type: "CHANGE_BULK",
         payload: { targetMessage: undefined, flag: undefined },
@@ -254,7 +255,7 @@ const ChatRoomCtxProvider = ({
         )
         busDispatch(_BUS.scrollEndChatBox)
       } else {
-        chat.send({ message: text, replyTo: state.targetMessage })
+        chat.send({ payload: { ...payload, replyTo: state.targetMessage } })
         busDispatch(_BUS.scrollEndChatBox)
       }
     },

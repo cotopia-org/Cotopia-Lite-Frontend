@@ -5,5 +5,6 @@ export type ChatItemType = MessageType & {
   is_edited?: boolean
   channel?: string
   is_pinned?: boolean
+  mentioned_everyone?: boolean
   is_direct?: boolean
 }
