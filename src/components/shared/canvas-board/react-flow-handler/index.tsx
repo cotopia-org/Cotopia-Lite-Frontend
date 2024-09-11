@@ -10,8 +10,6 @@ import {
   Node,
   NodeChange,
   NodeMouseHandler,
-  NodePositionChange,
-  NodeSelectionChange,
   ReactFlow,
   ReactFlowInstance,
   useNodesState,
@@ -27,7 +25,11 @@ import ShareScreen from "../nodes/share-screen";
 import { UserMinimalType } from "@/types/user";
 import NodesPreview from "../nodes-preview";
 import JailNode from "../nodes/jail-node";
+import { uniqueById } from "@/lib/utils";
 // import { useCanvas } from "..";
+
+export const RF_BACKGROUND_ID = "bg-node-4214242141";
+export const RF_JAIL_ID = "jail-78412641267";
 
 type Props = {
   tracks: TrackReferenceOrPlaceholder[];
@@ -70,7 +72,7 @@ function ReactFlowHandler({ tracks }: Props) {
   const nodesWithBackground = useCallback(
     (nodes: Node[]) => [
       {
-        id: "4214242141",
+        id: RF_BACKGROUND_ID,
         position: {
           x: -500,
           y: -700,
@@ -83,7 +85,7 @@ function ReactFlowHandler({ tracks }: Props) {
         selectable: false,
       },
       {
-        id: "78412641267",
+        id: RF_JAIL_ID,
         position: {
           x: -400,
           y: -400,
@@ -101,40 +103,42 @@ function ReactFlowHandler({ tracks }: Props) {
   );
 
   const addParticipants = (particpants: UserMinimalType[]) => {
-    return particpants.map((participant) => {
-      const rfUserId = "" + participant?.username;
+    return uniqueById(
+      particpants.map((participant) => {
+        const rfUserId = "" + participant?.username;
 
-      const coords = participant?.coordinates?.split(",");
+        const coords = participant?.coordinates?.split(",");
 
-      let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
-      let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
+        let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
+        let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
 
-      if (typeof xcoord === "string") xcoord = +xcoord;
-      if (typeof ycoord === "string") ycoord = +ycoord;
+        if (typeof xcoord === "string") xcoord = +xcoord;
+        if (typeof ycoord === "string") ycoord = +ycoord;
 
-      const track = tracks.find(
-        (a) => a.participant.identity === participant.username
-      );
+        const track = tracks.find(
+          (a) => a.participant.identity === participant.username
+        );
 
-      const isDraggable = user?.username === track?.participant?.identity;
+        const isDraggable = user?.username === track?.participant?.identity;
 
-      let object: Node = {
-        id: "" + participant?.username,
-        type: "userNode",
-        data: {
-          username: participant.username,
-          draggable: isDraggable,
-          isDragging: false,
-        },
-        position: { x: xcoord, y: ycoord },
-        parentId: "78412641267",
-        extent: "parent",
-      };
+        let object: Node = {
+          id: "" + participant?.username,
+          type: "userNode",
+          data: {
+            username: participant.username,
+            draggable: isDraggable,
+            isDragging: false,
+          },
+          position: { x: xcoord, y: ycoord },
+          parentId: RF_JAIL_ID,
+          extent: "parent",
+        };
 
-      if (!isDraggable) object["draggable"] = false;
+        if (!isDraggable) object["draggable"] = false;
 
-      return object;
-    });
+        return object;
+      })
+    ) as Node[];
   };
 
   //Init canvas
@@ -169,7 +173,7 @@ function ReactFlowHandler({ tracks }: Props) {
                 x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
                 y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
               },
-              parentId: "78412641267",
+              parentId: RF_JAIL_ID,
               extent: "parent",
             } as Node)
         ),
@@ -276,7 +280,9 @@ function ReactFlowHandler({ tracks }: Props) {
         <MiniMap />
         <Background />
       </ReactFlow>
-      {/* {!!viewPort && <NodesPreview nodes={nodes} viewport={viewPort} />} */}
+      {!!viewPort && (
+        <NodesPreview tracks={tracks} nodes={nodes} viewport={viewPort} />
+      )}
     </>
   );
 }

@@ -1,26 +1,26 @@
-import React, { ReactNode, useState } from "react"
-import CTabs from "@/components/shared-ui/c-tabs"
-import { CalendarDays, MessagesSquare, User } from "lucide-react"
-import SettingsUserAction from "./user/action"
-import SettingsChatAction from "./chat/action"
-import UserChat from "./chat"
-import Schedule from "./schedule"
+import React, { ReactNode, useState } from "react";
+import CTabs from "@/components/shared-ui/c-tabs";
+import { CalendarDays, MessagesSquare, User } from "lucide-react";
+import SettingsUserAction from "./user/action";
+import SettingsChatAction from "./chat/action";
+import UserChat from "./chat";
+import Schedule from "./schedule";
 
 export default function RoomSettings() {
-  const [value, setValue] = useState("chat")
+  const [value, setValue] = useState("chat");
 
-  let title: ReactNode = ""
+  let title: ReactNode = "";
   switch (value) {
     case "user":
-      title = <SettingsUserAction />
-      break
+      title = <SettingsUserAction />;
+      break;
     case "chat":
-      title = <SettingsChatAction />
-      break
+      title = <SettingsChatAction />;
+      break;
   }
 
   return (
-    <div className="p-6 flex flex-col gap-y-4">
+    <div className='p-6 flex flex-col gap-y-4'>
       <CTabs
         title={<div>{title}</div>}
         defaultValue={value}
@@ -31,13 +31,8 @@ export default function RoomSettings() {
             content: <UserChat />,
             value: "chat",
           },
-          {
-            icon: <CalendarDays />,
-            content: <Schedule />,
-            value: "calendar",
-          },
         ]}
       />
     </div>
-  )
+  );
 }

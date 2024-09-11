@@ -181,3 +181,17 @@ export function convertCoordinateString(coords: string) {
     y: coordsObject[1] ? +coordsObject[1] : 0,
   };
 }
+
+type Item = {
+  id: string | number;
+  [key: string]: any; // Other properties
+};
+
+export function uniqueById(items: Item[]): Item[] {
+  const uniqueItems = items.reduce((acc, item) => {
+    acc.set(item.id, item);
+    return acc;
+  }, new Map<string | number, Item>());
+
+  return Array.from(uniqueItems.values());
+}
