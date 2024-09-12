@@ -20,17 +20,15 @@ import FullLoading from "../../full-loading"
 import RowItem from "./RowItem"
 import { getInitMessages } from "@/store/redux/slices/room-slice"
 import CBadge from "@/components/shared-ui/c-badge"
-import { UserMinimalType } from "@/types/user"
 
 type Props = {
   observer_user_id?: number
-  user?: UserMinimalType
   className?: string
 }
 
 export const SCROLL_THRESHOLD = 200
 
-function NewChatBox({ observer_user_id, user, className = "" }: Props) {
+function NewChatBox({ observer_user_id, className = "" }: Props) {
   let clss = "relative"
 
   const [wheelDirection, setWheelDirections] = useState<"down" | "up">("down")
@@ -320,7 +318,6 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
             const findedIndex = newItems.findIndex(
               (msg) => msg.id === message.reply_to?.id
             )
-
             if (items.length === 0) {
               finded = true
               try {
@@ -346,7 +343,6 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
                     behavior: "auto",
                     align: "center",
                   })
-
                   let newItems = []
                   if (xul === __VARS.pagesLimitDiff) {
                     newItems = [...items].reverse()
@@ -477,7 +473,6 @@ function NewChatBox({ observer_user_id, user, className = "" }: Props) {
       }}
       itemContent={(_, item) => (
         <RowItem
-          user={user}
           item={item}
           observerId={observer_user_id}
           onFetchMessages={() => focusOnFlagHandler(item)}
