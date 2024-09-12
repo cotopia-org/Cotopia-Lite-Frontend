@@ -6,6 +6,8 @@ import {
   useParticipants,
 } from "@livekit/components-react";
 import useWindowSize from "@/hooks/use-window-size";
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import useObjectSize from "@/hooks/use-object-size";
 
 type Props = {
   nodes: Node[];
@@ -14,23 +16,28 @@ type Props = {
 };
 
 const NodesPreview: React.FC<Props> = ({ tracks, nodes, viewport }) => {
+  const { user } = useProfile();
+
   const participants = useParticipants();
 
   const {
-    windowSize: { windowHeight, windowWidth },
-  } = useWindowSize();
+    objectSize: { width, height },
+  } = useObjectSize("canvas-board");
 
-  const width = windowWidth;
-  const height = windowHeight;
+  console.log("width", width);
+  console.log("height", height);
 
   const [outOfViewNodes, setOutOfViewNodes] = useState<Node[]>([]);
 
+  const viewportX = viewport.x - 300;
+  const viewportY = viewport.y - 300;
+
   useEffect(() => {
     const calculateOutOfViewNodes = () => {
-      const minX = -viewport.x / viewport.zoom;
-      const maxX = (width - viewport.x) / viewport.zoom;
-      const minY = -viewport.y / viewport.zoom;
-      const maxY = (height - viewport.y) / viewport.zoom;
+      const minX = -viewportX / viewport.zoom;
+      const maxX = (width - viewportX) / viewport.zoom;
+      const minY = -viewportY / viewport.zoom;
+      const maxY = (height - viewportY) / viewport.zoom;
 
       const outOfViewNodes = nodes.filter((node) => {
         const nodeX = node.position.x;
@@ -51,11 +58,15 @@ const NodesPreview: React.FC<Props> = ({ tracks, nodes, viewport }) => {
       window.removeEventListener("resize", calculateOutOfViewNodes);
       window.removeEventListener("scroll", calculateOutOfViewNodes);
     };
-  }, [nodes, viewport, width, height]);
+  }, [nodes, viewportX, viewportY, width, height]);
 
   if (outOfViewNodes.length === 0) return null;
 
-  const finalNodes = outOfViewNodes.filter((x) => x.type === "userNode");
+  const finalNodes = outOfViewNodes
+    .filter((x) => x.type === "userNode")
+    .filter((x) => x.id !== user.username);
+
+  console.log("outOfViewNodes", outOfViewNodes);
 
   return (
     <div className='z-40'>
@@ -67,10 +78,10 @@ const NodesPreview: React.FC<Props> = ({ tracks, nodes, viewport }) => {
         let previewX, previewY;
 
         // Adjust the logic for determining if the node is outside the viewport
-        const isLeft = objX < -viewport.x / zoom;
-        const isRight = objX > (-viewport.x + width) / zoom;
-        const isAbove = objY < -viewport.y / zoom;
-        const isBelow = objY > (-viewport.y + height) / zoom;
+        const isLeft = objX < -viewportX / zoom;
+        const isRight = objX > (-viewportX + width) / zoom;
+        const isAbove = objY < -viewportY / zoom;
+        const isBelow = objY > (-viewportY + height) / zoom;
 
         if (!isLeft && !isRight && !isAbove && !isBelow) return null;
 
@@ -78,21 +89,21 @@ const NodesPreview: React.FC<Props> = ({ tracks, nodes, viewport }) => {
         if (isLeft) {
           previewX = 0; // Stick to the left edge
           previewY = Math.min(
-            Math.max((objY + viewport.y) / zoom, 0),
+            Math.max((objY + viewportY) / zoom, 0),
             height - 50
           );
         } else if (isRight) {
           previewX = width; // Stick to the right edge
-          previewY = Math.min(Math.max((objY + viewport.y) / zoom, 0), height);
+          previewY = Math.min(Math.max((objY + viewportY) / zoom, 0), height);
         } else if (isAbove) {
           previewX = Math.min(
-            Math.max((objX + viewport.x) / zoom, 0),
+            Math.max((objX + viewportX) / zoom, 0),
             width - 50
           );
           previewY = 0; // Stick to the top edge
         } else if (isBelow) {
           previewX = Math.min(
-            Math.max((objX + viewport.x) / zoom, 0),
+            Math.max((objX + viewportX) / zoom, 0),
             width - 50
           );
           previewY = height - 50; // Stick to the bottom edge
