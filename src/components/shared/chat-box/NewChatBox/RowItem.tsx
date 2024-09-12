@@ -7,7 +7,6 @@ import { UserMinimalType } from "@/types/user"
 const RowItem = ({
   item,
   observerId,
-  user,
   onFetchMessages,
 }: {
   item: ChatItemType

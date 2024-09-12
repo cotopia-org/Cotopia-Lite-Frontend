@@ -208,7 +208,6 @@ const ChatRoomCtxProvider = ({
   const addMessageHandler = useCallback(
     async (payload: MessagePayloadType) => {
       if (!room_id) return
-
       if (down_limit > 1) {
         await appDispatch(
           getInitMessages({

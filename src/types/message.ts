@@ -1,7 +1,7 @@
 import { ChatItemType } from "./chat"
 import { AttachmentFileType } from "./file"
 import { WorkspaceRoomType } from "./room"
-import { UserType } from "./user"
+import { UserMinimalType, UserType } from "./user"
 
 export type MessageType = {
   files: AttachmentFileType[]
@@ -10,7 +10,7 @@ export type MessageType = {
   room?: WorkspaceRoomType
   links: any[]
   text: string
-  user: UserType | null
+  user: UserMinimalType | null
   room_id: number
   mentions: any[]
   created_at: number

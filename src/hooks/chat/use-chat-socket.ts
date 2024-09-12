@@ -8,9 +8,10 @@ import {
   removeMessageAction,
   updateMessagesAction,
 } from "@/store/redux/slices/room-slice"
-import { UserType } from "@/types/user"
+import { UserMinimalType, UserType } from "@/types/user"
 import { toast } from "sonner"
 import { RoomEnvironmentType } from "@/context/chat-room-context"
+import { AttachmentFileType } from "@/types/file"
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -29,6 +30,7 @@ export type MessagePayloadType = {
   text: string
   mentions?: MessageMentionType[]
   links?: MessageLinkType[]
+  user_id?: string
   replyTo?: ChatItemType
   mentioned_everyone?: boolean
 }
@@ -50,10 +52,14 @@ function messageCreator({
   room_id?: number
   reply_to?: ChatItemType | null
   is_direct?: boolean
-  user: UserType
+  user: {
+    avatar: null | AttachmentFileType
+    id: number
+    name: string
+    username: string
+  } | null
 }) {
   //Check the user id - TODO
-
   return {
     created_at: Math.floor(new Date().getTime() / 1000),
     deleted_at: null,
@@ -70,19 +76,26 @@ function messageCreator({
     updated_at: null,
     ...(mentioned_everyone ? { mentioned_everyone: true } : {}),
     user,
-    nonce_id: Math.floor(Math.random() * 100000) * new Date().getTime(),
+    nonce_id: new Date().getTime(),
   } as PartialBy<ChatItemType, "id">
 }
 
 //id is always room id
 export const useChatSocket = (
   id: number,
-  user: UserType,
+  user: UserMinimalType,
   env: RoomEnvironmentType
 ) => {
   const appDispatch = useAppDispatch()
 
   const isDirectEnv = env === RoomEnvironmentType.direct
+
+  let minimalUser = {
+    avatar: user.avatar,
+    id: user.id,
+    name: user.name,
+    username: user.username,
+  }
 
   let channel = `room-${id}`
   if (isDirectEnv) {
@@ -95,15 +108,43 @@ export const useChatSocket = (
       text: payload?.text ?? "",
       room_id: id,
       reply_to: payload?.replyTo ?? null,
-      user,
+      ...(payload?.replyTo ? { reply_id: payload?.replyTo?.id } : {}),
+      user: minimalUser,
       mentioned_everyone: payload?.mentioned_everyone ?? false,
       mentions: payload?.mentions ?? [],
       links: payload?.links ?? [],
     })
-
     tempMessage["channel"] = channel
     tempMessage["is_direct"] = env === RoomEnvironmentType.direct
+    appDispatch(
+      addToQueueAction({
+        message: tempMessage,
+      })
+    )
 
+    //Now message added to queue
+    socket?.emit("sendMessage", tempMessage, (message: ChatItemType) => {
+      console.log(message, "MESSAGE")
+    })
+  }
+
+  const sendFirstDirect = async ({
+    payload,
+  }: {
+    payload: MessagePayloadType
+  }) => {
+    let tempMessage = messageCreator({
+      text: payload?.text ?? "",
+      room_id: id,
+      reply_to: payload?.replyTo ?? null,
+      ...(payload?.replyTo ? { reply_id: payload?.replyTo?.id } : {}),
+      user: minimalUser,
+      mentioned_everyone: payload?.mentioned_everyone ?? false,
+      mentions: payload?.mentions ?? [],
+      links: payload?.links ?? [],
+    })
+    tempMessage["channel"] = channel
+    tempMessage["is_direct"] = env === RoomEnvironmentType.direct
     appDispatch(
       addToQueueAction({
         message: tempMessage,
