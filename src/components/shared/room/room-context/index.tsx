@@ -1,11 +1,20 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import { useApi } from "@/hooks/swr";
 import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
+import { ScheduleType } from "@/types/calendar";
+import { LeaderboardType } from "@/types/leaderboard";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
-import { UserMinimalType } from "@/types/user";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import { useRouter } from "next/navigation";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type LeftJoinType = { room_id: number; user: UserMinimalType };
 
@@ -33,6 +42,9 @@ const RoomCtx = createContext<{
   audioState: boolean;
   changePermissionState: (key: "video" | "audio", newValue: boolean) => void;
   joinRoom: () => void;
+  leaderboard: LeaderboardType[];
+  scheduled: ScheduleType[];
+  workpaceUsers: WorkspaceUserType[];
 }>({
   room: undefined,
   livekit_token: undefined,
@@ -46,6 +58,9 @@ const RoomCtx = createContext<{
   videoState: false,
   changePermissionState: (key, newValue) => {},
   joinRoom: () => {},
+  leaderboard: [],
+  scheduled: [],
+  workpaceUsers: [],
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -169,9 +184,44 @@ export default function RoomContext({
     [room]
   );
 
-  const [sidebar, setSidebar] = useState<ReactNode>();
+  const [sidebar, setSidebar] = useState<ReactNode>(<></>);
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
+
+  const { data: leaderboardData, mutate: leaderboardMutate } = useApi(
+    `/workspaces/${workspace_id}/leaderboard`
+  );
+
+  const [leaderboard, setLeaderboard] = useState<LeaderboardType[]>([]);
+  useEffect(() => {
+    if (leaderboardData !== undefined && leaderboardData?.data?.length > 0) {
+      const leaderboardUsers: LeaderboardType[] = leaderboardData.data;
+      setLeaderboard(leaderboardUsers);
+    }
+  }, [leaderboardData]);
+
+  // const { data: scheduledData } = useApi(`/schedules`);
+
+  // const [scheduled, setScheduled] = useState<ScheduleType[]>([]);
+  // useEffect(() => {
+  //   if (scheduledData !== undefined && scheduledData?.data?.length > 0) {
+  //     console.log("scheduledData", scheduledData);
+  //   }
+  // }, [leaderboardData]);
+
+  const { data: workspaceUsersData } = useApi(
+    `/workspaces/${workspace_id}/users`
+  );
+
+  const [workpaceUsers, setWorkspaceUsers] = useState<WorkspaceUserType[]>([]);
+  useEffect(() => {
+    if (
+      workspaceUsersData !== undefined &&
+      workspaceUsersData?.data?.length > 0
+    ) {
+      setWorkspaceUsers(workspaceUsersData.data);
+    }
+  }, [workspaceUsersData]);
 
   return (
     <RoomCtx.Provider
@@ -188,6 +238,9 @@ export default function RoomContext({
         changePermissionState,
         livekit_token: (livekit_token as string) ?? undefined,
         joinRoom: handleJoinRoom,
+        leaderboard,
+        scheduled: [],
+        workpaceUsers,
       }}
     >
       {children}

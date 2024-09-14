@@ -1,5 +1,6 @@
 import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import Avatars from "../avatars";
+import NotFound from "../layouts/not-found";
 
 type ParticipantType = WorkspaceUserType | UserMinimalType;
 

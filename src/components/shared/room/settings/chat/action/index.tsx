@@ -4,8 +4,12 @@ import React from "react";
 
 export default function SettingsChatAction() {
   return (
-    <CotopiaButton variant={"ghost"} endIcon={<ChevronDown />}>
-      Cotopia Lite
-    </CotopiaButton>
+    <div className='flex flex-row items-center'>
+      {["Rooms", "Direct"].map((item) => (
+        <CotopiaButton variant={"link"} key={item}>
+          {item}
+        </CotopiaButton>
+      ))}
+    </div>
   );
 }

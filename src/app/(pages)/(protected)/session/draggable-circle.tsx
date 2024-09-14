@@ -31,6 +31,7 @@ import VoiceAreaHearing from "./wrapper/voice-area-hearing";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { __VARS } from "@/app/const/vars";
 import { useRoomContext } from "@/components/shared/room/room-context";
+import ParticipantDetails from "@/components/shared/room/participant-detail";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -144,8 +145,6 @@ export const ParticipantTile = React.forwardRef<
   let clss =
     "relative z-[10] user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center";
 
-  if (!draggable) clss += ` cursor-default pointer-events-none`;
-
   const { user } = useProfile();
 
   const { room } = useRoomContext();
@@ -218,37 +217,47 @@ export const ParticipantTile = React.forwardRef<
 
   return (
     <CotopiaTooltip title={userFullName}>
-      <VoiceAreaHearing isDragging={isDragging} />
-      <div className={clss}>
-        <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
-          {showAvatar && (
-            <CotopiaAvatar
-              className='absolute top-0 left-0 w-full h-full z-[1]'
-              src={targetUser?.avatar?.url ?? ""}
-              title={userFullName?.[0] ?? livekitIdentity?.[0]}
-            />
-          )}
-          <div className={``}>
-            <div ref={ref} style={{ position: "relative" }} {...elementProps}>
-              <TrackRefContextIfNeeded trackRef={trackReference}>
-                <ParticipantContextIfNeeded
-                  participant={trackReference.participant}
-                >
-                  {children ?? <>{trackContent}</>}
-                </ParticipantContextIfNeeded>
-              </TrackRefContextIfNeeded>
+      <ParticipantDetails user={targetUser}>
+        {(open) => (
+          <>
+            <VoiceAreaHearing isDragging={isDragging} />
+            <div className={clss} onClick={open}>
+              <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
+                {showAvatar && (
+                  <CotopiaAvatar
+                    className='absolute top-0 left-0 w-full h-full z-[1]'
+                    src={targetUser?.avatar?.url ?? ""}
+                    title={userFullName?.[0] ?? livekitIdentity?.[0]}
+                  />
+                )}
+                <div className={``}>
+                  <div
+                    ref={ref}
+                    style={{ position: "relative" }}
+                    {...elementProps}
+                  >
+                    <TrackRefContextIfNeeded trackRef={trackReference}>
+                      <ParticipantContextIfNeeded
+                        participant={trackReference.participant}
+                      >
+                        {children ?? <>{trackContent}</>}
+                      </ParticipantContextIfNeeded>
+                    </TrackRefContextIfNeeded>
+                  </div>
+                </div>
+              </div>
+              <ActionsRight>
+                <MicButton
+                  trackRef={{
+                    participant: trackReference.participant,
+                    source: Track.Source.Microphone,
+                  }}
+                />
+              </ActionsRight>
             </div>
-          </div>
-        </div>
-        <ActionsRight>
-          <MicButton
-            trackRef={{
-              participant: trackReference.participant,
-              source: Track.Source.Microphone,
-            }}
-          />
-        </ActionsRight>
-      </div>
+          </>
+        )}
+      </ParticipantDetails>
     </CotopiaTooltip>
   );
 });

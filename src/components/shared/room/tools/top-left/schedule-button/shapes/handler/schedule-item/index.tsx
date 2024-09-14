@@ -1,9 +1,10 @@
 import { AvailabiltyType, ScheduleType } from "@/types/calendar";
 import Days from "./days";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
-import { Edit, Repeat } from "lucide-react";
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
+import { Repeat } from "lucide-react";
 import EditButton from "./edit";
+import ScheduleOverview from "@/components/shared/shedule-overview";
+import { useCallback, useState } from "react";
 
 type Props = {
   schedule: ScheduleType;
@@ -11,6 +12,13 @@ type Props = {
 };
 
 export default function ScheduleItem({ schedule, onDelete }: Props) {
+  const [selectedDay, setSelectedDay] = useState<number>();
+  const handleSelect = useCallback((item: number) => setSelectedDay(item), []);
+  const handleDeSelect = useCallback(
+    (item: number) => setSelectedDay(undefined),
+    []
+  );
+
   return (
     <div className='flex flex-col gap-y-4 items-start w-full p-4 border rounded-md shadow-md'>
       <div className='flex flex-row justify-between items-center w-full'>
@@ -28,7 +36,14 @@ export default function ScheduleItem({ schedule, onDelete }: Props) {
           )}
         </div>
       </div>
-      <Days schedule={schedule} />
+      <Days
+        schedule={schedule}
+        handleDeSelect={handleDeSelect}
+        handleSelect={handleSelect}
+      />
+      {selectedDay !== undefined && (
+        <ScheduleOverview item={schedule} selectedDay={selectedDay} />
+      )}
     </div>
   );
 }
