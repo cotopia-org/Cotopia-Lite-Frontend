@@ -19,6 +19,12 @@ export const sounds = {
   joined: new Howl({
     src: ["/assets/sounds-effects/joined.mp3"],
   }),
+  elseUserleft: new Howl({
+    src: ["/assets/sounds-effects/else-user-left.mp3"],
+  }),
+  elseUserJoin: new Howl({
+    src: ["/assets/sounds-effects/else-user-join.mp3"],
+  }),
 };
 
 export const playSoundEffect = (soundName: keyof typeof sounds) => {

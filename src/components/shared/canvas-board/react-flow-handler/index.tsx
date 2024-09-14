@@ -26,6 +26,7 @@ import { UserMinimalType } from "@/types/user";
 import NodesPreview from "../nodes-preview";
 import JailNode from "../nodes/jail-node";
 import { uniqueById } from "@/lib/utils";
+import { playSoundEffect } from "@/lib/sound-effects";
 // import { useCanvas } from "..";
 
 export const RF_BACKGROUND_ID = "bg-node-4214242141";
@@ -217,7 +218,7 @@ function ReactFlowHandler({ tracks }: Props) {
   );
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user } = data;
+    const { room_id: gotRoomId, user: targetUser } = data;
 
     console.log("test left event", data);
 
@@ -225,11 +226,13 @@ function ReactFlowHandler({ tracks }: Props) {
 
     if (gotRoomId !== +room_id) return;
 
-    setNodes((prev) => prev.filter((x) => x.id !== user.username));
+    setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
+
+    if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
   });
 
   useSocket("userJoinedToRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user } = data;
+    const { room_id: gotRoomId, user: targetUser } = data;
 
     if (room_id === undefined) return;
 
@@ -237,7 +240,9 @@ function ReactFlowHandler({ tracks }: Props) {
 
     console.log("test joined event", data);
 
-    setNodes((prev) => [...prev, ...addParticipants([user])]);
+    setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
+
+    if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
   });
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
