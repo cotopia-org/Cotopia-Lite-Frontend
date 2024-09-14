@@ -280,9 +280,9 @@ function ReactFlowHandler({ tracks }: Props) {
         <MiniMap />
         <Background />
       </ReactFlow>
-      {!!viewPort && (
+      {/* {!!viewPort && (
         <NodesPreview tracks={tracks} nodes={nodes} viewport={viewPort} />
-      )}
+      )} */}
     </>
   );
 }

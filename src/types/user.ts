@@ -9,6 +9,7 @@ export type UserType = {
   id: number;
   name: string;
   room_id: null | number;
+  workspace_id: null | number;
   screenshare_coordinates: null | string;
   screenshare_size: null | string;
   status: null | string;
