@@ -5,8 +5,7 @@ import EditButtonTool from "./edit-button";
 import ShareScreenButtonTool from "./share-screen-button";
 import VideoButtonTool from "./video-button";
 import VoiceButtonTool from "./voice-button";
-import MegaPhoneButtonTool from "./megaphone-button";
-import GridViewButtonTool from "./gridview-button";
+// import MegaPhoneButtonTool from "./megaphonew-button";
 
 export default function BottomMiddleTools() {
   return (
@@ -18,8 +17,8 @@ export default function BottomMiddleTools() {
       <BroadcastButtonTool />
       <VideoButtonTool />
       <VoiceButtonTool />
-      <MegaPhoneButtonTool />
-      <GridViewButtonTool />
+      {/* <MegaPhoneButtonTool /> */}
+      {/* <GridViewButtonTool /> */}
     </div>
   );
 }

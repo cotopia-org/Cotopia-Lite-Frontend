@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Background from "../backgrounds/background";
 import Toolbar from "../toolbar";
 import TopRightTools from "../tools/top-right";
 import BottomLeftTools from "../tools/bottom-left";
@@ -12,7 +11,6 @@ import LiveKitAudioManager from "../components/audio-manager";
 import TopLeftTools from "../tools/top-left";
 import InitRoom from "./init-room";
 import CanvasBoard from "../../canvas-board";
-
 export default function RoomInner() {
   const { sidebar, joinRoom } = useRoomContext();
 

@@ -282,7 +282,7 @@ function ReactFlowHandler({ tracks }: Props) {
           [4000, 1600],
         ]}
       >
-        <MiniMap />
+        {/* <MiniMap /> */}
         <Background />
       </ReactFlow>
       {/* {!!viewPort && (

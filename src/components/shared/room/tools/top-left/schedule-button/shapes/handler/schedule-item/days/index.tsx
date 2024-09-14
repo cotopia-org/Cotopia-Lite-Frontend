@@ -1,13 +1,23 @@
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { getDay } from "@/lib/utils";
 import { ScheduleType } from "@/types/calendar";
+import { Dot } from "lucide-react";
+import moment from "moment";
 import React from "react";
 
 type Props = {
   schedule: ScheduleType;
+  handleSelect: (day: number) => void;
+  handleDeSelect: (day: number) => void;
 };
 
-export default function Days({ schedule }: Props) {
+export default function Days({
+  schedule,
+  handleSelect,
+  handleDeSelect,
+}: Props) {
+  const today = moment();
+
   const days = Array.from(Array(7).keys());
 
   return (
@@ -17,10 +27,13 @@ export default function Days({ schedule }: Props) {
 
         const isSelected = !!currentDay;
 
-        let clss =
-          "flex flex-col items-center justify-center w-10 h-10 cursor-default";
+        const isToday = today.day() === day;
 
-        if (isSelected) clss += ` bg-black text-white cursor-pointer`;
+        let clss =
+          "relative flex flex-col items-center justify-center w-10 h-10 cursor-default rounded-md";
+
+        if (isSelected)
+          clss += ` border border-blue-500 text-blue-500 cursor-pointer`;
 
         let timeOfDayTooltip = "";
 
@@ -29,14 +42,31 @@ export default function Days({ schedule }: Props) {
             .map((x) => `${x.start} - ${x.end}`)
             .join(", ");
 
-        let content = <div className={clss}>{getDay(day)[0]}</div>;
+        let content = (
+          <div
+            className={clss}
+            onMouseEnter={() => handleSelect(day)}
+            onMouseLeave={() => handleDeSelect(day)}
+          >
+            <span>{getDay(day)[0]}</span>
+            {!!isToday && (
+              <span className='absolute text-blue-500 bottom-[-12px] left-[50%] translate-x-[-50%]'>
+                <Dot />
+              </span>
+            )}
+          </div>
+        );
 
-        return isSelected ? (
-          <CotopiaTooltip key={day} title={timeOfDayTooltip}>
-            {content}
-          </CotopiaTooltip>
-        ) : (
-          content
+        return (
+          <>
+            {isSelected ? (
+              <CotopiaTooltip key={day} title={timeOfDayTooltip}>
+                {content}
+              </CotopiaTooltip>
+            ) : (
+              content
+            )}
+          </>
         );
       })}
     </div>
