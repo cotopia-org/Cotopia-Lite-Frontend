@@ -12,5 +12,5 @@ export const metadata = {
 };
 
 export default function WorkspacePage({ params: { slug } }: Props) {
-  return <Wrapper />;
+  return <Wrapper workspace_id={slug} />;
 }
