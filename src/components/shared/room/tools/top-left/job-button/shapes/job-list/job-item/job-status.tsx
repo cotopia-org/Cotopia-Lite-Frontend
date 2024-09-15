@@ -1,34 +1,34 @@
-import { JobStatuType } from "@/types/job"
-import type { StatusBoxVariant } from "@/components/shared/status-box"
-import StatusBox from "@/components/shared/status-box"
+import { JobStatuType } from "@/types/job";
+import type { StatusBoxVariant } from "@/components/shared/status-box";
+import StatusBox from "@/components/shared/status-box";
 interface Props {
-  status: JobStatuType
+  status: JobStatuType;
 }
 
 const JobStatus = ({ status }: Props) => {
-  let statusVariant: StatusBoxVariant = "default"
+  let statusVariant: StatusBoxVariant = "default";
 
-  let label = ""
+  let label = "";
 
   switch (status) {
     case "in_progress":
-      label = "in progress"
-      statusVariant = "info"
-      break
+      label = "In progress";
+      statusVariant = "info";
+      break;
     case "paused":
-      label = "Paused"
-      statusVariant = "warning"
-      break
+      label = "Paused";
+      statusVariant = "warning";
+      break;
     case "completed":
-      label = "Completed"
-      statusVariant = "success"
-      break
+      label = "Completed";
+      statusVariant = "success";
+      break;
 
     default:
-      break
+      break;
   }
 
-  return <StatusBox variant={statusVariant} label={label} />
-}
+  return <StatusBox variant={statusVariant} label={label} />;
+};
 
-export default JobStatus
+export default JobStatus;
