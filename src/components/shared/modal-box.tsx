@@ -5,8 +5,14 @@ type Props = {
   trigger: (open: () => void) => ReactNode;
   children?: (open: () => void, close: () => void) => ReactNode;
   className?: string;
+  hasClose?: boolean;
 };
-export default function ModalBox({ trigger, children, className }: Props) {
+export default function ModalBox({
+  trigger,
+  children,
+  className,
+  hasClose = true,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => {
     setIsOpen(false);
@@ -15,10 +21,15 @@ export default function ModalBox({ trigger, children, className }: Props) {
   const handleOpen = () => {
     setIsOpen(true);
   };
+
+  let finalClassName = className ?? "";
+
+  if (!hasClose) finalClassName += ` [&_.right-4]:hidden`;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger(handleOpen)}</DialogTrigger>
-      <DialogContent className={className ?? ""}>
+      <DialogContent className={finalClassName ?? ""}>
         {children ? children(handleOpen, handleClose) : null}
       </DialogContent>
     </Dialog>
