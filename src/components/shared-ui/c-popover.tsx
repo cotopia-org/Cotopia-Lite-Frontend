@@ -6,6 +6,7 @@ type Props = {
   children: ReactNode
   open?: boolean
   contentClassName?: string
+  triggerClassName?: string
   align?: "center" | "end" | "start"
 }
 export default function CotopiaPopover({
@@ -13,11 +14,14 @@ export default function CotopiaPopover({
   children,
   open,
   contentClassName,
+  triggerClassName = "",
   align = "end",
 }: Props) {
   return (
     <Popover open={open}>
-      <PopoverTrigger>{trigger}</PopoverTrigger>
+      <PopoverTrigger className={`popover-trigger ${triggerClassName}`}>
+        {trigger}
+      </PopoverTrigger>
       <PopoverContent align={align} className={contentClassName ?? ""}>
         {children}
       </PopoverContent>

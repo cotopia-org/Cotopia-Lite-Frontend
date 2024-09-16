@@ -8,6 +8,7 @@ type Props = {
   onChange?: (date: Date) => void
   defaultDate?: Date
   format?: string
+  className?: string
   inputProps?: CotopiaInputProps
 }
 
@@ -15,6 +16,7 @@ export default function CDateInput({
   onChange,
   defaultDate,
   format = "YYYY-MM-DD",
+  className = "",
   inputProps,
 }: Props) {
   const [date, setDate] = useState<Date>()
@@ -34,6 +36,7 @@ export default function CDateInput({
 
   return (
     <CotopiaPopover
+      triggerClassName={className}
       trigger={<CotopiaInput {...inputProps} value={formatedDate} />}
     >
       <Calendar selected={date} onDayClick={handleChange} />
