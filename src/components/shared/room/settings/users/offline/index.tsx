@@ -4,6 +4,7 @@ import { useRoomContext } from "../../../room-context";
 import Participants from "@/components/shared/participants";
 import moment from "moment";
 import { WorkspaceUserType } from "@/types/user";
+import ParticipantsWithPopover from "@/components/shared/participants/with-popover";
 
 export default function OfflineUsers() {
   const { workpaceUsers, leaderboard } = useRoomContext();
@@ -19,7 +20,7 @@ export default function OfflineUsers() {
 
   return (
     <TitleEl title={`Offline (${allOfflineParticipants.length})`}>
-      <Participants
+      <ParticipantsWithPopover
         participants={allOfflineParticipants.map((x) => x)}
         customTitle={(x) => {
           const fromNow = moment((x as WorkspaceUserType).last_login).fromNow();

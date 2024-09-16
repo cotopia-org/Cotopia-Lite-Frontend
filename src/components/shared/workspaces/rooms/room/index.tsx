@@ -2,7 +2,10 @@ import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import CotopiaButton from "@/components/shared-ui/c-button";
 import Avatars from "@/components/shared/avatars";
 import Participants from "@/components/shared/participants";
+import ParticipantsWithPopover from "@/components/shared/participants/with-popover";
+import ParticipantDetails from "@/components/shared/room/participant-detail";
 import { WorkspaceRoomShortType } from "@/types/room";
+import { UserMinimalType } from "@/types/user";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -44,7 +47,7 @@ export default function WorkspaceRoom({
       >
         {room.title}
       </CotopiaButton>
-      <Participants participants={participants} />
+      <ParticipantsWithPopover participants={participants} />
     </div>
   );
 }
