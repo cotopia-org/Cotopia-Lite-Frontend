@@ -8,7 +8,7 @@ import { useCallback, useState } from "react";
 
 type Props = {
   schedule: ScheduleType;
-  onDelete: () => void;
+  onDelete?: () => void;
 };
 
 export default function ScheduleItem({ schedule, onDelete }: Props) {

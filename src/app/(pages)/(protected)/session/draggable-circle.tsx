@@ -218,45 +218,43 @@ export const ParticipantTile = React.forwardRef<
   return (
     <CotopiaTooltip title={userFullName}>
       <ParticipantDetails user={targetUser}>
-        {(open) => (
-          <>
-            <VoiceAreaHearing isDragging={isDragging} />
-            <div className={clss} onClick={open}>
-              <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
-                {showAvatar && (
-                  <CotopiaAvatar
-                    className='absolute top-0 left-0 w-full h-full z-[1]'
-                    src={targetUser?.avatar?.url ?? ""}
-                    title={userFullName?.[0] ?? livekitIdentity?.[0]}
-                  />
-                )}
-                <div className={``}>
-                  <div
-                    ref={ref}
-                    style={{ position: "relative" }}
-                    {...elementProps}
-                  >
-                    <TrackRefContextIfNeeded trackRef={trackReference}>
-                      <ParticipantContextIfNeeded
-                        participant={trackReference.participant}
-                      >
-                        {children ?? <>{trackContent}</>}
-                      </ParticipantContextIfNeeded>
-                    </TrackRefContextIfNeeded>
-                  </div>
+        <>
+          <VoiceAreaHearing isDragging={isDragging} />
+          <div className={clss}>
+            <div className='relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center'>
+              {showAvatar && (
+                <CotopiaAvatar
+                  className='absolute top-0 left-0 w-full h-full z-[1]'
+                  src={targetUser?.avatar?.url ?? ""}
+                  title={userFullName?.[0] ?? livekitIdentity?.[0]}
+                />
+              )}
+              <div className={``}>
+                <div
+                  ref={ref}
+                  style={{ position: "relative" }}
+                  {...elementProps}
+                >
+                  <TrackRefContextIfNeeded trackRef={trackReference}>
+                    <ParticipantContextIfNeeded
+                      participant={trackReference.participant}
+                    >
+                      {children ?? <>{trackContent}</>}
+                    </ParticipantContextIfNeeded>
+                  </TrackRefContextIfNeeded>
                 </div>
               </div>
-              <ActionsRight>
-                <MicButton
-                  trackRef={{
-                    participant: trackReference.participant,
-                    source: Track.Source.Microphone,
-                  }}
-                />
-              </ActionsRight>
             </div>
-          </>
-        )}
+            <ActionsRight>
+              <MicButton
+                trackRef={{
+                  participant: trackReference.participant,
+                  source: Track.Source.Microphone,
+                }}
+              />
+            </ActionsRight>
+          </div>
+        </>
       </ParticipantDetails>
     </CotopiaTooltip>
   );

@@ -1,22 +1,36 @@
 import { UserMinimalType } from "@/types/user";
+import UserCover from "./cover";
+import SendingDirect from "./sending-direct";
+import { createContext, useContext } from "react";
+import UserDate from "./user-date";
 
 type Props = {
   user: UserMinimalType;
 };
 
+const UserDetailContext = createContext<{ user?: UserMinimalType }>({
+  user: undefined,
+});
+export const useUserDetail = () => useContext(UserDetailContext);
+
 export default function Details({ user }: Props) {
   return (
-    <div className='flex h-screen'>
-      {/* Left Sidebar */}
-      <aside className='w-64 bg-black/10 h-full overflow-y-auto'>
-        Left Sidebar
-      </aside>
-
-      {/* Right Content Area */}
-      <main className='flex-1 bg-gray-100 p-8 overflow-auto'>
-        {/* Main content */}
-        <h1 className='text-2xl font-semibold mb-4'>User, {user.username}</h1>
-      </main>
-    </div>
+    <UserDetailContext.Provider value={{ user }}>
+      <div className='w-full max-w-full flex flex-col select-none'>
+        <UserCover />
+        <div className='p-4 pt-0 flex flex-col gap-y-2'>
+          <div className='flex flex-col'>
+            <strong data-testid='username-detail-card' className='capitalize'>
+              {user.name}
+            </strong>
+            <div className='flex flex-row items-center justify-between'>
+              <span className='text-xs font-light'>{user.username}</span>
+              <UserDate />
+            </div>
+          </div>
+          <SendingDirect />
+        </div>
+      </div>
+    </UserDetailContext.Provider>
   );
 }

@@ -1,19 +1,19 @@
 import { UserMinimalType } from "@/types/user";
-import { FullModalBox } from "../../modal-box";
 import { ReactNode } from "react";
+import CotopiaPopover from "@/components/shared-ui/c-popover";
 import Details from "./details";
 
 type Props = {
   user: UserMinimalType;
-  children: (open: () => void) => ReactNode;
+  children: ReactNode;
 };
 export default function ParticipantDetails({ user, children }: Props) {
   return (
-    <FullModalBox
+    <CotopiaPopover
       trigger={children}
-      className='max-h-screen !rounded-none !p-0'
+      contentClassName='p-0 overflow-hidden border-0 m-0 shadow-md'
     >
-      {(open, close) => <Details user={user} />}
-    </FullModalBox>
+      <Details user={user} />
+    </CotopiaPopover>
   );
 }

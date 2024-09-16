@@ -1,14 +1,19 @@
 import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import Avatars from "../avatars";
-import NotFound from "../layouts/not-found";
-
+import { ReactNode } from "react";
 type ParticipantType = WorkspaceUserType | UserMinimalType;
 
-type Props = {
+export type ParticipantsProps = {
   participants: ParticipantType[];
   customTitle?: (user: ParticipantType) => string;
+  render?: (index: number, content: ReactNode) => ReactNode;
 };
-export default function Participants({ participants, customTitle }: Props) {
+
+export default function Participants({
+  participants,
+  customTitle,
+  render,
+}: ParticipantsProps) {
   if (participants.length === 0) return;
 
   return (
@@ -20,7 +25,9 @@ export default function Participants({ participants, customTitle }: Props) {
             title: x?.name ?? "",
             toolTipTitle:
               customTitle !== undefined ? customTitle(x) : undefined,
+            render,
           }))}
+          render={render}
         />
       </div>
     )

@@ -10,7 +10,7 @@ import { useMemo } from "react";
 
 type Props = {
   schedule: ScheduleType;
-  onDelete: () => void;
+  onDelete?: () => void;
 };
 export default function EditButton({ schedule, onDelete }: Props) {
   const defaultValue = useMemo(() => {
@@ -54,7 +54,7 @@ export default function EditButton({ schedule, onDelete }: Props) {
           defaultId={schedule.id}
           defaultValue={defaultValue}
           onDelete={() => {
-            onDelete();
+            if (onDelete) onDelete();
             close();
           }}
         />
