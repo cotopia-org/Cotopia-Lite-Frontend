@@ -5,5 +5,5 @@ type Props = {
 };
 
 export default function ToolbarTopRight({ children }: Props) {
-  return <div className='absolute top-4 right-4 z-10'>{children}</div>;
+  return <div className='fixed top-4 right-4 z-10'>{children}</div>;
 }

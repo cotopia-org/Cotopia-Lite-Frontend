@@ -26,14 +26,6 @@ export default function RoomInner() {
       <InitRoom />
       <div id='main-room-holder' className={mainRoomHolderClss}>
         <div className='w-full h-full relative'>
-          {/* <Background /> */}
-          <Toolbar
-            topLeft={<TopLeftTools />}
-            topRight={<TopRightTools />}
-            bottomLeft={<BottomLeftTools />}
-            bottomMiddle={<BottomMiddleTools />}
-            bottomRight={<BottomRightTools />}
-          />
           <CanvasBoard />
         </div>
         {!!sidebar && (

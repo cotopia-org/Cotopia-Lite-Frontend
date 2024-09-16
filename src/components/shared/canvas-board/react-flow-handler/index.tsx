@@ -23,10 +23,15 @@ import { __VARS } from "@/app/const/vars";
 import { Track } from "livekit-client";
 import ShareScreen from "../nodes/share-screen";
 import { UserMinimalType } from "@/types/user";
-import NodesPreview from "../nodes-preview";
 import JailNode from "../nodes/jail-node";
 import { uniqueById } from "@/lib/utils";
 import { playSoundEffect } from "@/lib/sound-effects";
+import Toolbar from "../../room/toolbar";
+import TopLeftTools from "../../room/tools/top-left";
+import TopRightTools from "../../room/tools/top-right";
+import BottomLeftTools from "../../room/tools/bottom-left";
+import BottomMiddleTools from "../../room/tools/bottom-middle";
+import BottomRightTools from "../../room/tools/bottom-right";
 // import { useCanvas } from "..";
 
 export const RF_BACKGROUND_ID = "bg-node-4214242141";
@@ -284,6 +289,13 @@ function ReactFlowHandler({ tracks }: Props) {
       >
         {/* <MiniMap /> */}
         <Background />
+        <Toolbar
+          topLeft={<TopLeftTools />}
+          topRight={<TopRightTools />}
+          bottomLeft={<BottomLeftTools />}
+          bottomMiddle={<BottomMiddleTools />}
+          bottomRight={<BottomRightTools />}
+        />
       </ReactFlow>
       {/* {!!viewPort && (
         <NodesPreview tracks={tracks} nodes={nodes} viewport={viewPort} />
