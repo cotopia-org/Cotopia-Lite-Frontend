@@ -6,10 +6,16 @@ type Props = {
   title: string;
   children: ReactNode;
   onClose?: () => void;
+  className?: string;
 };
-export default function BoxHolder({ title, children, onClose }: Props) {
+export default function BoxHolder({
+  title,
+  children,
+  onClose,
+  className,
+}: Props) {
   return (
-    <div className='flex flex-col gap-y-2'>
+    <div className={`flex flex-col gap-y-2 ${className ?? ""}`}>
       <div className='flex flex-row items-center justify-between'>
         <strong>{title}</strong>
         {!!onClose && (

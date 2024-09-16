@@ -1,5 +1,4 @@
 import { AttachmentFileType } from "./file";
-import { JobType } from "./jon";
 import { WorkspaceRoomType } from "./room";
 import { WorkspaceType } from "./workspace";
 

@@ -9,9 +9,10 @@ import { useCallback, useState } from "react";
 type Props = {
   schedule: ScheduleType;
   onDelete?: () => void;
+  justView?: boolean;
 };
 
-export default function ScheduleItem({ schedule, onDelete }: Props) {
+export default function ScheduleItem({ schedule, onDelete, justView }: Props) {
   const [selectedDay, setSelectedDay] = useState<number>();
   const handleSelect = useCallback((item: number) => setSelectedDay(item), []);
   const handleDeSelect = useCallback(
@@ -28,7 +29,9 @@ export default function ScheduleItem({ schedule, onDelete }: Props) {
           })`}
         </strong>
         <div className='flex flex-row items-center gap-x-2'>
-          <EditButton schedule={schedule} onDelete={onDelete} />
+          {!!!justView && (
+            <EditButton schedule={schedule} onDelete={onDelete} />
+          )}
           {!!schedule.is_recurrence && (
             <CotopiaTooltip title='Recurrence'>
               <Repeat size={12} className='text-black/60' />
@@ -41,9 +44,11 @@ export default function ScheduleItem({ schedule, onDelete }: Props) {
         handleDeSelect={handleDeSelect}
         handleSelect={handleSelect}
       />
-      {selectedDay !== undefined && (
-        <ScheduleOverview item={schedule} selectedDay={selectedDay} />
-      )}
+      <div className='min-h-[24px]'>
+        {selectedDay !== undefined && (
+          <ScheduleOverview item={schedule} selectedDay={selectedDay} />
+        )}
+      </div>
     </div>
   );
 }

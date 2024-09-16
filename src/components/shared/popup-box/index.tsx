@@ -73,11 +73,11 @@ export default function PopupBox({ trigger, children, className }: Props) {
           {
             top: (triggerPosition?.top ?? 0) + (triggerPosition?.height ?? 0),
             left: triggerPosition?.left,
-            zIndex: 100,
+            zIndex: 21,
           } as {
             top: number;
             left: number;
-            zIndex: 100;
+            zIndex: 21;
           },
           handleOpen,
           handleClose

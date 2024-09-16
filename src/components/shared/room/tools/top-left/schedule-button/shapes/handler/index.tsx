@@ -7,14 +7,16 @@ import Schedules from "@/components/shared/schedules";
 
 export default function ShapesHandler() {
   const { data, isLoading, mutate } =
-    useApi<FetchDataType<ScheduleType[]>>(`/users/schedules`);
+    useApi<FetchDataType<ScheduleType[]>>(`/users/me/schedules`);
 
   const schedules = data !== undefined ? data?.data : [];
 
   let content = null;
 
   if (schedules.length > 0)
-    content = <Schedules items={schedules} onDelete={mutate} />;
+    content = (
+      <Schedules justView={false} items={schedules} onDelete={mutate} />
+    );
 
   if (isLoading || data === undefined) return <FullLoading />;
 

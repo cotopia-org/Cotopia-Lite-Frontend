@@ -5,8 +5,8 @@ import React from "react";
 import { useUserDetail } from "..";
 import { capitalizeWords } from "@/lib/utils";
 import ModalBox from "@/components/shared/modal-box";
-import Schedules from "@/components/shared/schedules";
 import BoxHolder from "@/components/shared/box-holder";
+import SchedulesList from "./list";
 
 export default function UserSchedules() {
   const { user } = useUserDetail();
@@ -22,7 +22,6 @@ export default function UserSchedules() {
   return (
     <ModalBox
       hasClose={false}
-      className='!z-[10000]'
       trigger={(open) => (
         <CotopiaTooltip title={boxLabel}>
           <CotopiaIconButton
@@ -34,11 +33,12 @@ export default function UserSchedules() {
           </CotopiaIconButton>
         </CotopiaTooltip>
       )}
+      className='w-[424px]'
     >
       {(open, close) => {
         return (
           <BoxHolder title={boxLabel} onClose={close}>
-            <Schedules items={[]} />
+            <SchedulesList />
           </BoxHolder>
         );
       }}

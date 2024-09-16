@@ -5,8 +5,9 @@ import NotFound from "../layouts/not-found";
 type Props = {
   items: ScheduleType[];
   onDelete?: () => void;
+  justView?: boolean;
 };
-export default function Schedules({ items, onDelete }: Props) {
+export default function Schedules({ items, onDelete, justView = true }: Props) {
   if (items.length === 0)
     return (
       <NotFound
@@ -18,7 +19,12 @@ export default function Schedules({ items, onDelete }: Props) {
   return (
     <div className='mb-6 flex flex-col gap-y-2'>
       {items.map((x) => (
-        <ScheduleItem schedule={x} key={x.id} onDelete={onDelete} />
+        <ScheduleItem
+          schedule={x}
+          key={x.id}
+          onDelete={onDelete}
+          justView={justView}
+        />
       ))}
     </div>
   );
