@@ -16,7 +16,11 @@ const TimeOverShower = ({ date }: Props) => {
   //calc date  difference in hours
   const hoursDiff = targetDate.diff(moment(), "hours");
 
-  let content = <span className={clss}>{`End at ${daysDiff} days later`}</span>;
+  let content = (
+    <span className={clss}>{`Ends in ${daysDiff} day${
+      daysDiff > 1 ? "s" : ""
+    } later`}</span>
+  );
 
   if (daysDiff < TARGET_DAY_CHANGE) {
     content = (
