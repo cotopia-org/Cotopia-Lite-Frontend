@@ -38,7 +38,6 @@ export default function ChatWrapper({ children }: Props) {
   })
 
   useSocket("messageSeen", (data) => {
-    console.log(data, "MESSAGE SEEN")
     const message = data.message
     let convertedMessage = { ...message, seen: true }
     appDispatch(
