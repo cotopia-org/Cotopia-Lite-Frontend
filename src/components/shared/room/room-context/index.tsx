@@ -1,20 +1,20 @@
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import {
+  useProfile,
+  useSocket,
+} from "@/app/(pages)/(protected)/protected-wrapper";
+import { _BUS } from "@/app/const/bus";
 import { useApi } from "@/hooks/swr";
 import useQueryParams from "@/hooks/use-query-params";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
 import { ScheduleType } from "@/types/calendar";
+import { JobType } from "@/types/job";
 import { LeaderboardType } from "@/types/leaderboard";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import { useRouter } from "next/navigation";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
+import { dispatch } from "use-bus";
 
 type LeftJoinType = { room_id: number; user: UserMinimalType };
 
@@ -45,6 +45,7 @@ const RoomCtx = createContext<{
   leaderboard: LeaderboardType[];
   scheduled: ScheduleType[];
   workpaceUsers: WorkspaceUserType[];
+  workspaceJobs: JobType[];
 }>({
   room: undefined,
   livekit_token: undefined,
@@ -61,6 +62,7 @@ const RoomCtx = createContext<{
   leaderboard: [],
   scheduled: [],
   workpaceUsers: [],
+  workspaceJobs: [],
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -130,6 +132,8 @@ export default function RoomContext({
     username: string,
     position: { x: number; y: number }
   ) => {
+    if (!socket) return;
+
     if (room === undefined) return;
 
     if (onRoomUpdated === undefined) return;
@@ -206,6 +210,9 @@ export default function RoomContext({
   const workpaceUsers =
     workspaceUsersData !== undefined ? workspaceUsersData?.data : [];
 
+  const { data: workpaceJobs } = useApi(`/workspaces/${workspace_id}/jobs`);
+  const workpaceJobItems = workpaceJobs !== undefined ? workpaceJobs?.data : [];
+
   return (
     <RoomCtx.Provider
       value={{
@@ -224,6 +231,7 @@ export default function RoomContext({
         leaderboard: leaderboardUsers,
         scheduled: schedulesItems,
         workpaceUsers,
+        workspaceJobs: workpaceJobItems,
       }}
     >
       {children}

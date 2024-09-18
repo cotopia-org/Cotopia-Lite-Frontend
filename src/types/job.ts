@@ -1,3 +1,5 @@
+import { UserMinimalType } from "./user";
+
 export type JobStatuType = "in_progress" | "paused" | "completed";
 
 export type JobType = {
@@ -9,4 +11,5 @@ export type JobType = {
   title: string;
   updated_at: string;
   workspace_id: number;
+  members: UserMinimalType[];
 };
