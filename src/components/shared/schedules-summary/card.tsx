@@ -1,6 +1,4 @@
 import { AvailabiltyType, ScheduleType } from "@/types/calendar";
-import Participants from "../participants";
-import ScheduleOverview from "../shedule-overview";
 import moment from "moment";
 import { useMemo } from "react";
 import UserOverview from "../user-overview";
