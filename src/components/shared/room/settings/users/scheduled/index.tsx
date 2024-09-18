@@ -17,17 +17,6 @@ export default function ScheduledUsers() {
   return (
     <TitleEl title={`Scheduled (${scheduledUsers})`}>
       <SchedulesSummary schedules={finalSchedules} />
-      {/* <Participants
-        participants={scheduled.map((s) => s.user)}
-        customTitle={(x) => {
-          const userSchedule = scheduled.find((s) => s.user.id === x.id);
-          const days = userSchedule?.days.length ?? 0;
-          let title = `${x.name}`;
-          if (userSchedule && days)
-            title = `${x.name} (in ${days} ${days < 2 ? "day" : "days"})`;
-          return title;
-        }}
-      /> */}
     </TitleEl>
   );
 }
