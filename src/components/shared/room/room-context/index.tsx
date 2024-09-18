@@ -188,45 +188,23 @@ export default function RoomContext({
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
 
-  const { data: leaderboardData, mutate: leaderboardMutate } = useApi(
+  const { data: leaderboardData } = useApi(
     `/workspaces/${workspace_id}/leaderboard`
   );
-
-  const [leaderboard, setLeaderboard] = useState<LeaderboardType[]>([]);
-  useEffect(() => {
-    if (leaderboardData !== undefined && leaderboardData?.data?.length > 0) {
-      const leaderboardUsers: LeaderboardType[] = leaderboardData.data;
-      setLeaderboard(leaderboardUsers);
-    }
-  }, [leaderboardData]);
+  const leaderboardUsers: LeaderboardType[] =
+    leaderboardData !== undefined ? leaderboardData.data : [];
 
   const { data: schedulesData } = useApi(
     `/workspaces/${workspace_id}/schedules`
   );
-
-  const [schedules, setSchedules] = useState<ScheduleType[]>([]);
-
-  useEffect(() => {
-    if (schedulesData !== undefined && schedulesData?.data?.length > 0) {
-      const schedulesItems: ScheduleType[] = schedulesData?.data;
-      setSchedules(schedulesItems);
-    }
-  }, [schedulesData]);
+  const schedulesItems: ScheduleType[] =
+    schedulesData !== undefined ? schedulesData?.data : [];
 
   const { data: workspaceUsersData } = useApi(
     `/workspaces/${workspace_id}/users`
   );
-
-  const [workpaceUsers, setWorkspaceUsers] = useState<WorkspaceUserType[]>([]);
-
-  useEffect(() => {
-    if (
-      workspaceUsersData !== undefined &&
-      workspaceUsersData?.data?.length > 0
-    ) {
-      setWorkspaceUsers(workspaceUsersData.data);
-    }
-  }, [workspaceUsersData]);
+  const workpaceUsers =
+    workspaceUsersData !== undefined ? workspaceUsersData?.data : [];
 
   return (
     <RoomCtx.Provider
@@ -243,8 +221,8 @@ export default function RoomContext({
         changePermissionState,
         livekit_token: (livekit_token as string) ?? undefined,
         joinRoom: handleJoinRoom,
-        leaderboard,
-        scheduled: schedules,
+        leaderboard: leaderboardUsers,
+        scheduled: schedulesItems,
         workpaceUsers,
       }}
     >
