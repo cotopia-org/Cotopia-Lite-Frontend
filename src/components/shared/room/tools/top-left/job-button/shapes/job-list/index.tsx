@@ -14,7 +14,7 @@ const JobList = (props: Props) => {
   const { workspace_id } = useRoomContext();
 
   const { data, isLoading, mutate } = useApi<FetchDataType<any>>(
-    urlWithQueryParams(`/users/jobs`, { workspace_id }),
+    urlWithQueryParams(`/users/me/jobs`, { workspace_id }),
     undefined,
     { isPaused: () => workspace_id === undefined }
   );
