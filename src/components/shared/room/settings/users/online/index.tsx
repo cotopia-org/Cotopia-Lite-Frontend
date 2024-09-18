@@ -2,6 +2,7 @@ import TitleEl from "@/components/shared/title-el"
 import React from "react"
 import { useRoomContext } from "../../../room-context"
 import Participants from "@/components/shared/participants"
+import ParticipantsWithPopover from "@/components/shared/participants/with-popover"
 
 export default function OnlineUsers() {
   const { leaderboard, workspace_id } = useRoomContext()
@@ -17,7 +18,7 @@ export default function OnlineUsers() {
 
   return (
     <TitleEl title={`Online (${onlineUsersCount})`}>
-      <Participants participants={onlineUsers.map((x) => x.user)} />
+      <ParticipantsWithPopover participants={onlineUsers.map((x) => x.user)} />
     </TitleEl>
   )
 }

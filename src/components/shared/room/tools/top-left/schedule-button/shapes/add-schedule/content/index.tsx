@@ -49,7 +49,6 @@ export default function AddScheduleContent({
 
   const isEdit = defaultValue !== undefined && defaultId !== undefined
 
-  console.log(defaultValue, "SCHEDULEDEF")
   const [recurrenceDates, setRecurrenceDates] = useState<{
     start_at?: string
     ends_at?: string
