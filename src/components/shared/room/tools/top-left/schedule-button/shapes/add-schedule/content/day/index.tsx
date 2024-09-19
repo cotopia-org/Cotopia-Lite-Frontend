@@ -29,7 +29,7 @@ function DayRemove({ onClick }: { onClick: () => void }) {
   );
 }
 
-export const initSheduleTimes = { from: "06:00", to: "23:30" };
+export const initSheduleTimes = { from: "09:00", to: "16:00" };
 
 export default function Day({ day, onChange, index }: Props) {
   const [value, setValue] = useState<ScheduleDayType>({

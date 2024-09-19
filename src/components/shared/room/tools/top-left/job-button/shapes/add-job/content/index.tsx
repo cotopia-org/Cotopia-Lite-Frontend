@@ -28,6 +28,7 @@ const dropdownItems = [
   { title: "In Progress", value: "in_progress" },
   { title: "Completed", value: "completed" },
   { title: "Paused", value: "paused" },
+  { title: "Started", value: "started" },
 ];
 
 const ManageJobContent = ({

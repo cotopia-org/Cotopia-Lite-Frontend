@@ -9,12 +9,14 @@ type Props = {
   schedule: ScheduleType;
   handleSelect: (day: number) => void;
   handleDeSelect: (day: number) => void;
+  selectedDay?: number;
 };
 
 export default function Days({
   schedule,
   handleSelect,
   handleDeSelect,
+  selectedDay,
 }: Props) {
   const today = moment();
 
@@ -33,7 +35,8 @@ export default function Days({
           "relative flex flex-col items-center justify-center w-10 h-10 cursor-default rounded-md";
 
         if (isSelected)
-          clss += ` border border-blue-500 text-blue-500 cursor-pointer`;
+          clss += ` border border-blue-500 text-blue-500 cursor-pointer bg-white hover:bg-blue-50`;
+        else clss += ` grayscale opacity-[.4]`;
 
         let timeOfDayTooltip = "";
 
@@ -41,6 +44,10 @@ export default function Days({
           timeOfDayTooltip = currentDay.times
             .map((x) => `${x.start} - ${x.end}`)
             .join(", ");
+
+        if (isSelected && isToday && selectedDay === day) {
+          clss += ` bg-blue-50`;
+        }
 
         let content = (
           <div

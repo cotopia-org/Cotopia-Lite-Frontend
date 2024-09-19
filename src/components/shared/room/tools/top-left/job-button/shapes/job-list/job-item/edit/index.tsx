@@ -4,7 +4,6 @@ import { FullModalBox } from "@/components/shared/modal-box";
 import { Edit } from "lucide-react";
 import { JobType } from "@/types/job";
 import ManageJobContent from "../../../add-job/content";
-import moment from "moment";
 
 type Props = {
   job: JobType;
@@ -19,7 +18,7 @@ export default function EditJobButton({ job, fetchAgain }: Props) {
             onClick={open}
             className='text-black/60 hover:text-black w-8 h-8'
           >
-            <Edit size={12} />
+            <Edit size={16} />
           </CotopiaIconButton>
         </CotopiaTooltip>
       )}

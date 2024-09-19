@@ -1,20 +1,21 @@
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import { useApi } from "@/hooks/swr";
 import useQueryParams from "@/hooks/use-query-params";
+import useSetting from "@/hooks/use-setting";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { urlWithQueryParams } from "@/lib/utils";
+import { uniqueById } from "@/lib/utils";
 import { ScheduleType } from "@/types/calendar";
 import { JobType } from "@/types/job";
 import { LeaderboardType } from "@/types/leaderboard";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
-import { UserMinimalType, WorkspaceUserType } from "@/types/user";
+import { UserMinimalType, UserType, WorkspaceUserType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import React, {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -48,6 +49,9 @@ const RoomCtx = createContext<{
   scheduled: ScheduleType[];
   workpaceUsers: WorkspaceUserType[];
   workspaceJobs: JobType[];
+  workingUsers: UserType[];
+  onlineUsers: UserMinimalType[];
+  usersHaveJobs: UserMinimalType[];
 }>({
   room: undefined,
   livekit_token: undefined,
@@ -65,6 +69,9 @@ const RoomCtx = createContext<{
   scheduled: [],
   workpaceUsers: [],
   workspaceJobs: [],
+  workingUsers: [],
+  onlineUsers: [],
+  usersHaveJobs: [],
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -76,6 +83,8 @@ export default function RoomContext({
   onRoomUpdated,
   workspace_id,
 }: Props) {
+  const settings = useSetting();
+
   const { query } = useQueryParams();
   const livekit_token = query?.token ?? undefined;
 
@@ -109,7 +118,7 @@ export default function RoomContext({
           .then((res) => {
             const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
-            playSoundEffect("joined");
+            if (settings.sounds.userJoinLeft) playSoundEffect("joined");
 
             if (livekitToken) {
               router.push(
@@ -211,7 +220,46 @@ export default function RoomContext({
     workspaceUsersData !== undefined ? workspaceUsersData?.data : [];
 
   const { data: workpaceJobs } = useApi(`/workspaces/${workspace_id}/jobs`);
-  const workpaceJobItems = workpaceJobs !== undefined ? workpaceJobs?.data : [];
+  const workpaceJobItems: JobType[] =
+    workpaceJobs !== undefined ? workpaceJobs?.data : [];
+
+  let usersHaveSchedules: number[] = [];
+  for (let job of workpaceJobItems) {
+    for (let jobMember of job.members) {
+      usersHaveSchedules.push(jobMember.id);
+    }
+  }
+
+  const workingUsers = leaderboardUsers
+    .filter(
+      (x) =>
+        x.user.active === 1 &&
+        x.user.room_id !== null &&
+        x.user.workspace_id === +(workspace_id as string) &&
+        usersHaveSchedules.includes(x.user.id)
+    )
+    .map((x) => x.user);
+
+  const onlineUsers = leaderboardUsers
+    .filter(
+      (x) =>
+        x.user.active === 1 &&
+        x.user.status === "online" &&
+        x.user.workspace_id === +(workspace_id as string)
+    )
+    .map((x) => x.user);
+
+  const usersHaveJobs = useMemo(() => {
+    let users: UserMinimalType[] = [];
+
+    for (let job of workpaceJobItems) {
+      for (let member of job.members) {
+        users.push(member);
+      }
+    }
+
+    return uniqueById(users) as UserMinimalType[];
+  }, [workpaceJobItems]);
 
   return (
     <RoomCtx.Provider
@@ -232,6 +280,9 @@ export default function RoomContext({
         scheduled: schedulesItems,
         workpaceUsers,
         workspaceJobs: workpaceJobItems,
+        workingUsers: workingUsers,
+        onlineUsers: onlineUsers,
+        usersHaveJobs: usersHaveJobs,
       }}
     >
       {children}

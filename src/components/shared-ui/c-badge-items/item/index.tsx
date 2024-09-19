@@ -12,6 +12,7 @@ export default function CBadgeItem({ item, isChecked, onSelect }: Props) {
       onClick={() => onSelect(item.value)}
       variant={isChecked ? "default" : "outline"}
       className='min-w-[80px]'
+      startIcon={item.icon}
     >
       {item.title}
     </CotopiaButton>

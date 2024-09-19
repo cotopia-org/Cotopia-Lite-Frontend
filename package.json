@@ -45,6 +45,7 @@
     "lucide-react": "^0.379.0",
     "moment": "^2.30.1",
     "next": "14.2.3",
+    "node-emoji": "^2.1.3",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",

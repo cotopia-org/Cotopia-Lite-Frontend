@@ -1,31 +1,22 @@
 import TitleEl from "@/components/shared/title-el";
 import React from "react";
 import { useRoomContext } from "../../../room-context";
-import Participants from "@/components/shared/participants";
+import * as emoji from "node-emoji";
+import WorkingCard from "./card";
 
 export default function WorkingUsers() {
-  const { leaderboard, workspace_id, workspaceJobs } = useRoomContext();
-
-  let usersHaveSchedules: number[] = [];
-  for (let job of workspaceJobs) {
-    for (let jobMember of job.members) {
-      usersHaveSchedules.push(jobMember.id);
-    }
-  }
-
-  const workingUsers = leaderboard.filter(
-    (x) =>
-      x.user.active === 1 &&
-      x.user.room_id !== null &&
-      x.user.workspace_id === +(workspace_id as string) &&
-      usersHaveSchedules.includes(x.user.id)
-  );
-
-  const workingUserCounts = workingUsers.length;
+  const { workingUsers } = useRoomContext();
 
   return (
-    <TitleEl title={`Working (${workingUserCounts})`}>
-      <Participants participants={workingUsers.map((x) => x.user)} />
+    <TitleEl
+      title={`Working (${workingUsers.length}) ${emoji.get("sunglasses")}`}
+    >
+      <div className='flex flex-col gap-y-2'>
+        {workingUsers.map((item) => (
+          <WorkingCard user={item} key={item.id} />
+        ))}
+      </div>
+      {/* <Participants participants={workingUsers} /> */}
     </TitleEl>
   );
 }

@@ -4,12 +4,21 @@ import { ScheduleType } from "@/types/calendar";
 import { FetchDataType } from "@/lib/axios";
 import FullLoading from "@/components/shared/full-loading";
 import Schedules from "@/components/shared/schedules";
+import { useEffect } from "react";
 
-export default function ShapesHandler() {
+type Props = {
+  onGetMySchedules?: (schedules: ScheduleType[]) => void;
+};
+
+export default function ShapesHandler({ onGetMySchedules }: Props) {
   const { data, isLoading, mutate } =
     useApi<FetchDataType<ScheduleType[]>>(`/users/me/schedules`);
 
   const schedules = data !== undefined ? data?.data : [];
+
+  useEffect(() => {
+    if (onGetMySchedules) onGetMySchedules(schedules);
+  }, [onGetMySchedules, schedules]);
 
   let content = null;
 

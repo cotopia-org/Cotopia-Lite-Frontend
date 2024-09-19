@@ -32,6 +32,7 @@ import TopRightTools from "../../room/tools/top-right";
 import BottomLeftTools from "../../room/tools/bottom-left";
 import BottomMiddleTools from "../../room/tools/bottom-middle";
 import BottomRightTools from "../../room/tools/bottom-right";
+import useSetting from "@/hooks/use-setting";
 // import { useCanvas } from "..";
 
 export const RF_BACKGROUND_ID = "bg-node-4214242141";
@@ -54,6 +55,8 @@ type LeftJoinType = {
 };
 
 function ReactFlowHandler({ tracks }: Props) {
+  const settings = useSetting();
+
   const [viewPort, setViewPort] = useState<Viewport>();
 
   const [rf, setRf] = useState<ReactFlowInstance>();
@@ -223,33 +226,43 @@ function ReactFlowHandler({ tracks }: Props) {
     [updateUserCoordinate]
   );
 
-  useSocket("userLeftFromRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+  useSocket(
+    "userLeftFromRoom",
+    (data: LeftJoinType) => {
+      const { room_id: gotRoomId, user: targetUser } = data;
 
-    console.log("test left event", data);
+      console.log("test left event", data);
 
-    if (room_id === undefined) return;
+      if (room_id === undefined) return;
 
-    if (gotRoomId !== +room_id) return;
+      if (gotRoomId !== +room_id) return;
 
-    setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
+      setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
-  });
+      if (user.id !== targetUser.id && settings.sounds.userJoinLeft)
+        playSoundEffect("elseUserleft");
+    },
+    [settings.sounds.userJoinLeft]
+  );
 
-  useSocket("userJoinedToRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+  useSocket(
+    "userJoinedToRoom",
+    (data: LeftJoinType) => {
+      const { room_id: gotRoomId, user: targetUser } = data;
 
-    if (room_id === undefined) return;
+      if (room_id === undefined) return;
 
-    if (gotRoomId !== +room_id) return;
+      if (gotRoomId !== +room_id) return;
 
-    console.log("test joined event", data);
+      console.log("test joined event", data);
 
-    setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
+      setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
-  });
+      if (user.id !== targetUser.id && settings.sounds.userJoinLeft)
+        playSoundEffect("elseUserJoin");
+    },
+    [settings.sounds.userJoinLeft]
+  );
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
