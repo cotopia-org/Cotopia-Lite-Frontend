@@ -5,8 +5,21 @@ import SettingsChatAction from "./chat/action";
 import UserChat from "./chat";
 import WorkspaceSidebar from "@/app/(pages)/(protected)/workspaces/sidebar";
 import WorkspaceUsers from "./users";
+import { useAppSelector } from "@/store/redux/store";
+import CBadgeSimple from "@/components/shared-ui/c-badge/c-badge-simple";
 
 export default function RoomSettings() {
+  const roomSlice = useAppSelector((state) => state.roomSlice);
+
+  const messagesCount = roomSlice?.messages_count ?? { room: [], objects: {} };
+
+  const roomIds = messagesCount.room;
+  const directsIds = Object?.values(messagesCount.directs).flatMap(
+    (item) => item
+  );
+
+  const totalCount = roomIds.length + directsIds.length;
+
   const [value, setValue] = useState("rooms");
 
   let title: ReactNode = "";
@@ -30,7 +43,11 @@ export default function RoomSettings() {
             value: "rooms",
           },
           {
-            icon: <MessagesSquare />,
+            icon: (
+              <CBadgeSimple count={totalCount}>
+                <MessagesSquare />
+              </CBadgeSimple>
+            ),
             content: <UserChat />,
             value: "chat",
           },

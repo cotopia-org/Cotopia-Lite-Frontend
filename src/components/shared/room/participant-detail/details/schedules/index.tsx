@@ -1,12 +1,13 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { Calendar } from "lucide-react";
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useUserDetail } from "..";
-import { capitalizeWords } from "@/lib/utils";
+import { capitalizeWords, estimateTotalHoursBySchedules } from "@/lib/utils";
 import ModalBox from "@/components/shared/modal-box";
 import BoxHolder from "@/components/shared/box-holder";
 import SchedulesList from "./list";
+import { ScheduleType } from "@/types/calendar";
 
 export default function UserSchedules() {
   const { user } = useUserDetail();
@@ -17,7 +18,11 @@ export default function UserSchedules() {
 
   if (userLabel) userLabel = capitalizeWords(userLabel);
 
-  const boxLabel = `${userLabel}'s schedules`;
+  const totalHours = useMemo(() => {
+    return estimateTotalHoursBySchedules([]);
+  }, []);
+
+  const boxLabel = `${userLabel}'s schedules (${totalHours}h)`;
 
   return (
     <ModalBox
@@ -36,11 +41,7 @@ export default function UserSchedules() {
       className='w-[424px]'
     >
       {(open, close) => {
-        return (
-          <BoxHolder title={boxLabel} onClose={close}>
-            <SchedulesList />
-          </BoxHolder>
-        );
+        return <SchedulesList justView />;
       }}
     </ModalBox>
   );

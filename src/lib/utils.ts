@@ -1,9 +1,11 @@
 import { __VARS } from "@/app/const/vars";
 import { mergePropsMain } from "@/components/shared/room/sessions/room-audio-renderer/use-media-track-by-source-or-name/merge-props";
+import { ScheduleType } from "@/types/calendar";
 import { UserMinimalType } from "@/types/user";
 import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import { type ClassValue, clsx } from "clsx";
 import { Track } from "livekit-client";
+import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -205,4 +207,42 @@ export const limitChar = (inputString: string, maxLength: number) => {
 
 export const capitalizeWords = (str: string) => {
   return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+export const timeStringToMoment = (time: string) => {
+  const timesArray = time.split(":");
+
+  const hour = timesArray[0];
+  const minutues = timesArray[1];
+
+  const momentDate = moment();
+
+  momentDate.set({
+    hours: +hour,
+    minutes: +minutues,
+  });
+
+  return momentDate;
+};
+
+export const estimateTotalHoursBySchedules = (schedules: ScheduleType[]) => {
+  let hours = 0;
+
+  if (schedules.length === 0) return 0;
+
+  for (let schedule of schedules) {
+    for (let scheduleDay of schedule.days) {
+      for (let time of scheduleDay.times) {
+        const startMoment = timeStringToMoment(time.start);
+        const endMoment = timeStringToMoment(time.end);
+
+        const diffMinutes = endMoment.diff(startMoment, "minutes");
+        const diffHours = Math.round(diffMinutes / 60);
+
+        hours += diffHours;
+      }
+    }
+  }
+
+  return hours;
 };

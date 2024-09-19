@@ -1,6 +1,6 @@
 import { UserMinimalType } from "./user";
 
-export type JobStatuType = "in_progress" | "paused" | "completed";
+export type JobStatuType = "in_progress" | "paused" | "completed" | "started";
 
 export type JobType = {
   created_at: string;

@@ -13,11 +13,14 @@ export default function ScheduleOverview({ selectedDay, item }: Props) {
     let output = `${getDay(selectedDay)}`;
 
     if (currentDay.length > 0) {
-      output += ` - `;
+      output += ` : `;
 
       for (let day of currentDay) {
+        let index = 0;
         for (let time of day.times) {
           output += ` ${time.start} - ${time.end}`;
+          if (index < day.times.length - 1) output += `, `;
+          index++;
         }
       }
     }
@@ -28,6 +31,6 @@ export default function ScheduleOverview({ selectedDay, item }: Props) {
   if (currentDay.length === 0) return;
 
   return (
-    <div className='flex flex-row items-center text-xs '>{labelOutput}</div>
+    <div className='flex flex-row items-center text-xs'>{labelOutput}</div>
   );
 }

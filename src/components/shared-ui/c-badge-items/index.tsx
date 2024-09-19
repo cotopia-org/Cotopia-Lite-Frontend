@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import CBadgeItem from "./item";
 
 export type CBadgeValueType = number | string;
 
-export type CBadgeItemType = { title: string; value: CBadgeValueType };
+export type CBadgeItemType = {
+  title: string;
+  icon?: ReactNode;
+  value: CBadgeValueType;
+};
 
 type Props = {
   items: CBadgeItemType[];

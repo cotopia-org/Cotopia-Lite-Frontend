@@ -1,8 +1,7 @@
 import { Switch } from "@/components/ui/switch";
+import { SwitchProps } from "@radix-ui/react-switch";
 
-type PrimitiveButtonProps = any;
-
-type Props = PrimitiveButtonProps & {
+type Props = SwitchProps & {
   title: string;
 };
 export default function TitleSwitch({ title, ...rest }: Props) {
