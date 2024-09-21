@@ -1,43 +1,44 @@
-"use client";
+"use client"
 
-import { LiveKitRoom } from "@livekit/components-react";
-import { __VARS } from "@/app/const/vars";
-import RoomContext from "./room-context";
-import RoomInner from "./room-inner";
-import { WorkspaceRoomType } from "@/types/room";
-import { createContext, useContext, useEffect, useState } from "react";
-import LiveKitConnectionStatus from "./connection-status";
-import CheckPermissions2, { useMediaPermissions } from "./check-permissions-2";
-import ChatWrapper from "../chat-wrapper";
+import { LiveKitRoom } from "@livekit/components-react"
+import { __VARS } from "@/app/const/vars"
+import RoomContext from "./room-context"
+import RoomInner from "./room-inner"
+import { WorkspaceRoomType } from "@/types/room"
+import { createContext, useContext, useEffect, useState } from "react"
+import LiveKitConnectionStatus from "./connection-status"
+import CheckPermissions2, { useMediaPermissions } from "./check-permissions-2"
+import ChatWrapper from "../chat-wrapper"
+import { ReactFlowProvider } from "@xyflow/react"
 
 type MediaPermission = {
-  audio: boolean;
-  video: boolean;
-};
+  audio: boolean
+  video: boolean
+}
 
 const DEFAULT_MEDIA_PERMISSIONS = {
   audio: true,
   video: true,
-};
+}
 
 const RoomHolderContext = createContext<{
-  mediaPermissions: MediaPermission;
-  changeMediaPermission: (perms: MediaPermission) => void;
+  mediaPermissions: MediaPermission
+  changeMediaPermission: (perms: MediaPermission) => void
 }>({
   mediaPermissions: DEFAULT_MEDIA_PERMISSIONS,
   changeMediaPermission: (perms) => {},
-});
+})
 
-export const useRoomHolder = () => useContext(RoomHolderContext);
+export const useRoomHolder = () => useContext(RoomHolderContext)
 
 type Props = {
-  token: string;
-  workspace_id: string;
-  room_id: number;
-  room?: WorkspaceRoomType;
-  onRoomUpdated?: (item: WorkspaceRoomType) => void;
-  isReConnecting?: boolean;
-};
+  token: string
+  workspace_id: string
+  room_id: number
+  room?: WorkspaceRoomType
+  onRoomUpdated?: (item: WorkspaceRoomType) => void
+  isReConnecting?: boolean
+}
 
 export default function RoomHolder({
   token,
@@ -48,23 +49,23 @@ export default function RoomHolder({
   isReConnecting,
 }: Props) {
   const [currentMediaPermissions, setCurrentMediaPermissions] = useState<{
-    audio: boolean;
-    video: boolean;
-  }>({ audio: false, video: false });
+    audio: boolean
+    video: boolean
+  }>({ audio: false, video: false })
 
-  const mediaPermissions = useMediaPermissions();
+  const mediaPermissions = useMediaPermissions()
   useEffect(() => {
     if (mediaPermissions) {
-      setCurrentMediaPermissions(mediaPermissions);
+      setCurrentMediaPermissions(mediaPermissions)
     }
-  }, [mediaPermissions]);
+  }, [mediaPermissions])
 
   const changeMediaPermission = (state: MediaPermission) => {
-    setCurrentMediaPermissions(state);
-    localStorage.setItem("media-permission", JSON.stringify(state));
-  };
+    setCurrentMediaPermissions(state)
+    localStorage.setItem("media-permission", JSON.stringify(state))
+  }
 
-  const [permissionChecked, setPermissionChecked] = useState(false);
+  const [permissionChecked, setPermissionChecked] = useState(false)
 
   let content = (
     <LiveKitRoom
@@ -134,27 +135,27 @@ export default function RoomHolder({
       <LiveKitConnectionStatus />
       <RoomInner />
     </LiveKitRoom>
-  );
+  )
 
   if (permissionChecked === false && !isReConnecting)
-    content = (
-      <CheckPermissions2 onChecked={() => setPermissionChecked(true)} />
-    );
+    content = <CheckPermissions2 onChecked={() => setPermissionChecked(true)} />
 
   return (
     <RoomHolderContext.Provider
       value={{ changeMediaPermission, mediaPermissions }}
     >
-      <ChatWrapper>
-        <RoomContext
-          room={room}
-          room_id={room_id}
-          onRoomUpdated={onRoomUpdated}
-          workspace_id={workspace_id}
-        >
-          {content}
-        </RoomContext>
-      </ChatWrapper>
+      <ReactFlowProvider>
+        <ChatWrapper>
+          <RoomContext
+            room={room}
+            room_id={room_id}
+            onRoomUpdated={onRoomUpdated}
+            workspace_id={workspace_id}
+          >
+            {content}
+          </RoomContext>
+        </ChatWrapper>
+      </ReactFlowProvider>
     </RoomHolderContext.Provider>
-  );
+  )
 }

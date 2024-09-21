@@ -140,7 +140,6 @@ const MentionableChatInput = ({ beforeNode, defaultValue, onAdd }: Props) => {
       mentions.find((m) => m.value === "@everyone") ?? undefined
     if (isMentionEveryone) payload["mentioned_everyone"] = true
 
-    console.log(payload, "PAYLOAD")
     onAdd(payload)
   }, [mentions, targetMention, value, selectedModel, models])
 
