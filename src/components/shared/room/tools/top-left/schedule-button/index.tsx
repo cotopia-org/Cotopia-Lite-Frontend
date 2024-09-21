@@ -37,7 +37,7 @@ export default function ScheduleButton() {
           left={triggerPosition.left}
           zIndex={triggerPosition.zIndex}
           onClose={close}
-          title={`Schedule (${totalHours ?? 0}h)`}
+          title={`Schedule (${totalHours ?? 0}h) per week`}
           width={400}
         >
           <ShapesHandler onGetMySchedules={onGetMySchedules} />

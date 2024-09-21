@@ -22,7 +22,7 @@ export default function UserSchedules() {
     return estimateTotalHoursBySchedules([]);
   }, []);
 
-  const boxLabel = `${userLabel}'s schedules (${totalHours}h)`;
+  const boxLabel = `${userLabel}'s schedules (${totalHours}h) per week`;
 
   return (
     <ModalBox
