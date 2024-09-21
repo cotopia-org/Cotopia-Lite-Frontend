@@ -10,7 +10,7 @@ export default function RoomChats() {
 
   return (
     <Chat2
-      items={messages}
+      items={[]}
       onFetchNewMessages={() =>
         new Promise((res) =>
           setTimeout(() => {
