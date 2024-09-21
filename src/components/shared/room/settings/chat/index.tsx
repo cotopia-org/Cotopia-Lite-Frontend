@@ -8,16 +8,12 @@ import ChatRoomCtxProvider, {
 } from "@/context/chat-room-context";
 import { useRoomContext } from "../../room-context";
 import DirectTabTitle from "./directs-title";
-import { useAppDispatch, useAppSelector } from "@/store/redux/store";
+import { useAppDispatch } from "@/store/redux/store";
 import { changeBulkRoomValuesAction } from "@/store/redux/slices/room-slice";
-import Chat2 from "@/components/shared/chat-box-2";
+import RoomChats from "./room-chats";
 
 export default function UserChat() {
-  const { chatRoom } = useAppSelector((store) => store.roomSlice);
-
   const { room_id } = useRoomContext();
-
-  const messages = chatRoom ? chatRoom?.[room_id]?.messages ?? [] : [];
 
   const appDispatch = useAppDispatch();
 
@@ -56,18 +52,7 @@ export default function UserChat() {
         {
           title: "New Chat",
           value: "new-chat",
-          content: (
-            <Chat2
-              items={messages}
-              onFetchNewMessages={() =>
-                new Promise((res) =>
-                  setTimeout(() => {
-                    res();
-                  }, 2000)
-                )
-              }
-            />
-          ),
+          content: <RoomChats />,
         },
       ]}
     />

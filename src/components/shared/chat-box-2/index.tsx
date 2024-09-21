@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import Items from "./items";
 import { MessageType } from "@/types/message";
 import ChatInput from "./input";
+import { Chat2ItemType } from "@/types/chat2";
 
 type Props = {
-  items: MessageType[];
+  items: Chat2ItemType[];
   addMessage?: (text: string) => void;
   onFetchNewMessages?: () => Promise<void>;
 };
@@ -14,15 +15,10 @@ const Chat2: React.FC<Props> = ({
   addMessage,
   onFetchNewMessages,
 }) => {
-  const [messages, setMessages] = useState<MessageType[]>([]);
-  useEffect(() => {
-    if (items !== undefined) setMessages(items);
-  }, [items]);
-
   return (
     <div className='flex flex-col h-full bg-gray-100 p-4'>
       {/* Chat message list */}
-      <Items items={messages} onFetchNewMessages={onFetchNewMessages} />
+      <Items items={items} onFetchNewMessages={onFetchNewMessages} />
       {/* Chat input */}
       {addMessage !== undefined && <ChatInput addMessage={addMessage} />}
     </div>

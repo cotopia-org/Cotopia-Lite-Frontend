@@ -2,9 +2,10 @@ import { MessageType } from "@/types/message";
 import ChatItem from "./item";
 import { useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Chat2ItemType } from "@/types/chat2";
 
 type Props = {
-  items: MessageType[];
+  items: Chat2ItemType[];
   onFetchNewMessages?: () => Promise<void>;
   marginFetching?: number;
 };
