@@ -6,15 +6,15 @@ import UserDate from "./user-date"
 
 type Props = {
   user: UserMinimalType
-  roomId: number
+  roomId?: number
 }
 
 const UserDetailContext = createContext<{
   user?: UserMinimalType
-  roomId: number
+  roomId?: number | undefined
 }>({
   user: undefined,
-  roomId: 1,
+  roomId: undefined,
 })
 export const useUserDetail = () => useContext(UserDetailContext)
 

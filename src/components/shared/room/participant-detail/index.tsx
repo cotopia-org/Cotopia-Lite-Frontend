@@ -6,7 +6,7 @@ import Details from "./details"
 type Props = {
   user: UserMinimalType
   children: ReactNode
-  roomId: number
+  roomId?: number
 }
 export default function ParticipantDetails({ user, roomId, children }: Props) {
   return (

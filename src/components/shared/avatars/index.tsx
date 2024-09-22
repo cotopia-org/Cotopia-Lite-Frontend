@@ -17,7 +17,7 @@ type Props = {
 
 export default function Avatars({ items, render }: Props) {
   return (
-    <div className="flex flex-row gap-1 items-center flex-wrap">
+    <div className="flex flex-row gap-1 items-start flex-wrap">
       {items.map((item, key) => {
         let content = <UserAvatar {...item} key={key} />
         return render ? render(item, content) : content

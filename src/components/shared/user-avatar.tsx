@@ -20,7 +20,7 @@ export default function UserAvatar({
   let content = (
     <CotopiaTooltip title={toolTipTitle ? toolTipTitle : title}>
       <CotopiaAvatar
-        className={`w-8 h-8 ${className}`}
+        className={`min-w-8 min-h-8 ${className}`}
         src={src}
         title={title ? title?.[0] : undefined}
       />
