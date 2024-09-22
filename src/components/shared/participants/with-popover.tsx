@@ -2,9 +2,9 @@ import { UserMinimalType } from "@/types/user"
 import Participants, { ParticipantsProps } from "."
 import ParticipantDetails from "../room/participant-detail"
 
-type Props = ParticipantsProps
+type Props = ParticipantsProps & { roomId: number }
 export default function ParticipantsWithPopover(props: Props) {
-  const { participants, ...rest } = props
+  const { participants, roomId, ...rest } = props
 
   return (
     <Participants
@@ -13,7 +13,11 @@ export default function ParticipantsWithPopover(props: Props) {
           | UserMinimalType
           | undefined
         if (user === undefined) return content
-        return <ParticipantDetails user={user}>{content}</ParticipantDetails>
+        return (
+          <ParticipantDetails roomId={roomId} user={user}>
+            {content}
+          </ParticipantDetails>
+        )
       }}
       participants={participants}
       {...rest}

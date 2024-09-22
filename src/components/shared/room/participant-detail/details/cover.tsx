@@ -3,9 +3,14 @@ import UserSchedules from "./schedules"
 import { useUserDetail } from "."
 import UserMood from "./mood"
 import UserNavigate from "./navigate"
+import { useRoomContext } from "../../room-context"
 
 export default function UserCover() {
-  const { user } = useUserDetail()
+  const { user, roomId } = useUserDetail()
+
+  const { room_id: currentRoomId } = useRoomContext()
+
+  const inCurrentRoom = roomId === currentRoomId
 
   return (
     <div className="relative pb-[40px]">
@@ -15,7 +20,7 @@ export default function UserCover() {
         className="absolute w-[80px] h-[80px] bottom-0 left-4 border-4 border-white"
       />
       <div className="absolute bottom-2 right-2 flex flex-row items-center gap-x-2">
-        <UserNavigate />
+        {inCurrentRoom && <UserNavigate />}
         <UserMood />
         <UserSchedules />
       </div>

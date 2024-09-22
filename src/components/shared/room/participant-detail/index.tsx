@@ -6,14 +6,15 @@ import Details from "./details"
 type Props = {
   user: UserMinimalType
   children: ReactNode
+  roomId: number
 }
-export default function ParticipantDetails({ user, children }: Props) {
+export default function ParticipantDetails({ user, roomId, children }: Props) {
   return (
     <CotopiaPopover
       trigger={children}
       contentClassName="p-0 overflow-hidden border-0 m-0 shadow-md"
     >
-      <Details user={user} />
+      <Details roomId={roomId} user={user} />
     </CotopiaPopover>
   )
 }
