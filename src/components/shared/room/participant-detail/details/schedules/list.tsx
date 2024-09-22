@@ -1,5 +1,5 @@
 import { useApi } from "@/hooks/swr";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useUserDetail } from "..";
 import { ScheduleType } from "@/types/calendar";
 import FullLoading from "@/components/shared/full-loading";
@@ -28,7 +28,7 @@ export default function SchedulesList({ justView = true }: Props) {
       <BoxHolder
         title={`${capitalizeWords(
           user?.username ?? ""
-        )}'s schedules (${totalHours}h)`}
+        )}'s schedules (${totalHours}h) per week`}
         onClose={close}
       >
         <Schedules items={schedules} justView={justView} />

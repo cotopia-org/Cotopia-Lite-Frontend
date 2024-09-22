@@ -2,6 +2,7 @@ import Participants from "@/components/shared/participants";
 import { UserType } from "@/types/user";
 import React, { useMemo } from "react";
 import { useRoomContext } from "../../../room-context";
+import * as emoji from "node-emoji";
 
 type Props = {
   user: UserType;
@@ -29,7 +30,11 @@ export default function WorkingCard({ user }: Props) {
     <div className='flex flex-row gap-x-2 items-center'>
       <Participants className='!pb-0' participants={[user]} />
       <span className='text-sm capitalize'>
-        {userJobs.map((x) => x.title).join(", ")}
+        {userJobs.length > 0
+          ? userJobs.map((x) => x.title).join(", ")
+          : `${emoji.get("question")}${emoji.get("question")}${emoji.get(
+              "question"
+            )}${emoji.get("question")}`}
       </span>
     </div>
   );
