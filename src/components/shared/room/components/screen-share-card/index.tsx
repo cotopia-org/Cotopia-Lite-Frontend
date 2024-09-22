@@ -9,6 +9,7 @@ import { dispatch } from "use-bus"
 import { useRoomContext } from "../../room-context"
 import useKeyPress from "@/hooks/use-key-press"
 import { createPortal } from "react-dom"
+import ResizableWrapper from "@/components/shared/resizable-wrapper"
 
 type Props = {
   track: TrackReference
@@ -52,7 +53,7 @@ export default function ScreenShareCard({ track }: Props) {
 
   const videoContent = <VideoTrack trackRef={track} />
 
-  const content = (
+  let content = (
     <div className={clss}>
       <div className="actions absolute top-4 left-4 flex flex-row items-center gap-x-2 opacity-0 invisible transition-all">
         <CotopiaIconButton
@@ -82,6 +83,12 @@ export default function ScreenShareCard({ track }: Props) {
         videoContent
       )}
     </div>
+  )
+
+  content = (
+    <ResizableWrapper>
+      <div>video</div>
+    </ResizableWrapper>
   )
 
   return isFullScreen
