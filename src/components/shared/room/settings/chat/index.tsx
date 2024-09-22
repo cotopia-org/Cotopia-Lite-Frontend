@@ -52,7 +52,7 @@ export default function UserChat() {
         {
           title: "New Chat",
           value: "new-chat",
-          content: <RoomChats />,
+          content: <RoomChats room_id={room_id} />,
         },
       ]}
     />

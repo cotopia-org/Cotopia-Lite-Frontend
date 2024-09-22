@@ -16,9 +16,13 @@ const Chat2: React.FC<Props> = ({
   onFetchNewMessages,
 }) => {
   return (
-    <div className='flex flex-col h-full bg-gray-100 p-4'>
+    <div className='flex flex-col h-full'>
       {/* Chat message list */}
-      <Items items={items} onFetchNewMessages={onFetchNewMessages} />
+      <Items
+        items={items}
+        onFetchNewMessages={onFetchNewMessages}
+        marginFetching={0}
+      />
       {/* Chat input */}
       {addMessage !== undefined && <ChatInput addMessage={addMessage} />}
     </div>

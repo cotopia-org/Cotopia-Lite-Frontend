@@ -15,7 +15,9 @@ export default function Items({
   marginFetching = 1000,
   onFetchNewMessages,
 }: Props) {
+  const isScrollToTop = useRef(true);
   const parentRef = useRef<HTMLDivElement>(null);
+  const latestScrollTop = useRef<number>();
 
   const [isFetching, setIsFetching] = useState(false);
 
@@ -27,24 +29,33 @@ export default function Items({
     count: reversedMessages.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 50, // Estimated height of each message
+    overscan: 5,
+    measureElement: (el) => el.getBoundingClientRect().height,
   });
 
   // Scroll to the last message when the chat mounts or new messages are added
   useEffect(() => {
+    if (isScrollToTop.current === false) {
+      return;
+    }
+
     rowVirtualizer.scrollToIndex(items.length - 1, { align: "end" });
+    isScrollToTop.current = false;
   }, [items.length, rowVirtualizer]);
 
   // Detect scroll position to fire the onFetchNewMessages event
   useEffect(() => {
-    if (!onFetchNewMessages) return;
-
     const handleScroll = async () => {
       const scrollTop = parentRef.current?.scrollTop || 0;
+      const scrollHeight = parentRef.current?.scrollHeight;
+
+      console.log("scrollHeight", scrollHeight);
 
       // Trigger fetching if the user is within 1000px from the top and not already fetching
-      if (scrollTop <= marginFetching && !isFetching) {
+      if (scrollTop <= marginFetching && !isFetching && onFetchNewMessages) {
         setIsFetching(true); // Set fetching status
         try {
+          latestScrollTop.current = scrollHeight;
           await onFetchNewMessages(); // Fetch new messages
         } finally {
           setIsFetching(false); // Reset fetching status
@@ -64,6 +75,18 @@ export default function Items({
     };
   }, [onFetchNewMessages, isFetching, marginFetching]);
 
+  // Restore scroll position after messages are updated
+  useEffect(() => {
+    const scrollElement = parentRef.current;
+    if (!scrollElement) return;
+
+    const currentScrollHeight = parentRef.current?.scrollHeight;
+
+    if (latestScrollTop.current)
+      parentRef.current.scrollTop =
+        currentScrollHeight - latestScrollTop.current;
+  }, [items.length]);
+
   return (
     <div
       ref={parentRef}
@@ -80,13 +103,14 @@ export default function Items({
           const message = reversedMessages[virtualRow.index];
           return (
             <div
+              data-index={virtualRow.index}
               key={message.id}
+              ref={rowVirtualizer.measureElement}
               style={{
                 position: "absolute",
-                top: 0,
+                top: `${virtualRow.start}px`,
                 left: 0,
                 width: "100%",
-                transform: `translateY(${virtualRow.start}px)`,
               }}
             >
               <ChatItem item={message} key={message.nonce_id} />
