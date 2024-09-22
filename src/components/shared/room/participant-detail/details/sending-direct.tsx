@@ -7,7 +7,7 @@ export default function SendingDirect() {
   const { user } = useUserDetail();
 
   return (
-    <form className='flex flex-row items-center gap-x-2'>
+    <div className='flex flex-row items-center gap-x-2'>
       <CotopiaInput
         placeholder='Sending message ...'
         className='flex-1 !ring-offset-0 !outline-none !ring-0'
@@ -15,6 +15,6 @@ export default function SendingDirect() {
       <CotopiaIconButton className='text-black w-8 h-8'>
         <SendHorizonal size={16} />
       </CotopiaIconButton>
-    </form>
+    </div>
   );
 }
