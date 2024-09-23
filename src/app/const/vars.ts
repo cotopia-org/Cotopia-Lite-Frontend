@@ -15,5 +15,5 @@ export const __VARS = {
   defaultPerPage: 20,
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
-  teleportMargin: 50,
+  teleportMargin: 40,
 }

@@ -16,6 +16,32 @@ import { __VARS } from "@/app/const/vars"
 
 interface Props {}
 
+const getAroundPoints = (r: number, margin: number) => {
+  //get the random angle between 0 and 2Pi (360deg)
+  const angle = Math.random() * 2 * Math.PI
+  //calc distance from center of circle
+  const distance = r + margin
+  //clac the distance from the center with the sin cos ratio in the x and y axis
+
+  const xPosition = Math.cos(angle)
+  const yPosition = Math.sin(angle)
+
+  let x = distance * xPosition
+  let y = distance * yPosition
+  if (xPosition < 0) {
+    x -= margin
+  } else {
+    x += margin
+  }
+  if (yPosition < 0) {
+    y -= margin
+  } else {
+    y += margin
+  }
+
+  return { x, y }
+}
+
 const UserNavigate = (props: Props) => {
   const socket = useSocket()
 
@@ -49,15 +75,23 @@ const UserNavigate = (props: Props) => {
     const ydimension = targetUser?.position.y
 
     if (h && w && xdimension && ydimension) {
-      const x = xdimension + w / 2
-      const y = ydimension + h / 2
-      const zoom = 1.5
+      const radius = w / 2
 
+      const x = xdimension + radius
+      const y = ydimension + radius
+      const zoom = 1.5
       rf.setCenter(x - wDiff, y - hDiff, { zoom, duration: 1000 })
 
-      const newCoords = `${x + __VARS.teleportMargin},${
-        y + __VARS.teleportMargin
-      }`
+      //calc radius of target user participant
+      const { x: aroundX, y: aroundY } = getAroundPoints(
+        radius,
+        __VARS.teleportMargin
+      )
+      let finalXCordinate = xdimension + aroundX
+      let finalYCordinate = ydimension + aroundY
+
+      const newCoords = `${finalXCordinate},${finalYCordinate}`
+
       const sendingObject = {
         room_id: room?.id,
         coordinates: newCoords,
