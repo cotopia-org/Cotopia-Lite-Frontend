@@ -23,10 +23,10 @@ export default function ScreenShareCard({ track }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   let clss =
-    "transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
+    "w-[400px] h-[160px] relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
 
   if (isFullScreen) {
-    clss += ` !fixed bg-black w-screen h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`
+    clss += ` !fixed bg-black !w-screen !h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`
   } else if (isExpanded) {
     clss += ` fixed !w-[1200px] !h-[480px]`
   }
@@ -79,9 +79,7 @@ export default function ScreenShareCard({ track }: Props) {
       </div>
       {!isFullScreen && !isExpanded ? (
         <ResizableWrapper>
-          <div className="w-full h-full rounded-xl overflow-hidden [&_video]:h-full [&_video]:w-full [&_video]:object-fill">
-            {videoContent}
-          </div>
+          <div className=" rounded-lg overflow-hidden">{videoContent}</div>
         </ResizableWrapper>
       ) : (
         videoContent

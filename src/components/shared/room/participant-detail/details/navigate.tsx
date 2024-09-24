@@ -80,6 +80,7 @@ const UserNavigate = (props: Props) => {
       const x = xdimension + radius
       const y = ydimension + radius
       const zoom = 1.5
+
       rf.setCenter(x - wDiff, y - hDiff, { zoom, duration: 1000 })
 
       //calc radius of target user participant
