@@ -4,6 +4,7 @@ import type { TypedUseSelectorHook } from "react-redux";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import roomSlice from "./slices/room-slice";
+import chatSlice from "./slices/chat-slice";
 import settingSlice from "./slices/setting-slice";
 
 const persistConfig = {
@@ -13,6 +14,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   roomSlice,
+  chatSlice,
   settingSlice,
 });
 
