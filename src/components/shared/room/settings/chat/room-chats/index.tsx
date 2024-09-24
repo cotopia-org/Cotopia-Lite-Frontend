@@ -48,6 +48,9 @@ export default function RoomChats({ room_id }: Props) {
     }
   };
 
+  //Handle add message
+  const handleAddMessage = (message: string) => {};
+
   return (
     <Chat2
       items={messages}

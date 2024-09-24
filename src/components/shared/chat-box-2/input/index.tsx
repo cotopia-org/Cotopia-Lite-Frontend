@@ -1,4 +1,12 @@
-import React, { useState } from "react";
+import React, {
+  FormEvent,
+  FormEventHandler,
+  useCallback,
+  useState,
+} from "react";
+import EmojiHandlerButton from "./emoji";
+import SendHandlerButton from "./send";
+import MultilineTextarea from "./textarea";
 
 type ChatInputProps = {
   addMessage: (message: string) => void;
@@ -7,29 +15,38 @@ type ChatInputProps = {
 const ChatInput: React.FC<ChatInputProps> = ({ addMessage }) => {
   const [inputValue, setInputValue] = useState("");
 
-  const handleSend = () => {
+  const handleAddMessage = useCallback((value: string) => {
+    setInputValue("");
+    addMessage(value.trim());
+  }, []);
+
+  const handleSend = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (inputValue.trim()) {
-      addMessage(inputValue.trim());
-      setInputValue("");
+      handleAddMessage(inputValue.trim());
     }
   };
 
+  const handleAddEmoji = useCallback(
+    (emoji: string) => setInputValue((prev) => `${prev}${emoji}`),
+    []
+  );
+
   return (
-    <div className='flex items-center space-x-2'>
-      <input
-        type='text'
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
-        placeholder='Type a message...'
+    <form
+      onSubmit={handleSend}
+      className='flex items-end space-x-2 border border-black/10 rounded-lg p-2'
+    >
+      <MultilineTextarea
+        defaultValue={inputValue}
+        onChange={setInputValue}
+        onSend={handleAddMessage}
       />
-      <button
-        onClick={handleSend}
-        className='p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
-      >
-        Send
-      </button>
-    </div>
+      <div className='flex flex-row items-center'>
+        <EmojiHandlerButton onPick={handleAddEmoji} />
+        <SendHandlerButton text={inputValue} />
+      </div>
+    </form>
   );
 };
 
