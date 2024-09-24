@@ -1,8 +1,8 @@
-import { MessageType } from "@/types/message";
 import ChatItem from "./item";
 import { useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Chat2ItemType } from "@/types/chat2";
+import FetchingProgress from "./fetching-progress";
 
 type Props = {
   items: Chat2ItemType[];
@@ -17,29 +17,28 @@ export default function Items({
 }: Props) {
   const isScrollToTop = useRef(true);
   const parentRef = useRef<HTMLDivElement>(null);
-  const latestScrollTop = useRef<number>();
+  const latestMessage = useRef<Chat2ItemType>();
 
   const [isFetching, setIsFetching] = useState(false);
 
-  // Reverse the messages array
-  const reversedMessages = [...items].reverse();
+  const messages = [...items].reverse();
 
   // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
-    count: reversedMessages.length,
+    count: messages.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 50, // Estimated height of each message
     overscan: 5,
     measureElement: (el) => el.getBoundingClientRect().height,
   });
 
-  // Scroll to the last message when the chat mounts or new messages are added
   useEffect(() => {
-    if (isScrollToTop.current === false) {
-      return;
-    }
+    if (isScrollToTop.current === false) return;
 
-    rowVirtualizer.scrollToIndex(items.length - 1, { align: "end" });
+    if (items.length === 0) return;
+
+    rowVirtualizer.scrollToIndex(items.length, { align: "end" });
+
     isScrollToTop.current = false;
   }, [items.length, rowVirtualizer]);
 
@@ -47,18 +46,17 @@ export default function Items({
   useEffect(() => {
     const handleScroll = async () => {
       const scrollTop = parentRef.current?.scrollTop || 0;
-      const scrollHeight = parentRef.current?.scrollHeight;
-
-      console.log("scrollHeight", scrollHeight);
 
       // Trigger fetching if the user is within 1000px from the top and not already fetching
       if (scrollTop <= marginFetching && !isFetching && onFetchNewMessages) {
         setIsFetching(true); // Set fetching status
         try {
-          latestScrollTop.current = scrollHeight;
+          latestMessage.current = items[items.length - 1];
           await onFetchNewMessages(); // Fetch new messages
         } finally {
-          setIsFetching(false); // Reset fetching status
+          setTimeout(() => {
+            setIsFetching(false);
+          }, 2000);
         }
       }
     };
@@ -73,26 +71,31 @@ export default function Items({
         scrollElement.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [onFetchNewMessages, isFetching, marginFetching]);
+  }, [onFetchNewMessages, isFetching, marginFetching, rowVirtualizer]);
 
-  // Restore scroll position after messages are updated
   useEffect(() => {
-    const scrollElement = parentRef.current;
-    if (!scrollElement) return;
+    if (!!!latestMessage.current) return;
 
-    const currentScrollHeight = parentRef.current?.scrollHeight;
+    const itemIndex = items.findIndex(
+      (x) => x.id === latestMessage.current?.id
+    );
 
-    if (latestScrollTop.current)
-      parentRef.current.scrollTop =
-        currentScrollHeight - latestScrollTop.current;
-  }, [items.length]);
+    if (itemIndex === -1) return;
+
+    rowVirtualizer.scrollToIndex(items.length - (itemIndex + 1), {
+      align: "start",
+    });
+
+    setIsFetching(false);
+  }, [items.length, rowVirtualizer]);
 
   return (
     <div
       ref={parentRef}
-      className='flex-grow overflow-y-auto mb-4 space-y-2'
+      className='relative flex-grow overflow-y-auto mb-4 space-y-2'
       style={{ contain: "strict", height: "100%" }}
     >
+      {!!isFetching && <FetchingProgress />}
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
@@ -100,7 +103,7 @@ export default function Items({
         }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-          const message = reversedMessages[virtualRow.index];
+          const message = messages[virtualRow.index];
           return (
             <div
               data-index={virtualRow.index}

@@ -21,7 +21,7 @@ const Chat2: React.FC<Props> = ({
       <Items
         items={items}
         onFetchNewMessages={onFetchNewMessages}
-        marginFetching={0}
+        marginFetching={300}
       />
       {/* Chat input */}
       {addMessage !== undefined && <ChatInput addMessage={addMessage} />}
