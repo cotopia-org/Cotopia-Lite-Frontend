@@ -1,14 +1,14 @@
-import { ReactNode } from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { ReactNode } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 type Props = {
-  trigger: ReactNode
-  children: ReactNode
-  open?: boolean
-  contentClassName?: string
-  triggerClassName?: string
-  align?: "center" | "end" | "start"
-}
+  trigger: ReactNode;
+  children: ReactNode;
+  open?: boolean;
+  contentClassName?: string;
+  triggerClassName?: string;
+  align?: "center" | "end" | "start";
+};
 export default function CotopiaPopover({
   trigger,
   children,
@@ -26,5 +26,5 @@ export default function CotopiaPopover({
         {children}
       </PopoverContent>
     </Popover>
-  )
+  );
 }

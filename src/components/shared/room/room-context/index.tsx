@@ -265,8 +265,6 @@ export default function RoomContext({
 
   const usersWithInprogressJobIds = usersHaveInProgressJobs.map((x) => x.id);
 
-  console.log("leaderboardUsers", leaderboardUsers);
-
   const workingUsers = leaderboardUsers
     .filter(
       (x) =>
