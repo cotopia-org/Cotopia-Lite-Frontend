@@ -1,47 +1,67 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import { ScreenShare } from "lucide-react";
-import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
-import { useCallback, useState } from "react";
-import {
-  createLocalScreenTracks,
-  createLocalVideoTrack,
-  LocalVideoTrack,
-  Track,
-} from "livekit-client";
+import { ScreenShare, X } from "lucide-react";
+import { useRoomContext } from "@livekit/components-react";
+import { useCallback, useEffect, useState } from "react";
 import useBus from "use-bus";
 import { _BUS } from "@/app/const/bus";
+import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 
 export default function ShareScreenButtonTool() {
-  const [screenTrack, setScreenTrack] = useState<any>(null);
-
   const room = useRoomContext();
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
 
-  const { localParticipant } = useLocalParticipant();
-
-  const startScreenShare = useCallback(async () => {
-    if (!room) return;
-    try {
-      await room.localParticipant.setScreenShareEnabled(true);
-    } catch (err) {
-      console.error("Error sharing screen:", err);
+  const checkIfScreenSharing = useCallback(() => {
+    if (!room) return false;
+    const tracks = room.localParticipant.videoTrackPublications;
+    for (let [_, track] of tracks.entries()) {
+      if (track.source === "screen_share") {
+        return true; // Screen share is active
+      }
     }
+    return false; // No screen share track
   }, [room]);
 
   const stopScreenShare = useCallback(async () => {
     try {
       await room.localParticipant.setScreenShareEnabled(false);
+      setIsScreenSharing(false); // Update state when screen sharing stops
     } catch (err) {
-      console.error("Error sharing screen:", err);
+      console.error("Error stopping screen share:", err);
     }
-  }, [room, screenTrack]);
+  }, [room]);
+
+  const toggleScreenShare = useCallback(async () => {
+    if (!room) return;
+
+    if (isScreenSharing) {
+      return stopScreenShare();
+    }
+
+    try {
+      await room.localParticipant.setScreenShareEnabled(true);
+      setIsScreenSharing(true); // Update state when screen sharing starts
+    } catch (err) {
+      console.error("Error starting screen share:", err);
+    }
+  }, [room, isScreenSharing, stopScreenShare]);
 
   useBus(_BUS.stopMyScreenSharing, () => {
     stopScreenShare();
   });
 
+  // Monitor changes in the room context to update the screen sharing status
+  useEffect(() => {
+    const screenSharingActive = checkIfScreenSharing();
+    setIsScreenSharing(screenSharingActive);
+  }, [room, checkIfScreenSharing]);
+
   return (
-    <CotopiaIconButton className='text-black' onClick={startScreenShare}>
-      <ScreenShare size={20} />
-    </CotopiaIconButton>
+    <CotopiaTooltip
+      title={isScreenSharing ? `Stop screen sharing` : `Share screen`}
+    >
+      <CotopiaIconButton className='text-black' onClick={toggleScreenShare}>
+        {isScreenSharing ? <X size={20} /> : <ScreenShare size={20} />}
+      </CotopiaIconButton>
+    </CotopiaTooltip>
   );
 }

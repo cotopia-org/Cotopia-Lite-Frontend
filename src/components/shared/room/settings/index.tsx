@@ -1,43 +1,63 @@
-import React, { ReactNode, useState } from "react"
-import CTabs from "@/components/shared-ui/c-tabs"
-import { CalendarDays, MessagesSquare, User } from "lucide-react"
-import SettingsUserAction from "./user/action"
-import SettingsChatAction from "./chat/action"
-import UserChat from "./chat"
-import Schedule from "./schedule"
+import React, { ReactNode, useState } from "react";
+import CTabs from "@/components/shared-ui/c-tabs";
+import { AudioLines, MessagesSquare, Users } from "lucide-react";
+import SettingsChatAction from "./chat/action";
+import UserChat from "./chat";
+import WorkspaceSidebar from "@/app/(pages)/(protected)/workspaces/sidebar";
+import WorkspaceUsers from "./users";
+import { useAppSelector } from "@/store/redux/store";
+import CBadgeSimple from "@/components/shared-ui/c-badge/c-badge-simple";
 
 export default function RoomSettings() {
-  const [value, setValue] = useState("chat")
+  const roomSlice = useAppSelector((state) => state.roomSlice);
 
-  let title: ReactNode = ""
+  const messagesCount = roomSlice?.messages_count ?? { room: [], objects: {} };
+
+  const roomIds = messagesCount.room;
+  const directsIds = Object?.values(messagesCount.directs).flatMap(
+    (item) => item
+  );
+
+  const totalCount = roomIds.length + directsIds.length;
+
+  const [value, setValue] = useState("rooms");
+
+  let title: ReactNode = "";
   switch (value) {
-    case "user":
-      title = <SettingsUserAction />
-      break
     case "chat":
-      title = <SettingsChatAction />
-      break
+      title = <SettingsChatAction />;
+      break;
   }
 
   return (
-    <div className="p-6 flex flex-col gap-y-4">
+    <div className='p-6 flex flex-col gap-y-4'>
       <CTabs
         title={<div>{title}</div>}
         defaultValue={value}
         onChangeTab={setValue}
+        className='[&_.tab-content>*]:px-0'
         items={[
           {
-            icon: <MessagesSquare />,
+            icon: <AudioLines />,
+            content: <WorkspaceSidebar />,
+            value: "rooms",
+          },
+          {
+            icon: (
+              <CBadgeSimple count={totalCount}>
+                <MessagesSquare />
+              </CBadgeSimple>
+            ),
             content: <UserChat />,
             value: "chat",
           },
           {
-            icon: <CalendarDays />,
-            content: <Schedule />,
-            value: "calendar",
+            icon: <Users />,
+            content: <WorkspaceUsers />,
+            value: "users",
           },
         ]}
       />
     </div>
-  )
+  );
 }

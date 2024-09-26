@@ -1,6 +1,7 @@
 // TimeSelector.tsx
 import React, { useState, useEffect } from "react";
 import TitleEl from "../title-el";
+import { initSheduleTimes } from "../room/tools/top-left/schedule-button/shapes/add-schedule/content/day";
 
 interface TimeSelectorProps {
   onTimeChange: (time: string) => void;
@@ -10,7 +11,7 @@ interface TimeSelectorProps {
 
 const TimeSelector: React.FC<TimeSelectorProps> = ({
   onTimeChange,
-  defaultValue = "00:00",
+  defaultValue = initSheduleTimes.from,
   label,
 }) => {
   const [hours, setHours] = useState("00");

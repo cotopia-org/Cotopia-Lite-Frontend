@@ -1,49 +1,50 @@
-import { ChatItemType } from "@/types/chat"
-import MyMessage from "./my-message"
-import TheirMessage from "./their-message"
+import { ChatItemType } from "@/types/chat";
+import MyMessage from "./my-message";
+import TheirMessage from "./their-message";
 import CotopiaContextMenu, {
   ContextItemType,
-} from "@/components/shared-ui/c-context-menu"
-import { Reply, Pencil, Trash2 } from "lucide-react"
-import colors from "tailwindcss/colors"
-import MessageBox from "./message/MessageBox"
-import TargetMessageAction from "./TargetMessageAction"
-import { _BUS } from "@/app/const/bus"
-import { ReactNode, forwardRef, useState } from "react"
-import DeleteMessageAction from "./my-message/DeleteMessageAction"
+} from "@/components/shared-ui/c-context-menu";
+import { Reply, Pencil, Trash2 } from "lucide-react";
+import colors from "tailwindcss/colors";
+import MessageBox from "./message/MessageBox";
+import TargetMessageAction from "./TargetMessageAction";
+import { _BUS } from "@/app/const/bus";
+import { ReactNode, forwardRef, useState } from "react";
+import DeleteMessageAction from "./my-message/DeleteMessageAction";
 import {
   RoomEnvironmentType,
   useChatRoomCtx,
-} from "@/context/chat-room-context"
+} from "@/context/chat-room-context";
 
 type Props = {
-  item: ChatItemType
-  observer_user_id?: number
-  onFlagSelect?: () => void
-}
+  item: ChatItemType;
+  observer_user_id?: number;
+  user?: number;
+  onFlagSelect?: () => void;
+};
 const ChatItem = forwardRef(
-  ({ item, observer_user_id, onFlagSelect }: Props, ref: any) => {
-    const { changeBulk, env } = useChatRoomCtx()
+  ({ item, observer_user_id, onFlagSelect, user }: Props, ref: any) => {
+    const { changeBulk, env } = useChatRoomCtx();
 
-    const [deleteAnchor, setDeleteAnchor] = useState<boolean>(false)
+    const [deleteAnchor, setDeleteAnchor] = useState<boolean>(false);
 
-    let targetMessage = item.reply_to
+    let targetMessage = item?.reply_to;
 
-    const isMyMessage = item.user?.id === observer_user_id
+    const isMyMessage = item?.user?.id === observer_user_id;
 
-    const isRoomEnv = env === RoomEnvironmentType.room
+    const isRoomEnv = env === RoomEnvironmentType.room;
 
-    let replyedNode = undefined
+    let replyedNode = undefined;
 
     if (!!targetMessage) {
       replyedNode = (
         <TargetMessageAction
-          className="!m-0"
+          className='!m-0'
           onSelect={onFlagSelect}
-          title={targetMessage.user.username}
+          title={targetMessage?.user?.username}
           description={targetMessage.text}
         />
-      )
+      );
     }
 
     let menuItems: ContextItemType[] = [
@@ -53,7 +54,7 @@ const ChatItem = forwardRef(
         onClick: () => changeBulk({ targetMessage: item, flag: "reply" }),
         icon: <Reply color={colors.black} size={14} />,
       },
-    ]
+    ];
 
     if (isMyMessage) {
       menuItems = [
@@ -72,7 +73,7 @@ const ChatItem = forwardRef(
           icon: <Trash2 color={colors.red[700]} size={14} />,
         },
         ...menuItems,
-      ]
+      ];
     }
 
     let content = (
@@ -89,7 +90,7 @@ const ChatItem = forwardRef(
           />
         }
       />
-    )
+    );
 
     if (!!item.deleted_at) {
       content = (
@@ -100,7 +101,7 @@ const ChatItem = forwardRef(
           item={item}
           isMine={isMyMessage}
         />
-      )
+      );
     }
 
     let messageNode = isMyMessage ? (
@@ -116,22 +117,22 @@ const ChatItem = forwardRef(
       </>
     ) : (
       <>{content}</>
-    )
+    );
 
     const directWrapper = (children: ReactNode) => {
       return isMyMessage ? (
         <MyMessage>{children}</MyMessage>
       ) : (
         <TheirMessage>{children}</TheirMessage>
-      )
-    }
+      );
+    };
 
     switch (env) {
       case RoomEnvironmentType.room:
-        return messageNode
+        return messageNode;
       case RoomEnvironmentType.direct:
-        return directWrapper(messageNode)
+        return directWrapper(messageNode);
     }
   }
-)
-export default ChatItem
+);
+export default ChatItem;

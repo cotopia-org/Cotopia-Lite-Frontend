@@ -4,7 +4,6 @@ import NotFound from "@/components/shared/layouts/not-found";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 import UserCard from "../users/card";
 import { DirectType } from "@/types/direct";
-import { useAppSelector } from "@/store/redux/store";
 
 type Props = {
   search?: string;
@@ -33,22 +32,29 @@ export default function Directs({ search, onSelect, directs }: Props) {
 
   return (
     <div className='flex flex-col gap-y-4'>
-      {finalDirects.map((item, key) => {
-        let defaultMessage = item.last_message;
-        return (
-          <UserCard
-            key={key}
-            user={
-              item.participants.find(
-                (x) => x.id !== user?.id
-              ) as UserMinimalType
-            }
-            defaultLatest={defaultMessage}
-            direct={item}
-            onClick={() => onSelect(item)}
-          />
-        );
-      })}
+      {finalDirects
+        .filter(
+          (x) =>
+            x?.last_message !== undefined && x?.last_message?.nonce_id !== null
+        )
+        //@ts-ignore
+        .sort((a, b) => b?.last_message?.nonce_id - a?.last_message?.nonce_id)
+        .map((item, key) => {
+          let defaultMessage = item.last_message;
+          return (
+            <UserCard
+              key={key}
+              user={
+                item.participants.find(
+                  (x) => x.id !== user?.id
+                ) as UserMinimalType
+              }
+              defaultLatest={defaultMessage}
+              direct={item}
+              onClick={() => onSelect(item)}
+            />
+          );
+        })}
     </div>
   );
 }

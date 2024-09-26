@@ -10,17 +10,20 @@ import { WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
 import ModalDisconnected from "../room/connection-status/modal-disconnected";
 import useNetworkStatus from "@/hooks/use-net";
+import useSetting from "@/hooks/use-setting";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
   workspace_id: string;
-  room_id: string;
+  room_id: number;
 };
 export default function RoomSpatialWrapper({
   token,
   workspace_id,
   room_id,
 }: Props) {
+  const settings = useSetting();
+
   const [isReConnecting, setIsReconnecting] = useState(false);
 
   const { isOnline } = useNetworkStatus();
@@ -38,6 +41,8 @@ export default function RoomSpatialWrapper({
 
     if (!room_id) return;
 
+    socket.emit("joinedInRoom");
+
     setIsReconnecting(true);
   };
 
@@ -53,6 +58,10 @@ export default function RoomSpatialWrapper({
         stopLoading();
       });
   };
+
+  useSocket("roomUpdated", (data) => {
+    setRoom(data);
+  });
 
   useEffect(() => {
     if (!socket) return;
@@ -90,21 +99,23 @@ export default function RoomSpatialWrapper({
   }, [socket]);
 
   useEffect(() => {
-    if (!socketConnected) {
+    if (!socketConnected && settings.sounds.userJoinLeft) {
       playSoundEffect("userGotClosed");
     }
-  }, [socketConnected]);
+  }, [socketConnected, settings.sounds.userJoinLeft]);
 
   if (socketConnected === false)
     return <ModalDisconnected onReTry={handleConnectToSocket} />;
 
   return (
-    <div className='overflow-hidden max-h-screen'>
+    <div className='max-h-screen'>
       <RoomWrapper>
         <RoomHolder
           token={token}
           room={room}
-          onRoomUpdated={setRoom}
+          onRoomUpdated={(room) => {
+            setRoom(room);
+          }}
           room_id={room_id}
           workspace_id={workspace_id}
           isReConnecting={isReConnecting}

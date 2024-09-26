@@ -3,8 +3,8 @@ import getServerSession from "@/lib/server-session";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import Dashboard from "../(dashboard)/dashboard";
-import DashboardLayoutMaker from "@/components/shared/layouts/dashboard";
-import WorkspaceSidebar from "./sidebar";
+// import DashboardLayoutMaker from "@/components/shared/layouts/dashboard";
+// import WorkspaceSidebar from "./sidebar";
 
 type Props = {
   children: ReactNode;
@@ -18,9 +18,7 @@ export default async function layout({ children }: Props) {
 
   return (
     <Dashboard accessToken={data?.accessToken as string} user={data?.user}>
-      <DashboardLayoutMaker leftSidebar={<WorkspaceSidebar />}>
-        {children}
-      </DashboardLayoutMaker>
+      {children}
     </Dashboard>
   );
 }

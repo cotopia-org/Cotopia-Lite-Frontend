@@ -9,16 +9,18 @@ import Time from "../time"
 import { CheckCheck } from "lucide-react"
 import colors from "tailwindcss/colors"
 import { ReactNode, forwardRef } from "react"
+import { UserMinimalType } from "@/types/user"
 
 interface Props {
   isMine: boolean
+  user?: UserMinimalType
   fullWidth?: boolean
   item: ChatItemType
   beforeNode?: ReactNode
 }
 
 const MessageBox = forwardRef(
-  ({ item, isMine, beforeNode, fullWidth = false }: Props, ref: any) => {
+  ({ item, isMine, beforeNode, fullWidth = false, user }: Props, ref: any) => {
     const isMessageEdited = !!item.is_edited
     const isMessageSeen = !!item.seen
 
@@ -62,7 +64,7 @@ const MessageBox = forwardRef(
       <div
         ref={ref}
         data-id={`${item.id}`}
-        className="chat-item overflow-hidden relative flex flex-row my-2 items-start gap-x-2 select-text"
+        className="chat-item border-destructive overflow-hidden relative flex flex-col my-2 items-start gap-x-2 select-text"
       >
         <div className={messageBoxClss}>
           <div className="flex flex-col gap-y-2 w-full">
@@ -75,7 +77,7 @@ const MessageBox = forwardRef(
                 className="w-5 h-5"
                 title={getUserFullname(item?.user)?.[0]}
               />
-              <Username username={item.user.username} />
+              <Username username={item?.user?.username ?? ""} />
             </div>
             {beforeNode && beforeNode}
             <Message isMine={isMine} item={item} />

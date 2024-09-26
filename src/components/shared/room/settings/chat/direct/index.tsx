@@ -100,7 +100,7 @@ export default function UserChatDirect() {
     content = (
       <ChatRoomCtxProvider
         environment={RoomEnvironmentType.direct}
-        room_id={"" + directId}
+        room_id={directId}
       >
         <RoomDirectEnv user={selectedUser} onBack={handleBackToList} />
       </ChatRoomCtxProvider>

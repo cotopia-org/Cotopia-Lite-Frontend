@@ -1,56 +1,47 @@
 import CotopiaButton from "@/components/shared-ui/c-button";
 import PopupBox from "@/components/shared/popup-box";
-import { useApi } from "@/hooks/swr";
-import { FetchDataType } from "@/lib/axios";
-import { urlWithQueryParams } from "@/lib/utils";
-import { CalendarType } from "@/types/calendar";
-import { Calendar } from "lucide-react";
-import React from "react";
-import { useRoomContext } from "../../../room-context";
-import Calendars from "./calendars";
+import PopupBoxChild from "@/components/shared/popup-box/child";
+import { CalendarDays } from "lucide-react";
+import React, { useCallback, useMemo, useState } from "react";
+import ShapesHandler from "./shapes/handler";
+import { ScheduleType } from "@/types/calendar";
+import moment from "moment";
+import { estimateTotalHoursBySchedules, timeStringToMoment } from "@/lib/utils";
 
 export default function ScheduleButton() {
-  const { room } = useRoomContext();
+  const [myTotalSchedules, setMyTotalSchedules] = useState<ScheduleType[]>([]);
+  const onGetMySchedules = useCallback((schedules: ScheduleType[]) => {
+    setMyTotalSchedules(schedules);
+  }, []);
 
-  const { data, isLoading, mutate } = useApi<FetchDataType<CalendarType[]>>(
-    urlWithQueryParams(`/calendars`, {
-      workspace_id: room?.workspace_id,
-    }),
-    {
-      isFetch: !!room?.workspace_id,
-    }
-  );
-
-  const calendars = data !== undefined ? data?.data : [];
-
-  const onCreateBackend = (calendar: CalendarType) => {
-    mutate();
-  };
-
-  let buttonText = "Schedule";
-
-  if (calendars.length > 0) buttonText = "Schedule";
+  const totalHours = useMemo(() => {
+    return estimateTotalHoursBySchedules(myTotalSchedules);
+  }, [myTotalSchedules]);
 
   return (
     <PopupBox
       trigger={(open) => (
         <CotopiaButton
           onClick={open}
-          startIcon={<Calendar />}
+          startIcon={<CalendarDays />}
           className='bg-white hover:bg-white text-black rounded-xl'
-          loading={isLoading}
         >
-          {buttonText}
+          Schedule
         </CotopiaButton>
       )}
+      className='w-[551px]'
     >
       {(triggerPosition, open, close) => (
-        <div
-          className='bg-white rounded-lg p-4 fixed mt-4 '
-          style={{ top: triggerPosition.top, zIndex: triggerPosition.zIndex }}
+        <PopupBoxChild
+          top={triggerPosition.top}
+          left={triggerPosition.left}
+          zIndex={triggerPosition.zIndex}
+          onClose={close}
+          title={`Schedule (${totalHours ?? 0}h) per week`}
+          width={400}
         >
-          <Calendars calendars={calendars} onCreate={onCreateBackend} />
-        </div>
+          <ShapesHandler onGetMySchedules={onGetMySchedules} />
+        </PopupBoxChild>
       )}
     </PopupBox>
   );

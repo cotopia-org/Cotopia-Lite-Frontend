@@ -1,5 +1,4 @@
 import UserCalendarSettingsButtonTool from "./user-calendar";
-import UserSettingsButtonTool from "./user";
 import UserChatsSettingsButtonTool from "./user-chats";
 import { useRoomContext } from "../../../room-context";
 import CloseSidebar from "./close-sidebar";
@@ -13,9 +12,8 @@ export default function ChatActionsGroup() {
         <CloseSidebar onClick={closeSidebar} />
       ) : (
         <>
-          {/* <UserSettingsButtonTool /> */}
           <UserChatsSettingsButtonTool />
-          <UserCalendarSettingsButtonTool />
+          {/* <UserCalendarSettingsButtonTool /> */}
         </>
       )}
     </div>

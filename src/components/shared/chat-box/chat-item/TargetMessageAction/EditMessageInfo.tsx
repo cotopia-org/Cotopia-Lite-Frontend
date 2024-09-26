@@ -8,20 +8,12 @@ import colors from "tailwindcss/colors"
 interface Props {
   title: string
   desc: string
-  messageId: number
   onSelect?: () => void
   onClose: () => void
 }
 
-const EditMessageInfo = ({
-  desc,
-  title,
-  onClose,
-  onSelect,
-  messageId,
-}: Props) => {
+const EditMessageInfo = ({ desc, title, onClose, onSelect }: Props) => {
   const selectInfoHandler = useCallback(() => {
-    dispatch({ type: _BUS.scrollToTargetMessage, payload: messageId })
     if (onSelect) onSelect()
   }, [onSelect])
 

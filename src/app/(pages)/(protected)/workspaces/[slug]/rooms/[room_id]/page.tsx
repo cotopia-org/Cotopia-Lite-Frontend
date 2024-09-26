@@ -18,5 +18,5 @@ export default function RoomPage({
   searchParams: { token },
   params: { room_id, slug },
 }: Props) {
-  return <RoomSpatial token={token} workspace_id={slug} room_id={room_id} />;
+  return <RoomSpatial token={token} workspace_id={slug} room_id={+room_id} />;
 }

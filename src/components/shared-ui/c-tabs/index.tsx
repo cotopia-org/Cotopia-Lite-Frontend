@@ -43,11 +43,6 @@ export default function CTabs({
       onValueChange={handleChangeTab}
     >
       <div className='tab-holder flex flex-row items-center justify-between'>
-        {!!title && typeof title === "string" ? (
-          <strong className={titleClassName ?? ""}>{title}</strong>
-        ) : (
-          title
-        )}
         <TabsList className='flex flex-row justify-start bg-black/5'>
           {items.map((x) => (
             <TabsTrigger value={x.value} key={x.value}>
@@ -55,6 +50,11 @@ export default function CTabs({
             </TabsTrigger>
           ))}
         </TabsList>
+        {!!title && typeof title === "string" ? (
+          <strong className={titleClassName ?? ""}>{title}</strong>
+        ) : (
+          title
+        )}
       </div>
       {!!dividerBetweenContentAndTabs && <hr />}
       {items.map((x) => (

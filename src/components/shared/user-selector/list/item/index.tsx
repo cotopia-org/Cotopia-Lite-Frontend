@@ -26,11 +26,9 @@ export default function UserCardItem({ item, onPick, isSelected }: Props) {
         src={item.avatar?.url ?? undefined}
         title={userFullname?.[0]}
       />
-      <div className="flex flex-col">
+      <div className="flex items-start flex-col">
         <strong>{userFullname}</strong>
-        <div className="flex flex-row items-center gap-x-2 text-black/40">
-          <span>{username}</span>
-        </div>
+        <span>{username}</span>
       </div>
     </div>
   )

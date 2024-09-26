@@ -1,7 +1,10 @@
 "use client"
 
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
 import CotopiaPrompt from "@/components/shared-ui/c-prompt"
+import { useChatRoomCtx } from "@/context/chat-room-context"
 import { useChat } from "@/hooks/chat/use-chat"
+import { useChatSocket } from "@/hooks/chat/use-chat-socket"
 import useLoading from "@/hooks/use-loading"
 import { removeMessageAction } from "@/store/redux/slices/room-slice"
 import { useAppDispatch } from "@/store/redux/store"
@@ -16,23 +19,18 @@ interface Props {
 }
 
 const DeleteMessageAction = ({ message, onClose }: Props) => {
-  const { isLoading, startLoading, stopLoading } = useLoading()
+  const { user } = useProfile()
+  const { roomId, env } = useChatRoomCtx()
 
-  const { deleteMessage } = useChat()
+  const { remove } = useChatSocket(roomId, user, env)
 
   const appDispatch = useAppDispatch()
 
   const deleteMessageHandler = useCallback(async () => {
     try {
-      startLoading()
-      const res = await deleteMessage(message.id)
-      appDispatch(removeMessageAction({ message: res }))
-      toast.success("Your message has been deleted successfully")
-      stopLoading()
+      await remove({ message })
       onClose()
-    } catch (error) {
-      stopLoading()
-    }
+    } catch (error) {}
   }, [message, onClose, appDispatch])
 
   return (
@@ -40,7 +38,6 @@ const DeleteMessageAction = ({ message, onClose }: Props) => {
       open
       title="Delete Message"
       submitText="Delete"
-      loading={isLoading}
       description="Do you want to delete this message?"
       onSubmit={deleteMessageHandler}
       onClose={onClose}

@@ -77,8 +77,8 @@ export default function CotopiaPrompt({
         {trigger ? (
           <DialogTrigger asChild>{trigger(handleOpen)}</DialogTrigger>
         ) : null}
-        <DialogOverlay onClick={handleClose} />
-        <div className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg">
+        <DialogOverlay className="z-10" onClick={handleClose} />
+        <div className="fixed left-[50%] top-[50%] z-20 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg">
           <CotopiaPromptContent
             {...rest}
             onSubmit={handleSubmit}

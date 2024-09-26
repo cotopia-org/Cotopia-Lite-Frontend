@@ -1,5 +1,6 @@
 import { Toaster } from "sonner";
 import "./globals.css";
+import "@xyflow/react/dist/style.css";
 import { Viewport } from "next";
 
 export const viewport: Viewport = {
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body>
         <Toaster />
         {children}
+        <div id='portal'></div>
       </body>
     </html>
   );

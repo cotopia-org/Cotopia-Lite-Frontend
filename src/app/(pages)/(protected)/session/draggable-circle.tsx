@@ -24,15 +24,14 @@ import { Participant, Track } from "livekit-client"
 import { isTrackReferencePlaceholder } from "@livekit/components-core"
 import SessionWrapper from "./wrapper"
 import { useUserTile } from "."
-import { useProfile, useSocket } from "../protected-wrapper"
-import { UserMinimalType } from "@/types/user"
-import { useRoomContext } from "@/components/shared/room/room-context"
+import { useProfile } from "../protected-wrapper"
 import CotopiaAvatar from "@/components/shared-ui/c-avatar"
 import { doCirclesMeet, getUserFullname } from "@/lib/utils"
 import VoiceAreaHearing from "./wrapper/voice-area-hearing"
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip"
-import DraggableRoom from "@/components/shared/room/components/draggable-room"
 import { __VARS } from "@/app/const/vars"
+import { useRoomContext } from "@/components/shared/room/room-context"
+import ParticipantDetails from "@/components/shared/room/participant-detail"
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -93,7 +92,7 @@ function TrackRefContextIfNeeded(
   )
 }
 
-const ParticipantTile = React.forwardRef<
+export const ParticipantTile = React.forwardRef<
   HTMLDivElement,
   ParticipantTileProps & { isDragging: boolean }
 >(function ParticipantTile(
@@ -109,12 +108,13 @@ const ParticipantTile = React.forwardRef<
 ) {
   const trackReference = useEnsureTrackRef(trackRef)
 
-  const { elementProps } = useParticipantTile<HTMLDivElement>({
+  const { elementProps } = useParticipantTile({
     htmlProps,
     disableSpeakingIndicator,
     onParticipantClick,
     trackRef: trackReference,
   })
+
   const layoutContext = useMaybeLayoutContext()
 
   const autoManageSubscription = useFeatureContext()?.autoSubscription
@@ -138,16 +138,17 @@ const ParticipantTile = React.forwardRef<
 
   const { isMuted } = useTrackMutedIndicator(trackRef)
 
+  const { draggable } = useUserTile()
+
   const isSpeaking = trackReference?.participant?.isSpeaking
 
   let clss =
-    "relative user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center"
+    "relative z-[10] user-circle transition-all w-full h-full [&_.lk-participant-tile]:!absolute [&_.lk-participant-tile]:w-full [&_.lk-participant-tile]:h-full [&_.lk-participant-tile]:top-0 [&_.lk-participant-tile]:left-0 rounded-full p-1 [&_video]:h-full [&_video]:object-cover [&_video]:rounded-full [&_video]:h-full [&_video]:w-full w-[96px] h-[96px] flex flex-col items-center justify-center"
 
   const { user } = useProfile()
 
-  const isMyUser = user?.username === livekitIdentity
+  const { room } = useRoomContext()
 
-  const { room, videoState } = useRoomContext()
   const participants = room?.participants
 
   const updatedMyUser = participants?.find(
@@ -183,13 +184,13 @@ const ParticipantTile = React.forwardRef<
     }
   }
 
-  let showAvatar = false
+  let showAvatar = true
 
   //I heet the circles? checking
   const { meet } = doCirclesMeet(updatedMyUser, targetUser)
 
-  //Show user avatar if user is muted or isn't in user's area
-  showAvatar = !(isMuted || meet) || isMuted || isMyUser
+  if (!isMuted && trackRef?.source === Track.Source.Camera && meet)
+    showAvatar = false
 
   //Scale down the user profile if user isn't in user's area
   if (!meet) clss += ` scale-[0.6]`
@@ -207,149 +208,87 @@ const ParticipantTile = React.forwardRef<
     clss += ` bg-gray-600`
   }
 
-  if (!isMuted && isMyUser) showAvatar = false
+  // if (!isMuted && trackRef?.source !== Track.Source.ScreenShare && isMyUser)
+  //   showAvatar = false;
 
   // if (!videoState) showAvatar = true;
 
+  if (targetUser === undefined) return
+
   return (
     <CotopiaTooltip title={userFullName}>
-      <VoiceAreaHearing isDragging={isDragging} />
-      <div className={clss}>
-        <div className="relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center">
-          {showAvatar && (
-            <CotopiaAvatar
-              className="absolute top-0 left-0 w-full h-full z-[1]"
-              src={targetUser?.avatar?.url ?? ""}
-              title={userFullName?.[0] ?? livekitIdentity?.[0]}
-            />
-          )}
-          <div className={``}>
-            <div ref={ref} style={{ position: "relative" }} {...elementProps}>
-              <TrackRefContextIfNeeded trackRef={trackReference}>
-                <ParticipantContextIfNeeded
-                  participant={trackReference.participant}
+      <ParticipantDetails roomId={room?.id as number} user={targetUser}>
+        <>
+          <VoiceAreaHearing isDragging={isDragging} />
+          <div className={clss}>
+            <div className="relative w-[86px] h-[86px] rounded-full flex flex-col items-center justify-center">
+              {showAvatar && (
+                <CotopiaAvatar
+                  className="absolute top-0 left-0 w-full h-full z-[1]"
+                  src={targetUser?.avatar?.url ?? ""}
+                  title={userFullName?.[0] ?? livekitIdentity?.[0]}
+                />
+              )}
+              <div className={``}>
+                <div
+                  ref={ref}
+                  style={{ position: "relative" }}
+                  {...elementProps}
                 >
-                  {children ?? <>{trackContent}</>}
-                </ParticipantContextIfNeeded>
-              </TrackRefContextIfNeeded>
+                  <TrackRefContextIfNeeded trackRef={trackReference}>
+                    <ParticipantContextIfNeeded
+                      participant={trackReference.participant}
+                    >
+                      {children ?? <>{trackContent}</>}
+                    </ParticipantContextIfNeeded>
+                  </TrackRefContextIfNeeded>
+                </div>
+              </div>
             </div>
+            <ActionsRight>
+              <MicButton
+                trackRef={{
+                  participant: trackReference.participant,
+                  source: Track.Source.Microphone,
+                }}
+              />
+            </ActionsRight>
           </div>
-        </div>
-        <ActionsRight>
-          <MicButton
-            trackRef={{
-              participant: trackReference.participant,
-              source: Track.Source.Microphone,
-            }}
-          />
-        </ActionsRight>
-      </div>
+        </>
+      </ParticipantDetails>
     </CotopiaTooltip>
   )
 })
 
 const DEFAULT_TILE_POSITION = [0, 0]
 
-export default function DraggableCircle() {
-  const socket = useSocket()
+type Props = {
+  defaultIsDragging: boolean
+}
 
-  const [isDragging, setIsDragging] = useState(false)
-  const handleStartDragging = () => {
-    setIsDragging(true)
-  }
-
-  const { room, updateUserCoords } = useRoomContext()
-
-  const [participants, setParticipants] = useState<UserMinimalType[]>(
-    room ? room?.participants : []
-  )
-  useEffect(() => {
-    setParticipants(room?.participants ?? [])
-  }, [room?.participants])
-
-  const { user } = useProfile()
+export default function DraggableCircle({ defaultIsDragging }: Props) {
   const { track } = useUserTile()
 
-  const livekitIdentity = track?.participant?.identity
-
-  useSocket("userUpdated", (user: UserMinimalType) => {
-    let userCoordinates = user?.coordinates
-      ? user?.coordinates?.split(",")
-      : DEFAULT_TILE_POSITION
-
-    userCoordinates = userCoordinates.map((x) => +x)
-
-    setParticipants((prev) => {
-      const prevParticpants = [...(prev ?? [])]
-
-      const participantIds = prev?.map((x) => x.id)
-
-      const foundIndex = participantIds?.findIndex((id) => id === user?.id)
-
-      if (foundIndex !== undefined && foundIndex > -1) {
-        const foundUser = prevParticpants[foundIndex]
-
-        const updatedUser: UserMinimalType = {
-          ...foundUser,
-          coordinates: user?.coordinates,
-        }
-
-        const userPosition = updatedUser.coordinates
-          ?.split(",")
-          ?.map((x) => +x) ?? [0, 0]
-
-        prevParticpants[foundIndex] = updatedUser
-        updateUserCoords(foundUser.username, {
-          x: userPosition[0],
-          y: userPosition[1],
-        })
-      }
-
-      return prevParticpants
-    })
-  })
-
-  const handleUpdateCoordinates = (position: { x: number; y: number }) => {
-    socket?.emit("updateCoordinates", {
-      room_id: room?.id,
-      coordinates: `${position.x ?? __VARS.defaultPositionOfUserX},${
-        position.y ?? __VARS.defaultPositionOfUserY
-      }`,
-      username: livekitIdentity,
-    })
-  }
-
-  const handleUpdateLocalCoords = (position: { x: number; y: number }) => {
-    updateUserCoords(user?.username, position)
-  }
-
-  const isMyUser = user?.username === livekitIdentity
-
-  const positionUser = participants?.find(
-    (x) => x?.username === livekitIdentity
-  )
-
-  const coordsUser = positionUser?.coordinates?.split(",")?.map((x) => +x) ?? [
-    __VARS.defaultPositionOfUserX,
-    __VARS.defaultPositionOfUserY,
-  ]
-
   return (
-    <DraggableRoom
-      onDragEnd={(position) => {
-        handleUpdateCoordinates(position)
-        setIsDragging(false)
-      }}
-      onDragging={handleUpdateLocalCoords}
-      onStartDragging={handleStartDragging}
-      disabled={!isMyUser}
-      hasTransition={!isMyUser}
-      x={coordsUser?.[0]}
-      y={coordsUser?.[1]}
-    >
-      <SessionWrapper>
-        <ParticipantTile isDragging={isDragging} />
-      </SessionWrapper>
-    </DraggableRoom>
+    <SessionWrapper>
+      <ParticipantTile trackRef={track as any} isDragging={defaultIsDragging} />
+    </SessionWrapper>
   )
+
+  // return (
+  //   <DraggableRoom
+  //     onDragEnd={(position) => {
+  //       handleUpdateCoordinates(position);
+  //       setIsDragging(false);
+  //     }}
+  //     onDragging={handleUpdateLocalCoords}
+  //     onStartDragging={handleStartDragging}
+  //     disabled={!isMyUser}
+  //     hasTransition={!isMyUser}
+  //     x={coordsUser?.[0]}
+  //     y={coordsUser?.[1]}
+  //   >
+
+  //   </DraggableRoom>
+  // );
 }

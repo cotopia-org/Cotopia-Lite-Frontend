@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import VoiceEffects from "./voice-effects";
 import LiveKitVoiceFrequency from "./voice-effects/test";
 
 type Props = {

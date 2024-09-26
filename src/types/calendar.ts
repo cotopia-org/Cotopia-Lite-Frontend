@@ -1,32 +1,21 @@
-export type CalendarType = {
-  created_at: string;
-  description: null | string;
-  id: number;
-  owner_id: number;
-  title: null | string;
-  updated_at: string;
-  workspace_id: number;
-};
-
-export enum RecurrencePattern {
-  "Daily" = 1,
-  "Weekly" = 2,
-  "Monthly" = 3,
-  "Custom" = 4,
-}
-
-export enum RecurrenceDays {
-  "Monday" = 0,
-  "Tuesday" = 1,
-  "Wednesday" = 2,
-  "Thursday" = 3,
-  "Friday" = 4,
-  "Saturday" = 5,
-  "Sunday" = 6,
-}
+import { UserMinimalType, WorkspaceUserType } from "./user"
 
 export enum AvailabiltyType {
   "Video" = 0,
   "Voice" = 1,
   "Text" = 2,
+}
+
+export type ScheduleType = {
+  availability_type: AvailabiltyType
+  days: { day: number; times: { start: string; end: string }[] }[]
+  end_time: string
+  id: number
+  is_recurrence: 0 | 1
+  recurrence_end_at: null | string
+  recurrence_start_at: string
+  start_time: string
+  timezone: string
+  user: WorkspaceUserType
+  workspace_id: number
 }

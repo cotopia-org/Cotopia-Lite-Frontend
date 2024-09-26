@@ -10,7 +10,10 @@ export const __VARS = {
   signOutApiPage: `/api/auth/sign-out`,
   voiceAreaRadius: 200,
   defaultPositionOfUserX: 400,
+  jailNodeType: "jailNode",
+  backgroundNodeType: "backgroundNode",
   defaultPerPage: 20,
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
+  teleportMargin: 40,
 }

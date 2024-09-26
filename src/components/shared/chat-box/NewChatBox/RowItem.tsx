@@ -2,6 +2,7 @@
 import { ChatItemType } from "@/types/chat"
 import ChatItem from "../chat-item"
 import { memo } from "react"
+import { UserMinimalType } from "@/types/user"
 
 const RowItem = ({
   item,
@@ -10,6 +11,7 @@ const RowItem = ({
 }: {
   item: ChatItemType
   observerId?: number
+  user?: UserMinimalType
   onFetchMessages?: () => Promise<void>
 }) => {
   return (
