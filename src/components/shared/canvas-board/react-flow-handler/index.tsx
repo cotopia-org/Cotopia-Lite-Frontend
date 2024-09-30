@@ -220,7 +220,6 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateCoordinates",
     (data) => {
-      console.log(data, "DATA")
       updateUserCoordinate(data)
     },
     [updateUserCoordinate]

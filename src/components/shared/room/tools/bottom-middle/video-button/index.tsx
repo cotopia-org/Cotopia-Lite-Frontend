@@ -1,58 +1,49 @@
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
-import { useLocalParticipant } from "@livekit/components-react";
-import { Track } from "livekit-client";
-import { Video, VideoOff } from "lucide-react";
-import { useRoomContext } from "../../../room-context";
-import { useRoomHolder } from "../../..";
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
+import CotopiaTooltip from "@/components/shared-ui/c-tooltip"
+import { useLocalParticipant } from "@livekit/components-react"
+import { Track } from "livekit-client"
+import { Video, VideoOff } from "lucide-react"
+import { useRoomHolder } from "../../.."
 
 export default function VideoButtonTool() {
-  const { mediaPermissions, changeMediaPermission } = useRoomHolder();
+  const { enableVideoAccess, disableVideoAccess, stream_loading } =
+    useRoomHolder()
 
-  const { changePermissionState } = useRoomContext();
+  const { localParticipant } = useLocalParticipant()
 
-  const { localParticipant } = useLocalParticipant();
+  const videoTrack = localParticipant.getTrackPublication(Track.Source.Camera)
 
-  const voiceTrack = localParticipant.getTrackPublication(Track.Source.Camera);
+  const track = videoTrack?.track
 
-  const track = voiceTrack?.track;
-
-  const isUpstreamPaused = voiceTrack?.isMuted ?? true;
+  const isUpstreamPaused = videoTrack?.isMuted ?? true
 
   const toggleUpstream = async () => {
     if (!track) {
-      return;
+      return localParticipant.setCameraEnabled(true), enableVideoAccess()
     }
-
     if (isUpstreamPaused) {
-      changeMediaPermission({
-        ...mediaPermissions,
-        video: true,
-      });
-
-      track.unmute();
-      changePermissionState("video", true);
+      enableVideoAccess()
+      track.unmute()
     } else {
-      changeMediaPermission({
-        ...mediaPermissions,
-        video: false,
-      });
-
-      track.mute();
-      track.stop();
-      changePermissionState("video", false);
+      disableVideoAccess()
+      track.mute()
+      track.stop()
     }
-  };
+  }
 
-  let title = "Video Off";
+  let title = "Video Off"
 
-  if (track?.isMuted) title = "Video on";
+  if (track?.isMuted) title = "Video on"
 
   return (
     <CotopiaTooltip title={title}>
-      <CotopiaIconButton className='text-black' onClick={toggleUpstream}>
+      <CotopiaIconButton
+        disabled={stream_loading}
+        className="text-black"
+        onClick={toggleUpstream}
+      >
         {isUpstreamPaused ? <VideoOff size={20} /> : <Video size={20} />}
       </CotopiaIconButton>
     </CotopiaTooltip>
-  );
+  )
 }
