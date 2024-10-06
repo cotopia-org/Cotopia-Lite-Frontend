@@ -51,11 +51,9 @@ export default function ChatWrapper({ children }: Props) {
   })
 
   useSocket("messageUpdated", (data) => {
-    console.log(data, "MESSAGE UPDATED")
     appDispatch(updateMessagesAction({ message: data }))
   })
   useSocket("messageDeleted", (data) => {
-    console.log(data, "MESSAGE Deleted")
     appDispatch(removeMessageAction({ message: data }))
   })
 

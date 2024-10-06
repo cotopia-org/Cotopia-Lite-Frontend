@@ -1,12 +1,21 @@
-import { ReactNode, useEffect } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { SquareArrowOutDownRight } from "lucide-react"
 
 interface Props {
   children: ReactNode
+  onChangeSize?: (size: { width: number; height: number }) => void
 }
 
-const ResizableWrapper = ({ children }: Props) => {
+const ResizableWrapper = ({ children, onChangeSize }: Props) => {
   let bulletClss = "w-[48px] h-[48px] bg-white shadow-lg rounded-full absolute"
+
+  const [measure, setMeasure] = useState<{ width: number; height: number }>()
+
+  useEffect(() => {
+    if (measure && onChangeSize) {
+      onChangeSize(measure)
+    }
+  }, [measure])
 
   let bulletsNode = (
     <div
@@ -24,17 +33,17 @@ const ResizableWrapper = ({ children }: Props) => {
       const minimum_size = 20
       let start_width = 0
       let start_height = 0
+      let last_width = 0
+      let last_height = 0
       let start_mouse_x = 0
       let start_mouse_y = 0
       let aspect_ratio = 1 // Default aspect ratio
-
       function resize(e: MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         if (resizerNode && element) {
           const delta_x = e.clientX - start_mouse_x
           const delta_y = e.clientY - start_mouse_y
-
           const available_delta =
             Math.abs(delta_x) > Math.abs(delta_y) ? delta_x : delta_y
           let new_width = start_width + available_delta
@@ -42,12 +51,16 @@ const ResizableWrapper = ({ children }: Props) => {
 
           // Ensure the new dimensions are above the minimum size
           if (new_width > minimum_size && new_height > minimum_size) {
+            last_height = new_height
+            last_width = new_width
             element.style.width = new_width + "px"
             element.style.height = new_height + "px"
           }
         }
       }
       function stopResize() {
+        setMeasure({ width: last_width, height: last_height })
+
         window.removeEventListener("mousemove", resize)
       }
       resizerNode.addEventListener("mousedown", function (e: any) {
@@ -64,7 +77,6 @@ const ResizableWrapper = ({ children }: Props) => {
             .replace("px", "")
         )
         aspect_ratio = start_width / start_height // Calculate the aspect ratio
-
         start_mouse_x = e.clientX
         start_mouse_y = e.clientY
         window.addEventListener("mousemove", resize)

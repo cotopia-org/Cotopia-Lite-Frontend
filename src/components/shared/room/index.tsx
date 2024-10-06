@@ -116,8 +116,6 @@ export default function RoomHolder({
       .query({ name: "camera" } as any)
       .then(async (res) => {
         const permissionState = res.state
-
-        console.log(permissionState, "PERMSTATE")
         if (permissionState === "denied") {
           return toast.error(
             "Access to camera is blocked,please check your browser settings"
@@ -179,8 +177,6 @@ export default function RoomHolder({
       .query({ name: "microphone" } as any)
       .then(async (res) => {
         const permissionState = res.state
-        console.log(permissionState, "PERMSTATE")
-
         if (permissionState === "denied") {
           return toast.error(
             "Access to microhpone is blocked,please check your browser settings"
@@ -264,7 +260,7 @@ export default function RoomHolder({
   let content = (
     <LiveKitRoom
       video={state.permissions.video}
-      audio
+      audio={state.permissions.audio}
       token={token}
       serverUrl={__VARS.serverUrl}
       options={{

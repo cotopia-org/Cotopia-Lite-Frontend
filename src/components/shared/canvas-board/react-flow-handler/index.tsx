@@ -48,7 +48,7 @@ const nodeTypes = {
   userNode: UserNode,
   backgroundNode: BackgroundNode,
   jailNode: JailNode,
-  shareSreenCard: ShareScreen,
+  shareScreenCard: ShareScreen,
 }
 
 type LeftJoinType = {
@@ -167,27 +167,66 @@ function ReactFlowHandler({ tracks }: Props) {
 
   useEffect(() => {
     setNodes((prev) => [
-      ...prev.filter((x) => x.type !== "shareSreenCard"),
+      ...prev.filter((x) => x.type !== "shareScreenCard"),
       ...tracks
         ?.filter((x) => x.source === Track.Source.ScreenShare)
-        ?.map(
-          (x, i) =>
-            ({
-              id: "share-screen-" + i,
-              type: "shareSreenCard",
-              data: {
-                track: x,
-              },
-              position: {
-                x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
-                y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
-              },
-              parentId: RF_JAIL_ID,
-              extent: "parent",
-            } as Node)
-        ),
+        ?.map((x, i) => {
+          const isDraggable = user?.username === x.participant.identity
+          return {
+            id: "share-screen-" + i,
+            type: "shareScreenCard",
+            data: {
+              track: x,
+              draggable: isDraggable,
+            },
+            measured: { width: 400, height: 200 },
+            position: {
+              x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
+              y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
+            },
+            parentId: RF_JAIL_ID,
+            extent: "parent",
+          } as Node
+        }),
     ])
   }, [tracks])
+
+  const updateShareScreenCoordinates = (data: { coordinates: string }) => {
+    const coordinates = data.coordinates
+    if (!coordinates) return
+    const arr_coords = coordinates.split(",")
+    if (arr_coords.length !== 2) return
+    let x = arr_coords[0]
+    let y = arr_coords[1]
+    setNodes((crtNds) => {
+      return crtNds.map((node) => {
+        const ssNode = node.type === "shareScreenCard"
+        return ssNode ? { ...node, position: { x: +x, y: +y } } : node
+      })
+    })
+  }
+
+  const updateShScreenMeasure = (data: { size: string }) => {
+    const size = data?.size
+
+    if (!size) return
+
+    const size_array = size.split(",")
+
+    if (size_array.length !== 2) return
+
+    let width = size_array[0]
+    let height = size_array[1]
+
+    setNodes((crtNds) => {
+      return crtNds.map((node) => {
+        const ssNode = node.type === "shareScreenCard"
+        return ssNode
+          ? { ...node, measured: { width: +width, height: +height } }
+          : node
+      })
+    })
+  }
 
   const updateUserCoordinate = (data: UserMinimalType) => {
     const username = data?.username
@@ -225,9 +264,30 @@ function ReactFlowHandler({ tracks }: Props) {
     [updateUserCoordinate]
   )
 
+  useSocket(
+    "updateShareScreenCoordinates",
+    (data) => {
+      updateShareScreenCoordinates(data)
+    },
+    [updateShareScreenCoordinates]
+  )
+
+  useSocket(
+    "updateShareScreenSize",
+    (data) => {
+      console.log(data, "RESIZEDATA")
+      updateShScreenMeasure(data.size)
+    },
+    [updateShScreenMeasure]
+  )
+
   useBus(_BUS.changeMyUserCoord, (data) => {
-    console.log("data.data", data.data)
     updateUserCoordinate(data.data)
+  })
+
+  useBus(_BUS.changeScreenShareSize, (data) => {
+    console.log(data.data, "DATATTA")
+    updateShScreenMeasure(data.data)
   })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
@@ -259,23 +319,35 @@ function ReactFlowHandler({ tracks }: Props) {
   })
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
-    if (node?.data?.draggable) {
-      if (!socket) return
-
-      const newCoords = `${node.position.x},${node.position.y}`
-
-      const username: string = node.data.username as string
-      const sendingObject = {
-        room_id: room?.id,
-        coordinates: newCoords,
-        username,
+    //check if the node belongs to share screen
+    const isShareScreenNode = node.type === "shareScreenCard"
+    //check if the node belongs to user node
+    const isUserNode = node.type === "userNode"
+    //check is node draggable
+    const isDraggable = node?.data?.draggable
+    if (isDraggable) {
+      if (isUserNode) {
+        if (!socket) return
+        const newCoords = `${node.position.x},${node.position.y}`
+        const username: string = node.data.username as string
+        const sendingObject = {
+          room_id: room?.id,
+          coordinates: newCoords,
+          username,
+        }
+        socket.emit("updateCoordinates", sendingObject)
+        const livekitIdentity = username
+        updateUserCoords(livekitIdentity, node.position)
       }
-
-      socket.emit("updateCoordinates", sendingObject)
-
-      const livekitIdentity = username
-
-      updateUserCoords(livekitIdentity, node.position)
+      if (isShareScreenNode) {
+        if (!socket) return
+        const newCoords = `${node.position.x},${node.position.y}`
+        const sendingObject = {
+          room_id: room?.id,
+          coordinates: newCoords,
+        }
+        socket.emit("updateShareScreenCoordinates", sendingObject)
+      }
     }
   }
 

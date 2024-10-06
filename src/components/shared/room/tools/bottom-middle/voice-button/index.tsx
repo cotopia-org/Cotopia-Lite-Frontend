@@ -24,7 +24,9 @@ export default function VoiceButtonTool() {
         )
       } else {
         if (!track) {
-          return
+          return (
+            localParticipant.setMicrophoneEnabled(true), enableAudioAccess()
+          )
         }
         if (track.isMuted) {
           track.unmute()

@@ -63,8 +63,6 @@ const NodesPreview: React.FC<Props> = ({ tracks, nodes, viewport }) => {
     .filter((x) => x.type === "userNode")
     .filter((x) => x.id !== user.username)
 
-  console.log("outOfViewNodes", outOfViewNodes)
-
   return (
     <div className="z-40">
       {finalNodes.map((node) => {

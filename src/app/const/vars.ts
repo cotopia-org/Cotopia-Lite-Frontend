@@ -12,6 +12,7 @@ export const __VARS = {
   defaultPositionOfUserX: 400,
   jailNodeType: "jailNode",
   backgroundNodeType: "backgroundNode",
+  ShareScreenType: "shareScreenCard",
   defaultPerPage: 20,
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
