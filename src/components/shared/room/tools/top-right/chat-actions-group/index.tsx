@@ -1,4 +1,3 @@
-import UserCalendarSettingsButtonTool from "./user-calendar";
 import UserChatsSettingsButtonTool from "./user-chats";
 import { useRoomContext } from "../../../room-context";
 import CloseSidebar from "./close-sidebar";
