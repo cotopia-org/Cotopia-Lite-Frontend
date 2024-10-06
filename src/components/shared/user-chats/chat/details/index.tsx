@@ -1,8 +1,9 @@
-import { useChat } from "..";
+import { ChatType } from "@/types/chat2";
 
-export default function ChatDetails() {
-  const { chat } = useChat();
-
+type Props = {
+  chat: ChatType;
+};
+export default function ChatDetails({ chat }: Props) {
   return (
     <div className='flex flex-col gap-y-1 flex-1'>
       <div className='flex flex-row items-center justify-between'>
