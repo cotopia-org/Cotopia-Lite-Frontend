@@ -30,7 +30,7 @@ export default function ScreenShareCard({ track }: Props) {
   const sh_screen_w = shareScreenNode?.measured?.width ?? 400
   const sh_screen_h = shareScreenNode?.measured?.height ?? 200
 
-  console.log(sh_screen_w, sh_screen_h, "SHWIH")
+  console.log(nodes, "SHWIH")
 
   const { room } = useRoomContext()
 
@@ -70,28 +70,27 @@ export default function ScreenShareCard({ track }: Props) {
 
   const videoContent = <VideoTrack trackRef={track} />
 
-  const resizeShScreenHandler = useCallback(
-    (measure: { width: number; height: number }) => {
-      console.log(socket, "SOCKET")
-      if (!socket) return
-      let new_width = measure.width
-      let new_height = measure.height
-      const new_size = `${new_width},${new_height}`
-      const sendingObject = {
-        room_id: room?.id,
+  const resizeShScreenHandler = (measure: {
+    width: number
+    height: number
+  }) => {
+    console.log(socket, "SOCKET")
+    if (!socket) return
+    let new_width = measure.width
+    let new_height = measure.height
+    const new_size = `${new_width},${new_height}`
+    const sendingObject = {
+      room_id: room?.id,
+      size: new_size,
+    }
+    socket.emit("updateShareScreenSize", sendingObject)
+    dispatch({
+      type: _BUS.changeScreenShareSize,
+      data: {
         size: new_size,
-      }
-      console.log(sendingObject, "SENDING OBJECT")
-      socket.emit("updateShareScreenSize", sendingObject)
-      dispatch({
-        type: _BUS.changeScreenShareSize,
-        data: {
-          size: new_size,
-        },
-      })
-    },
-    [nodes, room, socket]
-  )
+      },
+    })
+  }
 
   let content = (
     <div style={{ width: sh_screen_w, height: sh_screen_h }} className={clss}>

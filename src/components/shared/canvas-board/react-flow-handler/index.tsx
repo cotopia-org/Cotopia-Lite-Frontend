@@ -125,7 +125,7 @@ function ReactFlowHandler({ tracks }: Props) {
         if (typeof ycoord === "string") ycoord = +ycoord
 
         const track = tracks.find(
-          (a) => a.participant.identity === participant.username
+          (a) => a.participant.identity === participant?.username
         )
 
         const isDraggable = user?.username === track?.participant?.identity
@@ -134,7 +134,7 @@ function ReactFlowHandler({ tracks }: Props) {
           id: "" + participant?.username,
           type: "userNode",
           data: {
-            username: participant.username,
+            username: participant?.username,
             draggable: isDraggable,
             isDragging: false,
           },
@@ -179,7 +179,10 @@ function ReactFlowHandler({ tracks }: Props) {
               track: x,
               draggable: isDraggable,
             },
-            measured: { width: 400, height: 200 },
+            measured: {
+              width: rf?.getNode("share-screen-" + i)?.measured?.width ?? 400,
+              height: rf?.getNode("share-screen-" + i)?.measured?.height ?? 200,
+            },
             position: {
               x: rf?.getNode("share-screen-" + i)?.position.x ?? 200,
               y: rf?.getNode("share-screen-" + i)?.position.y ?? 200,
@@ -193,11 +196,15 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const updateShareScreenCoordinates = (data: { coordinates: string }) => {
     const coordinates = data.coordinates
+
     if (!coordinates) return
+
     const arr_coords = coordinates.split(",")
+
     if (arr_coords.length !== 2) return
     let x = arr_coords[0]
     let y = arr_coords[1]
+
     setNodes((crtNds) => {
       return crtNds.map((node) => {
         const ssNode = node.type === "shareScreenCard"
@@ -275,8 +282,7 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateShareScreenSize",
     (data) => {
-      console.log(data, "RESIZEDATA")
-      updateShScreenMeasure(data.size)
+      updateShScreenMeasure(data)
     },
     [updateShScreenMeasure]
   )
@@ -286,7 +292,6 @@ function ReactFlowHandler({ tracks }: Props) {
   })
 
   useBus(_BUS.changeScreenShareSize, (data) => {
-    console.log(data.data, "DATATTA")
     updateShScreenMeasure(data.data)
   })
 
@@ -299,7 +304,7 @@ function ReactFlowHandler({ tracks }: Props) {
 
     if (gotRoomId !== +room_id) return
 
-    setNodes((prev) => prev.filter((x) => x.id !== targetUser.username))
+    setNodes((prev) => prev.filter((x) => x.id !== targetUser?.username))
 
     if (user.id !== targetUser.id) playSoundEffect("elseUserleft")
   })
@@ -329,7 +334,7 @@ function ReactFlowHandler({ tracks }: Props) {
       if (isUserNode) {
         if (!socket) return
         const newCoords = `${node.position.x},${node.position.y}`
-        const username: string = node.data.username as string
+        const username: string = node.data?.username as string
         const sendingObject = {
           room_id: room?.id,
           coordinates: newCoords,
