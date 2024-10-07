@@ -209,6 +209,8 @@ function ReactFlowHandler({ tracks }: Props) {
   const updateShareScreenCoordinates = (data: { coordinates: string }) => {
     const coordinates = data.coordinates
 
+    console.log(data, "UPDATECOORD")
+
     if (!coordinates) return
 
     const arr_coords = coordinates.split(",")
@@ -240,14 +242,14 @@ function ReactFlowHandler({ tracks }: Props) {
     setNodes((crtNds) => {
       return crtNds.map((node) => {
         const ssNode = node.type === "shareScreenCard"
+
+        let newData = { ...node, measured: { width: +width, height: +height } }
         if (ssNode) {
-          return {
-            ...node,
-            measured: { width: +width, height: +height },
-            // data: { ...node?.data, width: +width, height: +height },
-          }
+          console.log(newData, "NEWDATA")
+          return newData
+        } else {
+          return node
         }
-        return node
       })
     })
   }
@@ -255,6 +257,7 @@ function ReactFlowHandler({ tracks }: Props) {
   console.log(nodes, "INNER NODES")
   const updateUserCoordinate = (data: UserMinimalType) => {
     const username = data?.username
+
     const coordinates = data?.coordinates
 
     if (!username) {
@@ -292,6 +295,7 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateShareScreenCoordinates",
     (data) => {
+      console.log(data, "DATA")
       updateShareScreenCoordinates(data)
     },
     [updateShareScreenCoordinates]
@@ -300,6 +304,7 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateShareScreenSize",
     (data) => {
+      console.log(data, "SHARESCREENDATA")
       updateShScreenMeasure(data)
     },
     [updateShScreenMeasure]
@@ -310,7 +315,7 @@ function ReactFlowHandler({ tracks }: Props) {
   })
 
   useBus(_BUS.changeScreenShareSize, (data) => {
-    updateShScreenMeasure(data.data)
+    // updateShScreenMeasure(data.data)
   })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {

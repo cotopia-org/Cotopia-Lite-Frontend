@@ -47,15 +47,19 @@ export default function ScreenShareCard({
     return width
   }, [shareScreenNode?.measured?.width])
 
+  const new_sh_screen_w = shareScreenNode?.measured?.width ?? 400
+
+  const new_sh_screen_h = shareScreenNode?.measured?.height ?? 200
+
   const sh_screen_h = useMemo(() => {
-    let height = 400
+    let height = 200
     if (shareScreenNode?.measured?.height) {
       height = shareScreenNode.measured.height
     }
     return height
   }, [shareScreenNode?.measured?.height])
 
-  console.log(sh_screen_w, sh_screen_h, "SHDEMI")
+  console.log(sh_screen_w, sh_screen_h, "CHANGESSHDEMI")
 
   const { room } = useRoomContext()
 
@@ -65,8 +69,7 @@ export default function ScreenShareCard({
 
   const [isExpanded, setIsExpanded] = useState(false)
 
-  let clss =
-    "relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
+  let clss = `share-screen-node relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible`
   if (isFullScreen) {
     clss += ` !fixed bg-black !w-screen !h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`
   } else if (isExpanded) {
@@ -95,29 +98,34 @@ export default function ScreenShareCard({
 
   const videoContent = <VideoTrack trackRef={track} />
 
-  const resizeShScreenHandler = (measure: {
-    width: number
-    height: number
-  }) => {
-    if (!socket) return
-    let new_width = measure.width
-    let new_height = measure.height
-    const new_size = `${new_width},${new_height}`
-    const sendingObject = {
-      room_id: room?.id,
-      size: new_size,
-    }
-    socket.emit("updateShareScreenSize", sendingObject)
-    dispatch({
-      type: _BUS.changeScreenShareSize,
-      data: {
+  const resizeShScreenHandler = useCallback(
+    (measure: { width: number; height: number }) => {
+      console.log(shareScreenNode, "SHARESCREEN")
+      if (!socket || !shareScreenNode?.data?.draggable) return
+      let new_width = measure.width
+      let new_height = measure.height
+      const new_size = `${new_width},${new_height}`
+      const sendingObject = {
+        room_id: room?.id,
         size: new_size,
-      },
-    })
-  }
+      }
+      console.log(sendingObject, "SENDINGOBJECT")
+      socket.emit("updateShareScreenSize", sendingObject)
+      dispatch({
+        type: _BUS.changeScreenShareSize,
+        data: {
+          size: new_size,
+        },
+      })
+    },
+    [shareScreenNode]
+  )
 
   let content = (
-    <div style={{ width: sh_screen_w, height: sh_screen_h }} className={clss}>
+    <div
+      style={{ width: new_sh_screen_w, height: new_sh_screen_h }}
+      className={clss}
+    >
       <div className="actions absolute top-4 left-4 flex flex-row items-center gap-x-2 opacity-0 invisible transition-all">
         <CotopiaIconButton
           className="text-black/60 z-10"
