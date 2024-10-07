@@ -1,8 +1,8 @@
-import React from "react";
-import ScreenShareCard from "../../room/components/screen-share-card";
+import React from "react"
+import ScreenShareCard from "../../room/components/screen-share-card"
 
 export default function ShareScreen(props: any) {
-  const { data } = props;
+  const { data } = props
 
   return (
     <ScreenShareCard
@@ -11,5 +11,5 @@ export default function ShareScreen(props: any) {
       defaultWidth={data?.width}
       defaultHeight={data?.height}
     />
-  );
+  )
 }

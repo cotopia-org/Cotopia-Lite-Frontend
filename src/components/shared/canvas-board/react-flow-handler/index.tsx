@@ -1,8 +1,8 @@
 import {
   useProfile,
   useSocket,
-} from "@/app/(pages)/(protected)/protected-wrapper";
-import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
+} from "@/app/(pages)/(protected)/protected-wrapper"
+import { TrackReferenceOrPlaceholder } from "@livekit/components-react"
 import {
   Background,
   MiniMap,
@@ -15,67 +15,75 @@ import {
   ReactFlowProvider,
   useNodesState,
   Viewport,
-} from "@xyflow/react";
-import { useRoomContext } from "../../room/room-context";
-import UserNode from "../nodes/user";
-import { useCallback, useEffect, useRef, useState } from "react";
-import BackgroundNode from "../nodes/background";
-import { __VARS } from "@/app/const/vars";
-import { Track } from "livekit-client";
-import ShareScreen from "../nodes/share-screen";
-import { UserMinimalType } from "@/types/user";
-import JailNode from "../nodes/jail-node";
-import { uniqueById } from "@/lib/utils";
-import { playSoundEffect } from "@/lib/sound-effects";
-import Toolbar from "../../room/toolbar";
-import TopLeftTools from "../../room/tools/top-left";
-import TopRightTools from "../../room/tools/top-right";
-import BottomLeftTools from "../../room/tools/bottom-left";
-import BottomMiddleTools from "../../room/tools/bottom-middle";
-import BottomRightTools from "../../room/tools/bottom-right";
-import useBus, { dispatch } from "use-bus";
-import { _BUS } from "@/app/const/bus";
+} from "@xyflow/react"
+import { useRoomContext } from "../../room/room-context"
+import UserNode from "../nodes/user"
+import { useCallback, useEffect, useRef, useState } from "react"
+import BackgroundNode from "../nodes/background"
+import { __VARS } from "@/app/const/vars"
+import { Track } from "livekit-client"
+import ShareScreen from "../nodes/share-screen"
+import { UserMinimalType } from "@/types/user"
+import JailNode from "../nodes/jail-node"
+import { uniqueById } from "@/lib/utils"
+import { playSoundEffect } from "@/lib/sound-effects"
+import Toolbar from "../../room/toolbar"
+import TopLeftTools from "../../room/tools/top-left"
+import TopRightTools from "../../room/tools/top-right"
+import BottomLeftTools from "../../room/tools/bottom-left"
+import BottomMiddleTools from "../../room/tools/bottom-middle"
+import BottomRightTools from "../../room/tools/bottom-right"
+import useBus, { dispatch } from "use-bus"
+import { _BUS } from "@/app/const/bus"
 // import { useCanvas } from "..";
 
-export const RF_BACKGROUND_ID = "bg-node-4214242141";
-export const RF_JAIL_ID = "jail-78412641267";
+export const RF_BACKGROUND_ID = "bg-node-4214242141"
+export const RF_JAIL_ID = "jail-78412641267"
 
 type Props = {
-  tracks: TrackReferenceOrPlaceholder[];
-};
+  tracks: TrackReferenceOrPlaceholder[]
+}
 
 const nodeTypes = {
   userNode: UserNode,
   backgroundNode: BackgroundNode,
   jailNode: JailNode,
   shareScreenCard: ShareScreen,
-};
+}
 
 type LeftJoinType = {
-  room_id: number;
-  user: UserMinimalType;
-};
+  room_id: number
+  user: UserMinimalType
+}
 
 function ReactFlowHandler({ tracks }: Props) {
-  const [viewPort, setViewPort] = useState<Viewport>();
+  const [viewPort, setViewPort] = useState<Viewport>()
 
-  const [rf, setRf] = useState<ReactFlowInstance>();
-  const { user } = useProfile();
+  const [rf, setRf] = useState<ReactFlowInstance>()
+  const { user } = useProfile()
 
-  const { room, updateUserCoords, room_id } = useRoomContext();
+  const { room, updateUserCoords, room_id } = useRoomContext()
 
-  const socketParticipants = room?.participants ?? [];
+  const socketParticipants = room?.participants ?? []
 
-  const socket = useSocket();
+  const socket = useSocket()
 
-  const initState = useRef(true);
+  const initState = useRef(true)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
 
   const handleNodesChange = (changes: NodeChange[]) => {
+    console.log(changes, "CHANGES")
+    // let has_dimensions = false
+    // for (let node of changes) {
+    //   if (Object.keys(node).includes("dimensions")) {
+    //     has_dimensions = true
+    //   }
+    // }
+    // if (has_dimensions) return
     // Always apply the changes to keep the nodes state updated
-    onNodesChange(changes);
-  };
+    onNodesChange(changes)
+  }
 
   //Node with background
   const nodesWithBackground = useCallback(
@@ -109,26 +117,27 @@ function ReactFlowHandler({ tracks }: Props) {
       ...nodes,
     ],
     []
-  );
+  )
 
   const addParticipants = (particpants: UserMinimalType[]) => {
     return uniqueById(
       particpants.map((participant) => {
-        const rfUserId = "" + participant?.username;
+        const rfUserId = "" + participant?.username
 
-        const coords = participant?.coordinates?.split(",");
+        const coords = participant?.coordinates?.split(",")
 
-        let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
-        let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
+        let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200
+        let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200
 
-        if (typeof xcoord === "string") xcoord = +xcoord;
-        if (typeof ycoord === "string") ycoord = +ycoord;
+        console.log(xcoord, ycoord, "XYCORD")
+        if (typeof xcoord === "string") xcoord = +xcoord
+        if (typeof ycoord === "string") ycoord = +ycoord
 
         const track = tracks.find(
           (a) => a.participant.identity === participant?.username
-        );
+        )
 
-        const isDraggable = user?.username === track?.participant?.identity;
+        const isDraggable = user?.username === track?.participant?.identity
 
         let object: Node = {
           id: "" + participant?.username,
@@ -141,29 +150,29 @@ function ReactFlowHandler({ tracks }: Props) {
           position: { x: xcoord, y: ycoord },
           parentId: RF_JAIL_ID,
           extent: "parent",
-        };
+        }
 
-        if (!isDraggable) object["draggable"] = false;
+        if (!isDraggable) object["draggable"] = false
 
-        return object;
+        return object
       })
-    ) as Node[];
-  };
+    ) as Node[]
+  }
 
   //Init canvas
   useEffect(() => {
-    if (initState.current === false) return;
+    if (initState.current === false) return
 
     //Is we have no participant in room
     if (socketParticipants.length === 0) {
-      setNodes(nodesWithBackground([]));
-      return;
+      setNodes(nodesWithBackground([]))
+      return
     }
 
-    setNodes(nodesWithBackground(addParticipants(socketParticipants)));
+    setNodes(nodesWithBackground(addParticipants(socketParticipants)))
 
-    initState.current = false;
-  }, [socketParticipants, tracks]);
+    initState.current = false
+  }, [socketParticipants, tracks])
 
   useEffect(() => {
     setNodes((prev) => [
@@ -171,8 +180,8 @@ function ReactFlowHandler({ tracks }: Props) {
       ...tracks
         ?.filter((x) => x.source === Track.Source.ScreenShare)
         ?.map((x, i) => {
-          const isDraggable = user?.username === x.participant.identity;
-          const shareScreenId = "share-screen-" + i;
+          const isDraggable = user?.username === x.participant.identity
+          const shareScreenId = "share-screen-" + i
 
           return {
             id: shareScreenId,
@@ -182,186 +191,188 @@ function ReactFlowHandler({ tracks }: Props) {
               draggable: isDraggable,
               id: shareScreenId,
             },
-            measured: {
-              width: rf?.getNode(shareScreenId)?.measured?.width ?? 400,
-              height: rf?.getNode(shareScreenId)?.measured?.height ?? 200,
-            },
+            // measured: {
+            //   width: rf?.getNode(shareScreenId)?.measured?.width ?? 400,
+            //   height: rf?.getNode(shareScreenId)?.measured?.height ?? 200,
+            // },
             position: {
               x: rf?.getNode(shareScreenId)?.position.x ?? 200,
               y: rf?.getNode(shareScreenId)?.position.y ?? 200,
             },
             parentId: RF_JAIL_ID,
             extent: "parent",
-          } as Node;
+          } as Node
         }),
-    ]);
-  }, [tracks]);
+    ])
+  }, [tracks])
 
   const updateShareScreenCoordinates = (data: { coordinates: string }) => {
-    const coordinates = data.coordinates;
+    const coordinates = data.coordinates
 
-    if (!coordinates) return;
+    if (!coordinates) return
 
-    const arr_coords = coordinates.split(",");
+    const arr_coords = coordinates.split(",")
 
-    if (arr_coords.length !== 2) return;
-    let x = arr_coords[0];
-    let y = arr_coords[1];
+    if (arr_coords.length !== 2) return
+    let x = arr_coords[0]
+    let y = arr_coords[1]
 
     setNodes((crtNds) => {
       return crtNds.map((node) => {
-        const ssNode = node.type === "shareScreenCard";
-        return ssNode ? { ...node, position: { x: +x, y: +y } } : node;
-      });
-    });
-  };
+        const ssNode = node.type === "shareScreenCard"
+        return ssNode ? { ...node, position: { x: +x, y: +y } } : node
+      })
+    })
+  }
 
   const updateShScreenMeasure = (data: { size: string }) => {
-    const size = data?.size;
+    const size = data?.size
 
-    if (!size) return;
+    if (!size) return
 
-    const size_array = size.split(",");
+    const size_array = size.split(",")
 
-    if (size_array.length !== 2) return;
+    if (size_array.length !== 2) return
 
-    let width = size_array[0];
-    let height = size_array[1];
+    let width = size_array[0]
+    let height = size_array[1]
 
     setNodes((crtNds) => {
       return crtNds.map((node) => {
-        const ssNode = node.type === "shareScreenCard";
+        const ssNode = node.type === "shareScreenCard"
         if (ssNode) {
           return {
             ...node,
-            data: { ...node?.data, width: +width, height: +height },
-          };
+            measured: { width: +width, height: +height },
+            // data: { ...node?.data, width: +width, height: +height },
+          }
         }
-        return node;
-      });
-    });
-  };
+        return node
+      })
+    })
+  }
 
+  console.log(nodes, "INNER NODES")
   const updateUserCoordinate = (data: UserMinimalType) => {
-    const username = data?.username;
-    const coordinates = data?.coordinates;
+    const username = data?.username
+    const coordinates = data?.coordinates
 
     if (!username) {
-      return;
+      return
     }
 
     if (!coordinates) {
-      return;
+      return
     }
 
-    const coords_array = coordinates.split(",");
+    const coords_array = coordinates.split(",")
 
-    if (coords_array.length !== 2) return;
+    if (coords_array.length !== 2) return
 
-    let x = coords_array[0];
-    let y = coords_array[1];
+    let x = coords_array[0]
+    let y = coords_array[1]
 
-    updateUserCoords(username, { x: +x, y: +y });
+    updateUserCoords(username, { x: +x, y: +y })
 
     setNodes((nds) => {
       return nds.map((node) =>
         node.id === username ? { ...node, position: { x: +x, y: +y } } : node
-      );
-    });
-  };
+      )
+    })
+  }
 
   useSocket(
     "updateCoordinates",
     (data) => {
-      updateUserCoordinate(data);
+      updateUserCoordinate(data)
     },
     [updateUserCoordinate]
-  );
+  )
 
   useSocket(
     "updateShareScreenCoordinates",
     (data) => {
-      updateShareScreenCoordinates(data);
+      updateShareScreenCoordinates(data)
     },
     [updateShareScreenCoordinates]
-  );
+  )
 
   useSocket(
     "updateShareScreenSize",
     (data) => {
-      updateShScreenMeasure(data);
+      updateShScreenMeasure(data)
     },
     [updateShScreenMeasure]
-  );
+  )
 
   useBus(_BUS.changeMyUserCoord, (data) => {
-    updateUserCoordinate(data.data);
-  });
+    updateUserCoordinate(data.data)
+  })
 
   useBus(_BUS.changeScreenShareSize, (data) => {
-    updateShScreenMeasure(data.data);
-  });
+    updateShScreenMeasure(data.data)
+  })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+    const { room_id: gotRoomId, user: targetUser } = data
 
-    console.log("test left event", data);
+    console.log("test left event", data)
 
-    if (room_id === undefined) return;
+    if (room_id === undefined) return
 
-    if (gotRoomId !== +room_id) return;
+    if (gotRoomId !== +room_id) return
 
-    setNodes((prev) => prev.filter((x) => x.id !== targetUser?.username));
+    setNodes((prev) => prev.filter((x) => x.id !== targetUser?.username))
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
-  });
+    if (user.id !== targetUser.id) playSoundEffect("elseUserleft")
+  })
 
   useSocket("userJoinedToRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+    const { room_id: gotRoomId, user: targetUser } = data
 
-    if (room_id === undefined) return;
+    if (room_id === undefined) return
 
-    if (gotRoomId !== +room_id) return;
+    if (gotRoomId !== +room_id) return
 
-    console.log("test joined event", data);
+    console.log("test joined event", data)
 
-    setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
+    setNodes((prev) => [...prev, ...addParticipants([targetUser])])
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
-  });
+    if (user.id !== targetUser.id) playSoundEffect("elseUserJoin")
+  })
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     //check if the node belongs to share screen
-    const isShareScreenNode = node.type === "shareScreenCard";
+    const isShareScreenNode = node.type === "shareScreenCard"
     //check if the node belongs to user node
-    const isUserNode = node.type === "userNode";
+    const isUserNode = node.type === "userNode"
     //check is node draggable
-    const isDraggable = node?.data?.draggable;
+    const isDraggable = node?.data?.draggable
     if (isDraggable) {
       if (isUserNode) {
-        if (!socket) return;
-        const newCoords = `${node.position.x},${node.position.y}`;
-        const username: string = node.data?.username as string;
+        if (!socket) return
+        const newCoords = `${node.position.x},${node.position.y}`
+        const username: string = node.data?.username as string
         const sendingObject = {
           room_id: room?.id,
           coordinates: newCoords,
           username,
-        };
-        socket.emit("updateCoordinates", sendingObject);
-        const livekitIdentity = username;
-        updateUserCoords(livekitIdentity, node.position);
+        }
+        socket.emit("updateCoordinates", sendingObject)
+        const livekitIdentity = username
+        updateUserCoords(livekitIdentity, node.position)
       }
       if (isShareScreenNode) {
-        if (!socket) return;
-        const newCoords = `${node.position.x},${node.position.y}`;
+        if (!socket) return
+        const newCoords = `${node.position.x},${node.position.y}`
         const sendingObject = {
           room_id: room?.id,
           coordinates: newCoords,
-        };
-        socket.emit("updateShareScreenCoordinates", sendingObject);
+        }
+        socket.emit("updateShareScreenCoordinates", sendingObject)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -398,7 +409,7 @@ function ReactFlowHandler({ tracks }: Props) {
         <NodesPreview tracks={tracks} nodes={nodes} viewport={viewPort} />
       )} */}
     </>
-  );
+  )
 }
 
-export default ReactFlowHandler;
+export default ReactFlowHandler
