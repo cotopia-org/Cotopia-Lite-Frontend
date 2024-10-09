@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
-import UserSession from "@/app/(pages)/(protected)/session";
-import { useParticipants, useTracks } from "@livekit/components-react";
-import { RoomEvent, Track } from "livekit-client";
+import React, { useMemo } from "react"
+import UserSession from "@/app/(pages)/(protected)/session"
+import { useParticipants, useTracks } from "@livekit/components-react"
+import { RoomEvent, Track } from "livekit-client"
 
 const UserNode = (props: any) => {
-  const { data, dragging } = props;
+  const { data, dragging } = props
 
   const tracks = useTracks(
     [
@@ -22,28 +22,28 @@ const UserNode = (props: any) => {
       ],
       onlySubscribed: true,
     }
-  );
-  const participants = useParticipants();
+  )
+  const participants = useParticipants()
 
   const allRoomParticipantUsername = useMemo(() => {
-    return participants?.map((x) => x.identity) ?? [];
-  }, [participants]);
+    return participants?.map((x) => x.identity) ?? []
+  }, [participants])
 
   const track = useMemo(() => {
-    if (!data?.username) return undefined;
+    if (!data?.username) return undefined
 
-    if (tracks.length === 0) return undefined;
+    if (tracks.length === 0) return undefined
 
-    return tracks.find((x) => x.participant.identity === data.username);
-  }, [tracks, data.username]);
+    return tracks.find((x) => x.participant.identity === data.username)
+  }, [tracks, data.username])
 
   const participant = useMemo(() => {
-    if (participants.length === 0) return undefined;
+    if (participants.length === 0) return undefined
 
-    return participants.find((x) => x.identity === data.username);
-  }, [participants, data.username]);
+    return participants.find((x) => x.identity === data.username)
+  }, [participants, data.username])
 
-  if (!allRoomParticipantUsername.includes(data?.username)) return;
+  if (!allRoomParticipantUsername.includes(data?.username)) return
 
   return (
     <>
@@ -54,7 +54,7 @@ const UserNode = (props: any) => {
         isDragging={dragging}
       />
     </>
-  );
-};
+  )
+}
 
-export default UserNode;
+export default UserNode

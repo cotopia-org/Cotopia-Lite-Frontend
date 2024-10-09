@@ -11,6 +11,7 @@ export const __VARS = {
   voiceAreaRadius: 200,
   defaultPositionOfUserX: 400,
   jailNodeType: "jailNode",
+  collisionMargin: 70,
   backgroundNodeType: "backgroundNode",
   defaultPerPage: 20,
   pagesLimitDiff: 6,

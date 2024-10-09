@@ -4,7 +4,10 @@ import {
 } from "@/app/(pages)/(protected)/protected-wrapper"
 import { TrackReferenceOrPlaceholder } from "@livekit/components-react"
 import {
+  applyNodeChanges,
   Background,
+  Edge,
+  EdgeChange,
   MiniMap,
   //   Background,
   Node,
@@ -13,19 +16,21 @@ import {
   ReactFlow,
   ReactFlowInstance,
   ReactFlowProvider,
+  useEdgesState,
   useNodesState,
+  useReactFlow,
   Viewport,
 } from "@xyflow/react"
 import { useRoomContext } from "../../room/room-context"
 import UserNode from "../nodes/user"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react"
 import BackgroundNode from "../nodes/background"
 import { __VARS } from "@/app/const/vars"
 import { Track } from "livekit-client"
 import ShareScreen from "../nodes/share-screen"
 import { UserMinimalType } from "@/types/user"
 import JailNode from "../nodes/jail-node"
-import { uniqueById } from "@/lib/utils"
+import { checkNodesCollision, uniqueById } from "@/lib/utils"
 import { playSoundEffect } from "@/lib/sound-effects"
 import Toolbar from "../../room/toolbar"
 import TopLeftTools from "../../room/tools/top-left"
@@ -33,7 +38,7 @@ import TopRightTools from "../../room/tools/top-right"
 import BottomLeftTools from "../../room/tools/bottom-left"
 import BottomMiddleTools from "../../room/tools/bottom-middle"
 import BottomRightTools from "../../room/tools/bottom-right"
-import useBus, { dispatch } from "use-bus"
+import useBus from "use-bus"
 import { _BUS } from "@/app/const/bus"
 // import { useCanvas } from "..";
 
@@ -56,11 +61,20 @@ type LeftJoinType = {
   user: UserMinimalType
 }
 
+type NodesCollisionType = {
+  target_node: Node
+  intersections: Node[]
+}
+
 function ReactFlowHandler({ tracks }: Props) {
   const [viewPort, setViewPort] = useState<Viewport>()
 
+  const { getIntersectingNodes } = useReactFlow()
   const [rf, setRf] = useState<ReactFlowInstance>()
   const { user } = useProfile()
+
+  const [nodesCollision, setNodesCollision] =
+    useState<NodesCollisionType | null>(null)
 
   const { room, updateUserCoords, room_id } = useRoomContext()
 
@@ -70,12 +84,54 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const initState = useRef(true)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [nodes, setNodes] = useNodesState<Node>([])
 
-  const handleNodesChange = (changes: NodeChange[]) => {
-    // Always apply the changes to keep the nodes state updated
-    onNodesChange(changes)
-  }
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      setNodes((crtNds) => {
+        const nodesChanges = changes.map((node) => {
+          const node_type = node.type
+
+          console.log(node, "NODE")
+          const hasCollision =
+            !!nodesCollision && nodesCollision?.intersections?.length > 0
+
+          let targetNode: Node | undefined = undefined
+          let myNode: Node | undefined = undefined
+          if (hasCollision) {
+            myNode = nodesCollision.target_node
+            targetNode = nodesCollision.intersections[0]
+          }
+          if (
+            node_type === "position" &&
+            hasCollision &&
+            targetNode &&
+            myNode &&
+            node?.position
+          ) {
+            const { x_position, y_position } = checkNodesCollision(
+              myNode,
+              targetNode
+            )
+            console.log("HI")
+            return {
+              ...node,
+              position: {
+                x: targetNode.data.has_collied ? x_position : node.position.x,
+                y: targetNode.data.has_collied ? y_position : node.position.y,
+              },
+            }
+          } else {
+            return node
+          }
+        })
+
+        return applyNodeChanges(nodesChanges, crtNds)
+      })
+      // Always apply the changes to keep the nodes state updated
+    },
+    [nodesCollision, setNodes]
+  )
 
   //Node with background
   const nodesWithBackground = useCallback(
@@ -212,7 +268,13 @@ function ReactFlowHandler({ tracks }: Props) {
 
     setNodes((nds) => {
       return nds.map((node) =>
-        node.id === username ? { ...node, position: { x: +x, y: +y } } : node
+        node.id === username
+          ? {
+              ...node,
+              data: { ...node.data, in_collision: false },
+              position: { x: +x, y: +y },
+            }
+          : node
       )
     })
   }
@@ -226,14 +288,11 @@ function ReactFlowHandler({ tracks }: Props) {
   )
 
   useBus(_BUS.changeMyUserCoord, (data) => {
-    console.log("data.data", data.data)
     updateUserCoordinate(data.data)
   })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user: targetUser } = data
-
-    console.log("test left event", data)
 
     if (room_id === undefined) return
 
@@ -258,25 +317,81 @@ function ReactFlowHandler({ tracks }: Props) {
     if (user.id !== targetUser.id) playSoundEffect("elseUserJoin")
   })
 
-  const onNodeDragStop: NodeMouseHandler = (event, node) => {
-    if (node?.data?.draggable) {
-      if (!socket) return
+  const onNodeDragStop: NodeMouseHandler = useCallback(
+    (event, stopedNode) => {
+      let last_nodes = [...nodes]
+      //check if the node belongs to share screen
+      const isShareScreenNode = stopedNode.type === "shareScreenCard"
+      //check if the node belongs to user node
+      const isUserNode = stopedNode.type === "userNode"
+      //check is node draggable
+      const isDraggable = stopedNode?.data?.draggable
 
-      const newCoords = `${node.position.x},${node.position.y}`
+      const hasCollision =
+        nodesCollision && nodesCollision?.intersections?.length > 0
 
-      const username: string = node.data.username as string
-      const sendingObject = {
-        room_id: room?.id,
-        coordinates: newCoords,
-        username,
+      let droppedNode: Node = stopedNode
+
+      if (hasCollision) {
+        droppedNode = last_nodes.find(
+          (node) => node.id === droppedNode.id
+        ) as Node
+        setTimeout(() => {
+          setNodesCollision(null)
+        }, 500)
       }
 
-      socket.emit("updateCoordinates", sendingObject)
+      if (isDraggable) {
+        if (isUserNode) {
+          if (!socket) return
+          const newCoords = `${droppedNode.position.x},${droppedNode.position.y}`
+          const username: string = droppedNode.data?.username as string
+          const sendingObject = {
+            room_id: room?.id,
+            coordinates: newCoords,
+            username,
+          }
+          socket.emit("updateCoordinates", sendingObject)
+          const livekitIdentity = username
+          updateUserCoords(livekitIdentity, droppedNode.position)
+        }
+        if (isShareScreenNode) {
+          // if (!socket) return
+          // const newCoords = `${node.position.x},${node.position.y}`
+          // const sendingObject = {
+          //   room_id: room?.id,
+          //   coordinates: newCoords,
+          // }
+          // socket.emit("updateShareScreenCoordinates", sendingObject)
+        }
+      }
+    },
+    [nodesCollision, nodes]
+  )
 
-      const livekitIdentity = username
+  console.log(nodesCollision, "NODESCOL")
+  const onNodeDragHandler = (
+    event: MouseEvent,
+    draggingNode: Node,
+    nodes: Node[]
+  ) => {
+    const intersectingNodes = getIntersectingNodes(draggingNode).filter(
+      (item) => {
+        const isUserNode =
+          item.type !== __VARS.jailNodeType &&
+          item.type !== __VARS.backgroundNodeType
+        return isUserNode
+      }
+    )
 
-      updateUserCoords(livekitIdentity, node.position)
-    }
+    setNodesCollision({
+      target_node: draggingNode,
+      intersections: intersectingNodes.map((node) => {
+        const { has_collied } = checkNodesCollision(draggingNode, node)
+
+        return { ...node, data: { ...node.data, has_collied: !!has_collied } }
+      }),
+    })
   }
 
   return (
@@ -287,6 +402,8 @@ function ReactFlowHandler({ tracks }: Props) {
         onNodeDragStop={onNodeDragStop}
         onNodesChange={handleNodesChange}
         panOnDrag={true}
+        nodesConnectable={false}
+        onNodeDrag={onNodeDragHandler}
         zoomOnScroll={true}
         zoomOnPinch={true}
         nodes={nodes}

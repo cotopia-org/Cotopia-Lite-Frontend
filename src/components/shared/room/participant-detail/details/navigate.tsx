@@ -19,7 +19,7 @@ interface Props {}
 const getAroundPoints = (r: number, margin: number) => {
   //get the random angle between 0 and 2Pi (360deg)
   const angle = Math.random() * 2 * Math.PI
-  //calc distance from center of circle
+  //calc distance from center of circle*
   const distance = r + margin
   //clac the distance from the center with the sin cos ratio in the x and y axis
 
