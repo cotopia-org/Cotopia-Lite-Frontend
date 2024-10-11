@@ -280,7 +280,7 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   //find center of target node
   let target_measure_w = targetNode?.measured?.width
   let target_measure_h = targetNode?.measured?.height
-  let my_node_measure_w = myNode?.measured?.height
+  let my_node_measure_w = myNode?.measured?.width
   let my_node_measure_h = myNode?.measured?.height
 
   if (!target_measure_w || !target_measure_h)
@@ -336,27 +336,6 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
     top_dir = true
   }
 
-  // if (my_center_x < center_x) {
-  //   left_dir = true
-  // } else {
-  //   left_dir = false
-  // }
-  // if (my_center_x >= center_x) {
-  //   right_dir = true
-  // } else {
-  //   right_dir = false
-  // }
-  // if (my_center_y <= center_y) {
-  //   top_dir = true
-  // } else {
-  //   top_dir = false
-  // }
-  // if (my_center_y > center_y) {
-  //   bottom_dir = true
-  // } else {
-  //   bottom_dir = false
-  // }
-
   let final_x = target_x
   let final_y = target_y
 
@@ -380,23 +359,6 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   if (distance <= total_radius) {
     has_collied = true
   }
-
-  // if (top_dir && absolute_y) {
-  //   final_x = target_x
-  //   final_y = target_y - COLLISION_MARGIN
-  // }
-  // if (bottom_dir && absolute_y) {
-  //   final_x = target_x
-  //   final_y = target_y + COLLISION_MARGIN
-  // }
-  // if (left_dir && absolute_x) {
-  //   final_x = target_x - COLLISION_MARGIN
-  //   final_y = target_y
-  // }
-  // if (right_dir && absolute_x) {
-  //   final_x = target_x + COLLISION_MARGIN
-  //   final_y = target_y
-  // }
 
   return { x_position: final_x, y_position: final_y, distance, has_collied }
 }

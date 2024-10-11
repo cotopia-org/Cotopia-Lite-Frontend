@@ -92,7 +92,6 @@ function ReactFlowHandler({ tracks }: Props) {
         const nodesChanges = changes.map((node) => {
           const node_type = node.type
 
-          console.log(node, "NODE")
           const hasCollision =
             !!nodesCollision && nodesCollision?.intersections?.length > 0
 
@@ -113,7 +112,6 @@ function ReactFlowHandler({ tracks }: Props) {
               myNode,
               targetNode
             )
-            console.log("HI")
             return {
               ...node,
               position: {
