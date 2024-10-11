@@ -265,8 +265,8 @@ export const thunkResHandler = (
 
 export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   //get target node position
-  let target_x = targetNode.position.x
-  let target_y = targetNode.position.y
+  let target_x = targetNode?.position?.x
+  let target_y = targetNode?.position?.y
 
   const target_position = target_x && target_y
   //get my node position
@@ -276,6 +276,7 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
 
   const my_node_position = my_node_x && my_node_y
 
+  let COLLISION_MARGIN = __VARS.collisionMargin
   //find center of target node
   let target_measure_w = targetNode?.measured?.width
   let target_measure_h = targetNode?.measured?.height
@@ -290,6 +291,12 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   let target_radius = target_measure_w / 2
   let my_node_radius = my_node_measure_w / 2
 
+  const center_x = target_x + target_measure_w / 2
+  const center_y = target_y + target_measure_h / 2
+
+  const my_center_x = my_node_x + my_node_measure_w / 2
+  const my_center_y = my_node_y + my_node_measure_h / 2
+
   let total_radius = target_radius + my_node_radius
   let distance = total_radius
 
@@ -297,84 +304,99 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
 
   if (my_node_position && target_position) {
     distance = Math.sqrt(
-      Math.pow(target_x - my_node_x, 2) + Math.pow(target_y - my_node_y, 2)
+      Math.pow(center_x - my_center_x, 2) + Math.pow(center_y - my_center_y, 2)
     )
   }
 
-  if (distance <= total_radius) {
-    has_collied = true
+  if (target_measure_w) {
+    COLLISION_MARGIN = target_measure_w
   }
-  const center_x = target_x + target_measure_w / 2
-  const center_y = target_y + target_measure_h / 2
-
-  const my_center_x = my_node_x + my_node_measure_w / 2
-  const my_center_y = my_node_y + my_node_measure_h / 2
 
   let top_dir = false
   let bottom_dir = false
   let left_dir = false
   let right_dir = false
 
-  if (my_center_x < center_x) {
-    left_dir = true
-  } else {
-    left_dir = false
-  }
-  if (my_center_x >= center_x) {
+  if (my_node_x <= target_x + target_measure_w) {
     right_dir = true
   } else {
     right_dir = false
   }
-  if (my_center_y <= center_y) {
-    top_dir = true
+  if (my_node_x + my_node_measure_w > target_x) {
+    left_dir = true
   } else {
-    top_dir = false
+    left_dir = false
   }
-  if (my_center_y > center_y) {
+  if (my_node_y <= target_y + target_measure_h) {
     bottom_dir = true
   } else {
     bottom_dir = false
   }
-
-  let final_x = my_node_x
-  let final_y = my_node_y
-
-  let absolute_y = !right_dir && !left_dir
-  let absolute_x = !top_dir && !bottom_dir
-
-  if (top_dir && right_dir) {
-    final_x = target_x + __VARS.collisionMargin
-    final_y = target_y - __VARS.collisionMargin
-  }
-  if (top_dir && left_dir) {
-    final_x = target_x - __VARS.collisionMargin
-    final_y = target_y - __VARS.collisionMargin
-  }
-  if (bottom_dir && right_dir) {
-    final_x = target_x + __VARS.collisionMargin
-    final_y = target_y + +__VARS.collisionMargin
-  }
-  if (bottom_dir && left_dir) {
-    final_x = target_x - __VARS.collisionMargin
-    final_y = target_y + __VARS.collisionMargin
+  if (my_node_y + my_node_measure_h > target_y) {
+    top_dir = true
   }
 
-  if (top_dir && absolute_y) {
-    final_x = target_x
-    final_y = target_y - __VARS.collisionMargin
+  // if (my_center_x < center_x) {
+  //   left_dir = true
+  // } else {
+  //   left_dir = false
+  // }
+  // if (my_center_x >= center_x) {
+  //   right_dir = true
+  // } else {
+  //   right_dir = false
+  // }
+  // if (my_center_y <= center_y) {
+  //   top_dir = true
+  // } else {
+  //   top_dir = false
+  // }
+  // if (my_center_y > center_y) {
+  //   bottom_dir = true
+  // } else {
+  //   bottom_dir = false
+  // }
+
+  let final_x = target_x
+  let final_y = target_y
+
+  if (right_dir) {
+    final_x = target_x + COLLISION_MARGIN
+    final_y = my_node_y
   }
-  if (bottom_dir && absolute_y) {
-    final_x = target_x
-    final_y = target_y + __VARS.collisionMargin
+  if (left_dir) {
+    final_x = target_x - my_node_measure_w
+    final_y = my_node_y
   }
-  if (left_dir && absolute_x) {
-    final_x = target_x - __VARS.collisionMargin
-    final_y = target_y
+  if (bottom_dir) {
+    final_x = my_node_x
+    final_y = target_y + my_node_y
   }
-  if (right_dir && absolute_x) {
-    final_x = target_x + __VARS.collisionMargin
-    final_y = target_y
+  if (top_dir) {
+    final_x = my_node_x
+    final_y = target_y - my_node_measure_h
   }
+
+  if (distance <= total_radius) {
+    has_collied = true
+  }
+
+  // if (top_dir && absolute_y) {
+  //   final_x = target_x
+  //   final_y = target_y - COLLISION_MARGIN
+  // }
+  // if (bottom_dir && absolute_y) {
+  //   final_x = target_x
+  //   final_y = target_y + COLLISION_MARGIN
+  // }
+  // if (left_dir && absolute_x) {
+  //   final_x = target_x - COLLISION_MARGIN
+  //   final_y = target_y
+  // }
+  // if (right_dir && absolute_x) {
+  //   final_x = target_x + COLLISION_MARGIN
+  //   final_y = target_y
+  // }
 
   return { x_position: final_x, y_position: final_y, distance, has_collied }
 }

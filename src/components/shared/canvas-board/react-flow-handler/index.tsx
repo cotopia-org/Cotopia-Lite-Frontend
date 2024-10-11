@@ -369,7 +369,6 @@ function ReactFlowHandler({ tracks }: Props) {
     [nodesCollision, nodes]
   )
 
-  console.log(nodesCollision, "NODESCOL")
   const onNodeDragHandler = (
     event: MouseEvent,
     draggingNode: Node,
@@ -388,7 +387,6 @@ function ReactFlowHandler({ tracks }: Props) {
       target_node: draggingNode,
       intersections: intersectingNodes.map((node) => {
         const { has_collied } = checkNodesCollision(draggingNode, node)
-
         return { ...node, data: { ...node.data, has_collied: !!has_collied } }
       }),
     })

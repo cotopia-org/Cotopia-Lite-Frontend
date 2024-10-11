@@ -23,7 +23,7 @@ export default function ScreenShareCard({ track }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   let clss =
-    "w-[400px] h-[160px] relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
+    "w-[400px] h-full relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
 
   if (isFullScreen) {
     clss += ` !fixed bg-black !w-screen !h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`
