@@ -10,8 +10,12 @@ export default function Slide({ children, index }: Props) {
 
   return (
     <div
-      style={{ width: width, transform: `translateX(${width * (camera + 1)})` }}
-      className='absolute flex flex-grow top-0 transition-all'
+      style={{
+        width: width,
+        left: width * index,
+        opacity: camera === index + 1 ? 1 : 0,
+      }}
+      className='absolute flex flex-grow top-0 transition-all overflow-hidden'
     >
       {children}
     </div>

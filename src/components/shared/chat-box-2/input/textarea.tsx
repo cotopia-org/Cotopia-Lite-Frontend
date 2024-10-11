@@ -45,7 +45,7 @@ const MultilineTextarea: React.FC<Props> = ({
       onKeyDown={handleKeyDown}
       placeholder='Type your message here...'
       rows={1} // Start with one line by default
-      className='outline-none w-full min-h-[32px] overflow-y-auto max-h-[200px]'
+      className='outline-none w-full min-h-[32px] overflow-y-auto max-h-[200px] text-sm'
       style={{ resize: "none" }}
     />
   );

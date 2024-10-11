@@ -1,70 +1,107 @@
 import { __VARS } from "@/app/const/vars";
 import axiosInstance from "@/lib/axios";
-import { Chat2ItemType } from "@/types/chat2";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { uniqueById } from "@/lib/utils";
+import { Chat2ItemType, ChatType } from "@/types/chat2";
+import { MessageType } from "@/types/message";
+import { UserMinimalType } from "@/types/user";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 type ChatState = {
   chats: {
     [chat_id: string]: {
+      object: ChatType;
       messages: Chat2ItemType[];
       loading: boolean;
       page: number;
     };
   };
   error: string | null;
+  loading: boolean;
+  participants: UserMinimalType[];
 };
 
 const initialState: ChatState = {
   chats: {},
   error: null,
+  loading: false,
+  participants: [],
 };
 
 // Async thunk to fetch chat messages by page
-export const getChatMessages = createAsyncThunk(
-  "chat/getMessages",
-  async ({ chat_id, page }: { chat_id: number; page: number }) => {
-    const perPage = __VARS.defaultPerPage;
-    const res = await axiosInstance.get(`/rooms/${chat_id}/messages`, {
-      params: { page, perPage },
+export const getChats = createAsyncThunk(
+  "chat/getChats",
+  async ({ workspace_id }: { workspace_id: number }) => {
+    const res = await axiosInstance.get(`/users/chats`, {
+      params: { workspace_id },
     });
 
-    const messages = res.data.data || [];
-    return { chat_id, messages, page };
+    const chats = res.data.data || [];
+
+    return chats;
   }
 );
 
 const chatSlice = createSlice({
   name: "chat",
   initialState,
-  reducers: {},
+  reducers: {
+    addMessage: (state, action: PayloadAction<Chat2ItemType>) => {
+      state.chats[action.payload.chat_id].messages = [
+        action.payload,
+        ...state.chats[action.payload.chat_id].messages,
+      ];
+    },
+    updateMessage: (state, action: PayloadAction<Chat2ItemType>) => {
+      state.chats[action.payload.chat_id].messages = state.chats[
+        action.payload.chat_id
+      ].messages.map((x) => {
+        if (x.nonce_id === action.payload.nonce_id) {
+          return action.payload;
+        }
+
+        return x;
+      });
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(getChatMessages.pending, (state, action) => {
-        const { chat_id } = action.meta.arg;
-        state.chats[chat_id] = state.chats[chat_id] || {
-          messages: [],
-          loading: false,
-          page: 1,
-        };
-        state.chats[chat_id].loading = true;
+      .addCase(getChats.pending, (state, action) => {
+        state.loading = true;
       })
-      .addCase(getChatMessages.fulfilled, (state, action) => {
-        const { chat_id, messages, page } = action.payload;
-        const chat = state.chats[chat_id] || { messages: [], page: 1 };
+      .addCase(
+        getChats.fulfilled,
+        (state, action: PayloadAction<ChatType[]>) => {
+          let allParticipants: UserMinimalType[] = [];
 
-        // Prepend new messages when fetching older messages (scrolling up)
-        chat.messages = [...chat.messages, ...messages];
-        chat.page = page;
-        chat.loading = false;
+          const chatObjects = action.payload;
 
-        state.chats[chat_id] = chat;
-      })
-      .addCase(getChatMessages.rejected, (state, action) => {
+          for (let chat of chatObjects) {
+            if (state.chats[chat.id]) {
+              state.chats[chat.id] = { ...state.chats[chat.id], object: chat };
+            } else {
+              state.chats[chat.id] = {
+                loading: false,
+                messages: [],
+                object: chat,
+                page: 1,
+              };
+            }
+            allParticipants = [...allParticipants, ...chat.participants];
+          }
+
+          //Update all participants in redux
+          state.participants = uniqueById(allParticipants) as UserMinimalType[];
+
+          state.loading = false;
+        }
+      )
+      .addCase(getChats.rejected, (state, action) => {
         state.error = action.error.message || "Failed to fetch messages";
-        const { chat_id } = action.meta.arg;
-        state.chats[chat_id].loading = false;
+        state.loading = false;
       });
   },
 });
+
+export const { addMessage, updateMessage } = chatSlice.actions;
 
 export default chatSlice.reducer;

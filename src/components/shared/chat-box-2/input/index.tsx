@@ -35,7 +35,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ addMessage }) => {
   return (
     <form
       onSubmit={handleSend}
-      className='flex items-end space-x-2 border border-black/10 rounded-lg p-2'
+      className='flex items-end space-x-2 border border-black/10 rounded-lg p-2 bg-white'
     >
       <MultilineTextarea
         defaultValue={inputValue}

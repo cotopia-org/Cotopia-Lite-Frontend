@@ -9,10 +9,10 @@ export type Chat2ItemType = MessageType & {
 
 export type ChatType = {
   id: number;
-  last_message: any;
-  mentioned_messages: any[];
+  last_message: MessageType;
+  mentioned_messages: MessageType[];
   participants: UserMinimalType[];
-  pinned_messages: any[];
+  pinned_messages: MessageType[];
   title: string;
   unseens: number;
   workspace_id: string;

@@ -1,21 +1,19 @@
-import { ChatItemType } from "./chat";
 import { AttachmentFileType } from "./file";
-import { WorkspaceRoomType } from "./room";
-import { UserMinimalType, UserType } from "./user";
 
 export type MessageType = {
-  files: AttachmentFileType[];
-  id?: number;
-  deleted_at: number | null;
-  room?: WorkspaceRoomType;
-  links: any[];
-  text: string;
-  user: UserMinimalType;
-  room_id: number;
-  mentions: any[];
+  chat_id: number;
   created_at: number;
-  reply_to: ChatItemType | null;
-  updated_at?: number | null;
+  deleted_at: string | null;
+  files: AttachmentFileType[];
+  id: number;
+  is_edited: boolean | null;
+  is_pinned: 0 | 1;
+  links: any[];
+  mentions: any[];
+  nonce_id: number;
+  reply_to: any;
   seen: boolean;
-  nonce_id: number | null;
+  text: string;
+  updated_at: number;
+  user: number;
 };

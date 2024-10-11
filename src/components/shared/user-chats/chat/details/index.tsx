@@ -1,16 +1,22 @@
 import { ChatType } from "@/types/chat2";
 
 type Props = {
-  chat: ChatType;
+  title: string;
+  sub_title?: string;
+  description?: string;
 };
-export default function ChatDetails({ chat }: Props) {
+export default function ChatDetails({ title, sub_title, description }: Props) {
   return (
     <div className='flex flex-col gap-y-1 flex-1'>
       <div className='flex flex-row items-center justify-between'>
-        <strong>{chat.title}</strong>
-        <span className='text-xs text-gray-500'>21:32</span>
+        <strong>{title}</strong>
+        {!!sub_title && (
+          <span className='text-xs text-gray-500'>{sub_title}</span>
+        )}
       </div>
-      <span className='text-sm text-gray-500'>Last message preview</span>
+      {!!description && (
+        <span className='text-sm text-gray-500'>{description}</span>
+      )}
     </div>
   );
 }

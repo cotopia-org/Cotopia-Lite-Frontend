@@ -8,7 +8,7 @@ export default function ChatDate({ chat }: Props) {
   return (
     <div className='felx flex-col items-end w-full text-right'>
       <span className='text-xs text-black/60'>
-        {moment(chat.created_at).format("HH:mm")}
+        {moment(chat.nonce_id).format("HH:mm")}
       </span>
     </div>
   );

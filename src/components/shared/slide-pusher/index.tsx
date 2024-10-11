@@ -87,15 +87,20 @@ export default function SlidePusher({ children }: Props) {
         back: handleBackSlide,
       }}
     >
-      <div
-        ref={parentRef}
-        className='viewport flex flex-row w-full h-full relative'
-      >
-        {slides.map((x, key) => (
-          <Slide key={key} index={key}>
-            {x}
-          </Slide>
-        ))}
+      <div className='relative h-full flex-grow'>
+        <div
+          ref={parentRef}
+          className='viewport flex flex-row w-full h-full absolute top-0 left-0 transition-all'
+          style={{
+            transform: `translateX(${-1 * (camera - 1) * width}px)`,
+          }}
+        >
+          {slides.map((x, key) => (
+            <Slide key={key} index={key}>
+              {x}
+            </Slide>
+          ))}
+        </div>
       </div>
     </SlideContext.Provider>
   );

@@ -1,22 +1,30 @@
 import ChatItem from "./item";
-import { useEffect, useRef, useState } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
 import { Chat2ItemType } from "@/types/chat2";
 import FetchingProgress from "./fetching-progress";
+import { UserMinimalType } from "@/types/user";
+import useBus from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 type Props = {
   items: Chat2ItemType[];
   onFetchNewMessages?: () => Promise<void>;
   marginFetching?: number;
+  getUser: (user_id: number) => UserMinimalType | undefined;
+  onGetVirtualizer?: (vir: Virtualizer<HTMLDivElement, Element>) => void;
 };
 
 export default function Items({
   items,
   marginFetching = 1000,
   onFetchNewMessages,
+  getUser,
+  onGetVirtualizer,
 }: Props) {
   const isScrollToTop = useRef(true);
   const parentRef = useRef<HTMLDivElement>(null);
+
   const latestMessage = useRef<Chat2ItemType>();
 
   const [isFetching, setIsFetching] = useState(false);
@@ -27,10 +35,29 @@ export default function Items({
   const rowVirtualizer = useVirtualizer({
     count: messages.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 50, // Estimated height of each message
-    overscan: 5,
+    estimateSize: () => 100, // Estimated height of each message
     measureElement: (el) => el.getBoundingClientRect().height,
   });
+
+  useBus(
+    _BUS.scrollEndChatBox,
+    () => {
+      if (items.length === 0) return;
+
+      // Scroll to the latest message when a new message is added
+      rowVirtualizer.scrollToIndex(items.length, {
+        align: "end",
+        behavior: "smooth",
+      });
+    },
+    [items.length, rowVirtualizer]
+  );
+
+  useEffect(() => {
+    if (!rowVirtualizer) return;
+
+    if (onGetVirtualizer) onGetVirtualizer(rowVirtualizer);
+  }, [onGetVirtualizer, rowVirtualizer]);
 
   useEffect(() => {
     if (isScrollToTop.current === false) return;
@@ -116,7 +143,11 @@ export default function Items({
                 width: "100%",
               }}
             >
-              <ChatItem item={message} key={message.nonce_id} />
+              <ChatItem
+                item={message}
+                key={message.nonce_id}
+                getUser={getUser}
+              />
             </div>
           );
         })}
