@@ -27,7 +27,7 @@ const initialState: ChatState = {
   participants: [],
 };
 
-// Async thunk to fetch chat messages by page
+// Async thunk to fetch chat by page
 export const getChats = createAsyncThunk(
   "chat/getChats",
   async ({ workspace_id }: { workspace_id: number }) => {
@@ -41,22 +41,39 @@ export const getChats = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch chat messages by page
+export const getChatMessages = createAsyncThunk(
+  "chat/getChatMessages",
+  async ({ chat_id }: { chat_id: number }) => {
+    const res = await axiosInstance.get(`/chats/${chat_id}/messages`);
+
+    const chats = res.data.data || [];
+
+    return chats;
+  }
+);
+
 const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Chat2ItemType>) => {
-      state.chats[action.payload.chat_id].messages = [
+      const chat_id = action.payload.chat_id;
+
+      state.chats[chat_id].messages = [
         action.payload,
-        ...state.chats[action.payload.chat_id].messages,
+        ...state.chats[chat_id].messages,
       ];
+
+      state.chats[chat_id].object.last_message = action.payload;
     },
     updateMessage: (state, action: PayloadAction<Chat2ItemType>) => {
-      state.chats[action.payload.chat_id].messages = state.chats[
-        action.payload.chat_id
-      ].messages.map((x) => {
-        if (x.nonce_id === action.payload.nonce_id) {
-          return action.payload;
+      const incoming_chat_message = action.payload;
+      const chat_id = incoming_chat_message.chat_id;
+
+      state.chats[chat_id].messages = state.chats[chat_id].messages.map((x) => {
+        if (x.nonce_id === incoming_chat_message.nonce_id) {
+          return incoming_chat_message;
         }
 
         return x;
@@ -96,6 +113,26 @@ const chatSlice = createSlice({
         }
       )
       .addCase(getChats.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to fetch messages";
+        state.loading = false;
+      })
+      .addCase(getChatMessages.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(
+        getChatMessages.fulfilled,
+        (
+          state,
+          action: PayloadAction<Chat2ItemType[]> & {
+            meta: { [key: string]: any };
+          }
+        ) => {
+          const { chat_id } = action.meta.arg;
+          state.chats[chat_id].messages = [...action.payload].reverse();
+          state.loading = false;
+        }
+      )
+      .addCase(getChatMessages.rejected, (state, action) => {
         state.error = action.error.message || "Failed to fetch messages";
         state.loading = false;
       });

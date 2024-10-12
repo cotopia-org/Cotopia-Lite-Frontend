@@ -1,33 +1,31 @@
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import AddChat from "./add-chat";
-import Chats from "../..";
+import SlidePusher from "@/components/shared/slide-pusher";
 import { useChat2 } from "@/hooks/chat/use-chat-2";
-import FullLoading from "@/components/shared/full-loading";
-import { useRoomContext } from "@/components/shared/room/room-context";
-import { useCallback } from "react";
+import ChatsWrapper from "./chats-wrapper";
 
 type Props = {
   workspace_id: number;
 };
 export default function WorkspaceChats({ workspace_id }: Props) {
-  const { chats, loading, participants } = useChat2({ workspace_id });
+  const { add, update } = useChat2({ workspace_id });
 
-  const loadUserByUserId = useCallback(
-    (user_id: number) => {
-      const user = participants.find((x) => x.id === user_id);
+  useSocket("messageReceived", (data) => {
+    add(data);
+  });
 
-      return user;
-    },
-    [participants]
-  );
+  useSocket("messageUpdated", (data) => {
+    update(data);
+  });
 
   let content = (
     <>
       <AddChat workspace_id={workspace_id} />
-      <Chats chats={chats} getUser={loadUserByUserId} />
+      <SlidePusher>
+        <ChatsWrapper />
+      </SlidePusher>
     </>
   );
-
-  if (loading) content = <FullLoading />;
 
   return <div className='flex flex-col gap-y-2'>{content}</div>;
 }

@@ -6,6 +6,7 @@ import FetchingProgress from "./fetching-progress";
 import { UserMinimalType } from "@/types/user";
 import useBus from "use-bus";
 import { _BUS } from "@/app/const/bus";
+import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
 
 type Props = {
   items: Chat2ItemType[];
@@ -22,6 +23,8 @@ export default function Items({
   getUser,
   onGetVirtualizer,
 }: Props) {
+  const { user: profile } = useProfile();
+
   const isScrollToTop = useRef(true);
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -147,6 +150,7 @@ export default function Items({
                 item={message}
                 key={message.nonce_id}
                 getUser={getUser}
+                isMine={message?.user === profile?.id}
               />
             </div>
           );

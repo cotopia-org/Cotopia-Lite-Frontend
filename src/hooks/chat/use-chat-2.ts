@@ -102,9 +102,21 @@ export const useChat2 = (props?: {
   };
 
   const update = (message: Chat2ItemType, onSuccess?: () => void) => {
+    socket?.emit("sendMessage", message, (data: any) => {});
     dispatch(updateMessage(message));
     if (onSuccess) onSuccess();
   };
+
+  const seen = (message: Chat2ItemType, onSuccess?: () => void) => {
+    socket?.emit("seenMessage", {
+      chat_id: message.chat_id,
+      nonce_id: message.nonce_id,
+    });
+
+    if (onSuccess) onSuccess();
+  };
+
+  useSocket("messageSeen", (data) => console.log("data", data));
 
   const chatKeys = Object.keys(chats);
 
@@ -112,6 +124,7 @@ export const useChat2 = (props?: {
     add,
     send,
     update,
+    seen,
     chats: chatKeys.map((x) => chats[x].object),
     chatObjects: chats,
     loading,

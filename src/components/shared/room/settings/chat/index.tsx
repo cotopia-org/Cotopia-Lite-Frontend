@@ -9,7 +9,7 @@ export default function UserChat() {
 
   return (
     <>
-      <WorkspaceChats workspace_id={workspace_id} />
+      <WorkspaceChats workspace_id={+workspace_id} />
     </>
     // <CTabs
     //   defaultValue='room'

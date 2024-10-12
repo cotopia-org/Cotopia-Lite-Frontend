@@ -21,12 +21,12 @@ export default function Chat({ chat, getUser }: Props) {
   return (
     <ChatContext.Provider value={{ chat }}>
       <div
-        className='flex flex-row items-center gap-x-4 p-3 hover:bg-black/[.02] cursor-pointer'
+        className='flex flex-row items-center gap-x-4 p-3 hover:bg-black/[.02] cursor-pointer relative'
         onClick={() =>
           push(<ChatInnerHolder onBack={back} chat={chat} getUser={getUser} />)
         }
       >
-        <ChatPreview chat={chat} />
+        <ChatPreview />
       </div>
     </ChatContext.Provider>
   );

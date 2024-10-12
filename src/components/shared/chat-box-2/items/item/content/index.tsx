@@ -54,7 +54,7 @@ export default function ChatItemContent({ chat }: Props) {
           whiteSpace: "normal",
         }}
       >
-        {chat.text.split("\n").map((line, index) => (
+        {chat.text.split("\n").map((line: string, index) => (
           <Linkify
             options={{
               nl2br: true,

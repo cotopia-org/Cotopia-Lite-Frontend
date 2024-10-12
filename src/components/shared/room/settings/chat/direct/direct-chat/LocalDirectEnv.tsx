@@ -1,29 +1,25 @@
-import { useChat } from "@/hooks/chat/use-chat"
-import { UserMinimalType } from "@/types/user"
-import DirectChatBox from "."
-import ChatRoomCtxProvider, {
-  RoomEnvironmentType,
-} from "@/context/chat-room-context"
-import ChatUserInput from "@/components/shared/chat-box/user-input"
+import { useChat } from "@/hooks/chat/use-chat";
+import { UserMinimalType } from "@/types/user";
+import DirectChatBox from ".";
+import ChatUserInput from "@/components/shared/chat-box/user-input";
 
 interface Props {
-  user: UserMinimalType
-  onBack?: () => void
-  onAdd: (room_id: number) => void
+  user: UserMinimalType;
+  onBack?: () => void;
+  onAdd: (room_id: number) => void;
 }
 
 const LocalDirectEnv = ({ user, onBack, onAdd }: Props) => {
-  const { sendToDirect } = useChat()
+  const { sendToDirect } = useChat();
 
   const addMessageHandler = async (val: string) => {
-    if (!user?.id) return
-
-    try {
-      const direct = await sendToDirect(val, user.id)
-      if (direct?.room_id === undefined) return
-      if (direct) onAdd(direct.room_id)
-    } catch (error) {}
-  }
+    // if (!user?.id) return;
+    // try {
+    //   const direct = await sendToDirect(val, user.id);
+    //   if (direct?.room_id === undefined) return;
+    //   if (direct) onAdd(direct.room_id);
+    // } catch (error) {}
+  };
 
   return (
     <DirectChatBox
@@ -33,7 +29,7 @@ const LocalDirectEnv = ({ user, onBack, onAdd }: Props) => {
       user={user}
       messages={[]}
     />
-  )
-}
+  );
+};
 
-export default LocalDirectEnv
+export default LocalDirectEnv;
