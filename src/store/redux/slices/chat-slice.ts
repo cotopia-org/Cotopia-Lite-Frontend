@@ -93,10 +93,13 @@ const chatSlice = createSlice({
           const chatObjects = action.payload;
 
           for (let chat of chatObjects) {
-            if (state.chats[chat.id]) {
-              state.chats[chat.id] = { ...state.chats[chat.id], object: chat };
+            if (state.chats[chat?.id]) {
+              state.chats[chat?.id] = {
+                ...state.chats[chat?.id],
+                object: chat,
+              };
             } else {
-              state.chats[chat.id] = {
+              state.chats[chat?.id] = {
                 loading: false,
                 messages: [],
                 object: chat,
