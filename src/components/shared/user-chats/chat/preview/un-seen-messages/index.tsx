@@ -11,7 +11,7 @@ export default function UnSeenMessages() {
   const { chats } = useAppSelector((store) => store.chatSlice);
 
   const unSeenMessages = useMemo(() => {
-    const targetChatUnseenMessages = chats[chat?.id].messages.filter(
+    const targetChatUnseenMessages = chats[chat?.id]?.messages?.filter(
       (x) => x.seen === false
     );
 
