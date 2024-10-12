@@ -13,6 +13,7 @@ export const __VARS = {
   jailNodeType: "jailNode",
   collisionMargin: 70,
   backgroundNodeType: "backgroundNode",
+  ShareScreenType: "shareScreenCard",
   defaultPerPage: 20,
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,

@@ -17,6 +17,7 @@ import CheckPermissions2 from "./check-permissions-2"
 import ChatWrapper from "../chat-wrapper"
 import { ReactFlowProvider } from "@xyflow/react"
 import axiosInstance from "@/lib/axios"
+import { toast } from "sonner"
 
 type MediaPermission = {
   audio: boolean
@@ -105,26 +106,41 @@ export default function RoomHolder({
   isReConnecting,
 }: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
-
   const [permissionChecked, setPermissionChecked] = useState(false)
 
   const enableVideoAccess = async () => {
     const audioAccess = state.permissions.audio
     const audioStream = state.audioStream
     let perm_obj = { audio: !!(audioAccess && audioStream), video: true }
-    try {
-      dispatch({ type: "START_LOADING" })
-      await axiosInstance.post("/settings", { key: "video", value: "on" })
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-      const obj_to_update = {
-        loading: false,
-        videoStream: stream,
-        permissions: perm_obj,
-      }
-      dispatch({ type: "CHANGE_VALUES", payload: obj_to_update })
-    } catch (error) {
-      dispatch({ type: "STOP_LOADING" })
-    }
+    navigator.permissions
+      .query({ name: "camera" } as any)
+      .then(async (res) => {
+        const permissionState = res.state
+        if (permissionState === "denied") {
+          return toast.error(
+            "Access to camera is blocked,please check your browser settings"
+          )
+        } else {
+          try {
+            dispatch({ type: "START_LOADING" })
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+            })
+            await axiosInstance.post("/settings", { key: "video", value: "on" })
+            const obj_to_update = {
+              loading: false,
+              videoStream: stream,
+              permissions: perm_obj,
+            }
+            dispatch({ type: "CHANGE_VALUES", payload: obj_to_update })
+          } catch (error: any) {
+            dispatch({ type: "STOP_LOADING" })
+          }
+        }
+      })
+      .catch((err) => {
+        toast.error(err?.response?.message)
+      })
   }
   const disableVideoAccess = async () => {
     const audioAccess = state.permissions.audio
@@ -134,11 +150,14 @@ export default function RoomHolder({
     let perm_obj = { audio: !!(audioAccess && audioStream), video: false }
     try {
       dispatch({ type: "START_LOADING" })
-      await axiosInstance.post("/settings", { key: "video", value: "off" })
-      const videoTracks = videoStream.getTracks()
+      const videoTracks = videoStream.getVideoTracks()
       videoTracks.forEach((track) => {
-        track.stop()
+        if (track.enabled) {
+          track.stop()
+        }
       })
+      await axiosInstance.post("/settings", { key: "video", value: "off" })
+
       const obj_to_update = {
         loading: false,
         permissions: perm_obj,
@@ -149,23 +168,38 @@ export default function RoomHolder({
       dispatch({ type: "STOP_LOADING" })
     }
   }
+
   const enableAudioAccess = async () => {
     const videoAccess = state.permissions.video
     const videoStream = state.videoStream
     let perm_obj = { video: !!(videoAccess && videoStream), audio: true }
-    try {
-      dispatch({ type: "START_LOADING" })
-      await axiosInstance.post("/settings", { key: "audio", value: "on" })
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const obj_to_update = {
-        loading: false,
-        permissions: perm_obj,
-        audioStream: stream,
-      }
-      dispatch({ type: "CHANGE_VALUES", payload: obj_to_update })
-    } catch (error) {
-      dispatch({ type: "STOP_LOADING" })
-    }
+    navigator.permissions
+      .query({ name: "microphone" } as any)
+      .then(async (res) => {
+        const permissionState = res.state
+        if (permissionState === "denied") {
+          return toast.error(
+            "Access to microhpone is blocked,please check your browser settings"
+          )
+        } else {
+          try {
+            dispatch({ type: "START_LOADING" })
+            const stream = await navigator.mediaDevices.getUserMedia({
+              audio: true,
+            })
+            await axiosInstance.post("/settings", { key: "audio", value: "on" })
+            const obj_to_update = {
+              loading: false,
+              permissions: perm_obj,
+              audioStream: stream,
+            }
+            dispatch({ type: "CHANGE_VALUES", payload: obj_to_update })
+          } catch (error: any) {
+            dispatch({ type: "STOP_LOADING" })
+          }
+        }
+      })
+      .catch((err) => {})
   }
   const disableAudioAccess = async () => {
     const videoAccess = state.permissions.video
@@ -190,6 +224,7 @@ export default function RoomHolder({
       dispatch({ type: "STOP_LOADING" })
     }
   }
+
   const changeStreamState = (stream: MediaStream, type: "video" | "audio") => {
     let key = ""
     if (type === "video") key = "videoStream"
@@ -225,7 +260,7 @@ export default function RoomHolder({
   let content = (
     <LiveKitRoom
       video={state.permissions.video}
-      audio
+      audio={state.permissions.audio}
       token={token}
       serverUrl={__VARS.serverUrl}
       options={{

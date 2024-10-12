@@ -24,9 +24,7 @@ export default function ChatWrapper({ children }: Props) {
     "messageReceived",
     (data: ChatItemType) => {
       const isDirect = data?.is_direct
-
       if (settings.sounds.messageIncoming) playSoundEffect("newMessage2")
-
       appDispatch(
         updateMessagesAction({
           message: data,
@@ -53,11 +51,9 @@ export default function ChatWrapper({ children }: Props) {
   })
 
   useSocket("messageUpdated", (data) => {
-    console.log(data, "MESSAGE UPDATED")
     appDispatch(updateMessagesAction({ message: data }))
   })
   useSocket("messageDeleted", (data) => {
-    console.log(data, "MESSAGE Deleted")
     appDispatch(removeMessageAction({ message: data }))
   })
 

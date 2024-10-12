@@ -1,17 +1,11 @@
 import React, { useEffect } from "react"
-import Toolbar from "../toolbar"
-import TopRightTools from "../tools/top-right"
-import BottomLeftTools from "../tools/bottom-left"
-import BottomMiddleTools from "../tools/bottom-middle"
-import BottomRightTools from "../tools/bottom-right"
+
 import { useRoomContext } from "../room-context"
 import RoomSidebar from "../sidebar"
 import RoomSettings from "../settings"
 import LiveKitAudioManager from "../components/audio-manager"
-import TopLeftTools from "../tools/top-left"
 import InitRoom from "./init-room"
 import CanvasBoard from "../../canvas-board"
-import { ReactFlowProvider } from "@xyflow/react"
 export default function RoomInner() {
   const { sidebar, joinRoom } = useRoomContext()
 

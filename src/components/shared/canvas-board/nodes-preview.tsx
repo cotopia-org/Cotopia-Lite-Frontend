@@ -5,7 +5,6 @@ import {
   TrackReferenceOrPlaceholder,
   useParticipants,
 } from "@livekit/components-react"
-import useWindowSize from "@/hooks/use-window-size"
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper"
 import useObjectSize from "@/hooks/use-object-size"
 

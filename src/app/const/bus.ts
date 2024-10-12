@@ -9,4 +9,5 @@ export const _BUS = {
   scrollToTopNewChatMessages: "SCROLL_TO_TOP_NEW_CHAT_MESSAGES",
   scrollToTargetMessage: "SCROLL_TO_TARGET_MESSAGE",
   changeMyUserCoord: "CHANGE_MY_USER_COORD",
-};
+  changeScreenShareSize: "CHANGE_SCREEN_SHARE_SIZE",
+}
