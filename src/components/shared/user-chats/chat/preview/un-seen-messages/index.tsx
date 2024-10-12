@@ -20,7 +20,7 @@ export default function UnSeenMessages() {
 
   return (
     <CBadge
-      count={unSeenMessages.length}
+      count={unSeenMessages?.length}
       className='absolute bottom-2 right-2'
       size='normal'
     />
