@@ -1,22 +1,28 @@
 import { UserMinimalType } from "@/types/user"
 import Participants, { ParticipantsProps } from "."
 import ParticipantDetails from "../room/participant-detail"
-import { useRoomContext } from "../room/room-context"
 
-type Props = ParticipantsProps
-export default function ParticipantsWithPopover({ ...rest }: Props) {
-  const { room } = useRoomContext()
-  const participants = room?.participants ?? []
+type Props = ParticipantsProps & { roomId?: number }
+export default function ParticipantsWithPopover(props: Props) {
+  const { participants, roomId, ...rest } = props
 
   return (
     <Participants
-      render={(index, content) => {
-        const user = participants.find((_, i) => index === i) as
+      render={(item, content) => {
+        const user = participants.find((p) => item.id === p.id) as
           | UserMinimalType
           | undefined
-        if (user === undefined) return content
-        return <ParticipantDetails user={user}>{content}</ParticipantDetails>
+        if (user === undefined) {
+          return content
+        } else {
+          return (
+            <ParticipantDetails roomId={roomId} user={user}>
+              {content}
+            </ParticipantDetails>
+          )
+        }
       }}
+      participants={participants}
       {...rest}
     />
   )

@@ -1,4 +1,8 @@
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import {
+  useProfile,
+  useSocket,
+} from "@/app/(pages)/(protected)/protected-wrapper";
+import { _BUS } from "@/app/const/bus";
 import { useApi } from "@/hooks/swr";
 import useQueryParams from "@/hooks/use-query-params";
 import useSetting from "@/hooks/use-setting";
@@ -52,6 +56,7 @@ const RoomCtx = createContext<{
   workingUsers: UserType[];
   onlineUsers: UserMinimalType[];
   usersHaveJobs: UserMinimalType[];
+  usersHaveInProgressJobs: UserMinimalType[];
 }>({
   room: undefined,
   livekit_token: undefined,
@@ -72,6 +77,7 @@ const RoomCtx = createContext<{
   workingUsers: [],
   onlineUsers: [],
   usersHaveJobs: [],
+  usersHaveInProgressJobs: [],
 });
 
 export const useRoomContext = () => useContext(RoomCtx);
@@ -143,6 +149,8 @@ export default function RoomContext({
     username: string,
     position: { x: number; y: number }
   ) => {
+    if (!socket) return;
+
     if (room === undefined) return;
 
     if (onRoomUpdated === undefined) return;
@@ -230,25 +238,6 @@ export default function RoomContext({
     }
   }
 
-  const workingUsers = leaderboardUsers
-    .filter(
-      (x) =>
-        x.user.active === 1 &&
-        x.user.room_id !== null &&
-        x.user.workspace_id === +(workspace_id as string) &&
-        usersHaveSchedules.includes(x.user.id)
-    )
-    .map((x) => x.user);
-
-  const onlineUsers = leaderboardUsers
-    .filter(
-      (x) =>
-        x.user.active === 1 &&
-        x.user.status === "online" &&
-        x.user.workspace_id === +(workspace_id as string)
-    )
-    .map((x) => x.user);
-
   const usersHaveJobs = useMemo(() => {
     let users: UserMinimalType[] = [];
 
@@ -260,6 +249,41 @@ export default function RoomContext({
 
     return uniqueById(users) as UserMinimalType[];
   }, [workpaceJobItems]);
+
+  const usersHaveInProgressJobs = useMemo(() => {
+    let users: UserMinimalType[] = [];
+
+    for (let job of workpaceJobItems) {
+      if (job.status === "in_progress")
+        for (let member of job.members) {
+          users.push(member);
+        }
+    }
+
+    return uniqueById(users) as UserMinimalType[];
+  }, [workpaceJobItems]);
+
+  const usersWithInprogressJobIds = usersHaveInProgressJobs.map((x) => x.id);
+
+  const workingUsers = leaderboardUsers
+    .filter(
+      (x) =>
+        x.user.active === 1 &&
+        x.user.room_id !== null &&
+        x.user.workspace_id === +(workspace_id as string) &&
+        usersHaveSchedules.includes(x.user.id) &&
+        usersWithInprogressJobIds.includes(x.user.id)
+    )
+    .map((x) => x.user);
+
+  const onlineUsers = leaderboardUsers
+    .filter(
+      (x) =>
+        x.user.active === 1 &&
+        x.user.status === "online" &&
+        x.user.workspace_id === +(workspace_id as string)
+    )
+    .map((x) => x.user);
 
   return (
     <RoomCtx.Provider
@@ -283,6 +307,7 @@ export default function RoomContext({
         workingUsers: workingUsers,
         onlineUsers: onlineUsers,
         usersHaveJobs: usersHaveJobs,
+        usersHaveInProgressJobs: usersHaveInProgressJobs,
       }}
     >
       {children}

@@ -1,8 +1,8 @@
-import Participants from "@/components/shared/participants";
 import { UserType } from "@/types/user";
 import React, { useMemo } from "react";
 import { useRoomContext } from "../../../room-context";
 import * as emoji from "node-emoji";
+import ParticipantsWithPopover from "@/components/shared/participants/with-popover";
 
 type Props = {
   user: UserType;
@@ -28,13 +28,9 @@ export default function WorkingCard({ user }: Props) {
 
   return (
     <div className='flex flex-row gap-x-2 items-center'>
-      <Participants className='!pb-0' participants={[user]} />
+      <ParticipantsWithPopover className='!pb-0' participants={[user]} />
       <span className='text-sm capitalize'>
-        {userJobs.length > 0
-          ? userJobs.map((x) => x.title).join(", ")
-          : `${emoji.get("question")}${emoji.get("question")}${emoji.get(
-              "question"
-            )}${emoji.get("question")}`}
+        {userJobs.length > 0 && userJobs.map((x) => x.title).join(", ")}
       </span>
     </div>
   );

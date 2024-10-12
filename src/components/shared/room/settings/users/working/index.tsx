@@ -1,5 +1,4 @@
 import TitleEl from "@/components/shared/title-el";
-import React from "react";
 import { useRoomContext } from "../../../room-context";
 import * as emoji from "node-emoji";
 import WorkingCard from "./card";
@@ -16,7 +15,6 @@ export default function WorkingUsers() {
           <WorkingCard user={item} key={item.id} />
         ))}
       </div>
-      {/* <Participants participants={workingUsers} /> */}
     </TitleEl>
   );
 }
