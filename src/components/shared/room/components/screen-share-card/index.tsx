@@ -7,59 +7,29 @@ import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
 import { doCirclesMeet } from "@/lib/utils"
 import { TrackReference, VideoTrack } from "@livekit/components-react"
 import { Expand, Maximize2, Minimize, Minimize2, X } from "lucide-react"
-import { useCallback, useMemo, useState } from "react"
+import { ReactNode, useCallback, useMemo, useState } from "react"
 import { dispatch } from "use-bus"
 import { useRoomContext } from "../../room-context"
 import useKeyPress from "@/hooks/use-key-press"
 import { createPortal } from "react-dom"
-import ResizableWrapper from "@/components/shared/resizable-wrapper"
-import { useReactFlow } from "@xyflow/react"
+import { NodeResizeControl, useReactFlow } from "@xyflow/react"
 import { __VARS } from "@/app/const/vars"
+import { SquareArrowOutDownRight } from "lucide-react"
 
 type Props = {
   track: TrackReference
   id: string
-  defaultWidth?: number
-  defaultHeight?: number
 }
-export default function ScreenShareCard({
-  track,
-  id,
-  defaultWidth,
-  defaultHeight,
-}: Props) {
+export default function ScreenShareCard({ track, id }: Props) {
   const socket = useSocket()
-
-  const [dimensions, setDimensions] = useState({
-    width: defaultWidth,
-    height: defaultHeight,
-  })
 
   const rf = useReactFlow()
 
   const shareScreenNode = rf?.getNode(id)
 
-  const sh_screen_w = useMemo(() => {
-    let width = 400
-    if (shareScreenNode?.measured?.width) {
-      width = shareScreenNode.measured.width
-    }
-    return width
-  }, [shareScreenNode?.measured?.width])
+  const new_sh_screen_w = shareScreenNode?.measured?.width ?? 500
 
-  const new_sh_screen_w = shareScreenNode?.measured?.width ?? 400
-
-  const new_sh_screen_h = shareScreenNode?.measured?.height ?? 200
-
-  const sh_screen_h = useMemo(() => {
-    let height = 200
-    if (shareScreenNode?.measured?.height) {
-      height = shareScreenNode.measured.height
-    }
-    return height
-  }, [shareScreenNode?.measured?.height])
-
-  console.log(sh_screen_w, sh_screen_h, "CHANGESSHDEMI")
+  const new_sh_screen_h = shareScreenNode?.measured?.height ?? 280
 
   const { room } = useRoomContext()
 
@@ -70,7 +40,7 @@ export default function ScreenShareCard({
   const [isExpanded, setIsExpanded] = useState(false)
 
   let clss =
-    "w-[400px] h-full relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
+    "relative transition-all [&_.actions]:hover:opacity-100 [&_.actions]:hover:visible"
 
   if (isFullScreen) {
     clss += ` !fixed bg-black !w-screen !h-screen top-0 left-0 bottom-0 right-0 z-[1000] [&_video]:w-full [&_video]:h-full`
@@ -102,7 +72,6 @@ export default function ScreenShareCard({
 
   const resizeShScreenHandler = useCallback(
     (measure: { width: number; height: number }) => {
-      console.log(shareScreenNode, "SHARESCREEN")
       if (!socket || !shareScreenNode?.data?.draggable) return
       let new_width = measure.width
       let new_height = measure.height
@@ -111,54 +80,87 @@ export default function ScreenShareCard({
         room_id: room?.id,
         size: new_size,
       }
-      console.log(sendingObject, "SENDINGOBJECT")
       socket.emit("updateShareScreenSize", sendingObject)
-      dispatch({
-        type: _BUS.changeScreenShareSize,
-        data: {
-          size: new_size,
-        },
-      })
+      // dispatch({
+      //   type: _BUS.changeScreenShareSize,
+      //   data: {
+      //     size: new_size,
+      //   },
+      // })
     },
     [shareScreenNode]
   )
 
-  let content = (
-    <div
-      style={{ width: new_sh_screen_w, height: new_sh_screen_h }}
-      className={clss}
-    >
-      <div className="actions absolute top-4 left-4 flex flex-row items-center gap-x-2 opacity-0 invisible transition-all">
-        <CotopiaIconButton
-          className="text-black/60 z-10"
-          onClick={() => setIsFullScreen((prev) => !prev)}
-        >
-          {isFullScreen ? <Minimize2 /> : <Maximize2 />}
-        </CotopiaIconButton>
-        <CotopiaIconButton
-          className="text-black/60 z-10"
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
-          {isExpanded ? <Minimize /> : <Expand />}
-        </CotopiaIconButton>
-        {!!myScreenShare && (
+  const cardWrapper = (children: ReactNode) => {
+    return (
+      <div
+        style={{
+          width: new_sh_screen_w,
+          height: new_sh_screen_h,
+        }}
+        className={clss}
+      >
+        <div className="actions absolute top-4 left-4 flex flex-row items-center gap-x-2 opacity-0 invisible transition-all">
           <CotopiaIconButton
             className="text-black/60 z-10"
-            onClick={handleStopShareScreen}
+            onClick={() => setIsFullScreen((prev) => !prev)}
           >
-            <X />
+            {isFullScreen ? <Minimize2 /> : <Maximize2 />}
           </CotopiaIconButton>
-        )}
+          <CotopiaIconButton
+            className="text-black/60 z-10"
+            onClick={() => setIsExpanded((prev) => !prev)}
+          >
+            {isExpanded ? <Minimize /> : <Expand />}
+          </CotopiaIconButton>
+          {!!myScreenShare && (
+            <CotopiaIconButton
+              className="text-black/60 z-10"
+              onClick={handleStopShareScreen}
+            >
+              <X />
+            </CotopiaIconButton>
+          )}
+        </div>
+        {children}
       </div>
-      {!isFullScreen && !isExpanded ? (
-        <ResizableWrapper onChangeSize={resizeShScreenHandler}>
-          <div className="rounded-lg overflow-hidden">{videoContent}</div>
-        </ResizableWrapper>
-      ) : (
-        videoContent
-      )}
+    )
+  }
+
+  let content = cardWrapper(videoContent)
+
+  let resizerBullet = (
+    <div
+      className={`resizer w-full h-full absolute bottom-1 right-1  bg-white shadow-lg rounded-full z-[2] flex items-center justify-center cursor-nwse-resize`}
+    >
+      <SquareArrowOutDownRight size={14} />
     </div>
   )
+
+  if (!isFullScreen && !isExpanded) {
+    content = cardWrapper(
+      <div className=" [&_.resizer]:opacity-0 [&_.resizer]:hover:opacity-100 rounded-lg overflow-hidden">
+        <NodeResizeControl
+          minHeight={200}
+          minWidth={400}
+          onResizeEnd={(_, p) =>
+            resizeShScreenHandler({ width: p.width, height: p.height })
+          }
+          position="bottom-right"
+          keepAspectRatio
+          style={{
+            minWidth: "21px",
+            minHeight: "21px",
+            background: "transparent",
+            border: "none",
+          }}
+        >
+          {resizerBullet}
+        </NodeResizeControl>
+        {videoContent}
+      </div>
+    )
+  }
 
   return isFullScreen
     ? createPortal(content, document.getElementById("portal") as any)

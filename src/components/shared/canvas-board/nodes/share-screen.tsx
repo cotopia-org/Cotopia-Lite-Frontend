@@ -4,12 +4,5 @@ import ScreenShareCard from "../../room/components/screen-share-card"
 export default function ShareScreen(props: any) {
   const { data } = props
 
-  return (
-    <ScreenShareCard
-      track={data.track}
-      id={data?.id}
-      defaultWidth={data?.width}
-      defaultHeight={data?.height}
-    />
-  )
+  return <ScreenShareCard track={data.track} id={data?.id} />
 }

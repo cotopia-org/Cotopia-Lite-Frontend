@@ -6,17 +6,11 @@ import { TrackReferenceOrPlaceholder } from "@livekit/components-react"
 import {
   applyNodeChanges,
   Background,
-  Edge,
-  EdgeChange,
-  MiniMap,
-  //   Background,
   Node,
   NodeChange,
   NodeMouseHandler,
   ReactFlow,
   ReactFlowInstance,
-  ReactFlowProvider,
-  useEdgesState,
   useNodesState,
   useReactFlow,
   Viewport,
@@ -86,28 +80,23 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const [nodes, setNodes] = useNodesState<Node>([])
 
-  const handleNodesChange = useCallback(
-    (changes: NodeChange[]) => {
-      setNodes((crtNds) => {
-        const nodesChanges = changes.map((node) => {
-          const node_type = node.type
-
+  const handleNodesChange = (changes: NodeChange[]) => {
+    setNodes((crtNds) => {
+      let latest_changes = [...changes]
+      const nodesChanges = latest_changes.map((node) => {
+        const node_type = node.type
+        if (node_type === "position") {
           const hasCollision =
             !!nodesCollision && nodesCollision?.intersections?.length > 0
-
           let targetNode: Node | undefined = undefined
           let myNode: Node | undefined = undefined
           if (hasCollision) {
             myNode = nodesCollision.target_node
             targetNode = nodesCollision.intersections[0]
           }
-          if (
-            node_type === "position" &&
-            hasCollision &&
-            targetNode &&
-            myNode &&
-            node?.position
-          ) {
+
+          if (hasCollision && targetNode && myNode) {
+            let has_collied = targetNode?.data.has_collied
             const { x_position, y_position } = checkNodesCollision(
               myNode,
               targetNode
@@ -115,21 +104,20 @@ function ReactFlowHandler({ tracks }: Props) {
             return {
               ...node,
               position: {
-                x: targetNode.data.has_collied ? x_position : node.position.x,
-                y: targetNode.data.has_collied ? y_position : node.position.y,
+                x: has_collied ? x_position : node?.position?.x ?? 200,
+                y: has_collied ? y_position : node?.position?.y ?? 200,
               },
             }
           } else {
             return node
           }
-        })
-
-        return applyNodeChanges(nodesChanges, crtNds)
+        } else {
+          return node
+        }
       })
-      // Always apply the changes to keep the nodes state updated
-    },
-    [nodesCollision, setNodes]
-  )
+      return applyNodeChanges(nodesChanges, crtNds)
+    })
+  }
 
   //Node with background
   const nodesWithBackground = useCallback(
@@ -175,7 +163,6 @@ function ReactFlowHandler({ tracks }: Props) {
         let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200
         let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200
 
-        console.log(xcoord, ycoord, "XYCORD")
         if (typeof xcoord === "string") xcoord = +xcoord
         if (typeof ycoord === "string") ycoord = +ycoord
 
@@ -284,23 +271,22 @@ function ReactFlowHandler({ tracks }: Props) {
 
     let width = size_array[0]
     let height = size_array[1]
-
     setNodes((crtNds) => {
       return crtNds.map((node) => {
+        let sendingObject = node
         const ssNode = node.type === "shareScreenCard"
 
-        let newData = { ...node, measured: { width: +width, height: +height } }
         if (ssNode) {
-          console.log(newData, "NEWDATA")
-          return newData
-        } else {
-          return node
+          sendingObject = {
+            ...node,
+            data: { ...node.data, width: +width, height: +height },
+          }
         }
+        return sendingObject
       })
     })
   }
 
-  console.log(nodes, "INNER NODES")
   const updateUserCoordinate = (data: UserMinimalType) => {
     const username = data?.username
 
@@ -347,27 +333,26 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateShareScreenCoordinates",
     (data) => {
-      console.log(data, "DATA")
       updateShareScreenCoordinates(data)
     },
     [updateShareScreenCoordinates]
   )
 
-  useSocket(
-    "updateShareScreenSize",
-    (data) => {
-      console.log(data, "SHARESCREENDATA")
-      updateShScreenMeasure(data)
-    },
-    [updateShScreenMeasure]
-  )
+  // useSocket(
+  //   "updateShareScreenSize",
+  //   (data) => {
+  //     console.log(data, "SHARESCREENDATA")
+  //     updateShScreenMeasure(data)
+  //   },
+  //   [updateShScreenMeasure]
+  // )
 
   useBus(_BUS.changeMyUserCoord, (data) => {
     updateUserCoordinate(data.data)
   })
 
   useBus(_BUS.changeScreenShareSize, (data) => {
-    // updateShScreenMeasure(data.data)
+    updateShScreenMeasure(data.data)
   })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
@@ -435,13 +420,13 @@ function ReactFlowHandler({ tracks }: Props) {
           updateUserCoords(livekitIdentity, droppedNode.position)
         }
         if (isShareScreenNode) {
-          // if (!socket) return
-          // const newCoords = `${node.position.x},${node.position.y}`
-          // const sendingObject = {
-          //   room_id: room?.id,
-          //   coordinates: newCoords,
-          // }
-          // socket.emit("updateShareScreenCoordinates", sendingObject)
+          if (!socket) return
+          const newCoords = `${stopedNode.position.x},${stopedNode.position.y}`
+          const sendingObject = {
+            room_id: room?.id,
+            coordinates: newCoords,
+          }
+          socket.emit("updateShareScreenCoordinates", sendingObject)
         }
       }
     },
@@ -471,6 +456,7 @@ function ReactFlowHandler({ tracks }: Props) {
     })
   }
 
+  console.log(nodes, "INNER NODES")
   return (
     <>
       <ReactFlow
