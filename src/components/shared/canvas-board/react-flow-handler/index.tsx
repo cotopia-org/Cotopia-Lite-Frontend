@@ -338,22 +338,22 @@ function ReactFlowHandler({ tracks }: Props) {
     [updateShareScreenCoordinates]
   )
 
-  // useSocket(
-  //   "updateShareScreenSize",
-  //   (data) => {
-  //     console.log(data, "SHARESCREENDATA")
-  //     updateShScreenMeasure(data)
-  //   },
-  //   [updateShScreenMeasure]
-  // )
+  useSocket(
+    "updateShareScreenSize",
+    (data) => {
+      console.log(data, "SHARESCREENDATA")
+      updateShScreenMeasure(data)
+    },
+    [updateShScreenMeasure]
+  )
 
   useBus(_BUS.changeMyUserCoord, (data) => {
     updateUserCoordinate(data.data)
   })
 
-  useBus(_BUS.changeScreenShareSize, (data) => {
-    updateShScreenMeasure(data.data)
-  })
+  // useBus(_BUS.changeScreenShareSize, (data) => {
+  //   updateShScreenMeasure(data.data)
+  // })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user: targetUser } = data
