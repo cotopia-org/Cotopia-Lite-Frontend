@@ -18,7 +18,7 @@ export default function ChatPreview() {
         title={chat?.title}
         sub_title={
           chat?.last_message?.updated_at
-            ? moment(chat?.last_message?.updated_at).format("HH:mm")
+            ? moment(chat?.last_message?.updated_at * 1000).format("HH:mm")
             : undefined
         }
         description={chat?.last_message?.text}
