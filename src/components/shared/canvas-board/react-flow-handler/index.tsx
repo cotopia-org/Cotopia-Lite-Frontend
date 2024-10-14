@@ -24,7 +24,11 @@ import { Track } from "livekit-client"
 import ShareScreen from "../nodes/share-screen"
 import { UserMinimalType } from "@/types/user"
 import JailNode from "../nodes/jail-node"
-import { checkNodesCollision, uniqueById } from "@/lib/utils"
+import {
+  checkNodesCollision,
+  nodesCenterDistance,
+  uniqueById,
+} from "@/lib/utils"
 import { playSoundEffect } from "@/lib/sound-effects"
 import Toolbar from "../../room/toolbar"
 import TopLeftTools from "../../room/tools/top-left"
@@ -63,7 +67,6 @@ type NodesCollisionType = {
 function ReactFlowHandler({ tracks }: Props) {
   const [viewPort, setViewPort] = useState<Viewport>()
 
-  const { getIntersectingNodes } = useReactFlow()
   const [rf, setRf] = useState<ReactFlowInstance>()
   const { user } = useProfile()
 
@@ -81,7 +84,6 @@ function ReactFlowHandler({ tracks }: Props) {
   const [nodes, setNodes] = useNodesState<Node>([])
 
   const handleNodesChange = (changes: NodeChange[]) => {
-    console.log(changes, "CHANGES")
     setNodes((crtNds) => {
       let latest_changes = [...changes]
       const nodesChanges = latest_changes.map((node) => {
@@ -91,24 +93,52 @@ function ReactFlowHandler({ tracks }: Props) {
             !!nodesCollision && nodesCollision?.intersections?.length > 0
           let targetNode: Node | undefined = undefined
           let myNode: Node | undefined = undefined
+
           if (hasCollision) {
             myNode = nodesCollision.target_node
             targetNode = nodesCollision.intersections[0]
           }
 
           if (hasCollision && targetNode && myNode) {
-            let has_collied = targetNode?.data.has_collied
+            let flatted_nodes = crtNds.filter((node) => {
+              const isUserNode =
+                node.type !== __VARS.jailNodeType &&
+                node.type !== __VARS.backgroundNodeType &&
+                node.id !== myNode?.id
+              return isUserNode
+            })
             const { x_position, y_position } = checkNodesCollision(
               myNode,
               targetNode
             )
-            return {
+            let new_collisions: Node[] = []
+
+            if (flatted_nodes.length > 0) {
+              for (let n of flatted_nodes) {
+                const { has_collied } = checkNodesCollision(
+                  { ...myNode, position: { x: x_position, y: y_position } },
+                  n
+                )
+                if (has_collied) new_collisions.push(n)
+              }
+            }
+            let updatedNode = {
               ...node,
               position: {
-                x: has_collied ? x_position : node?.position?.x ?? 200,
-                y: has_collied ? y_position : node?.position?.y ?? 200,
+                x: x_position,
+                y: y_position,
               },
             }
+            if (new_collisions.length > 0) {
+              const target_node = new_collisions[new_collisions.length - 1]
+              const { x_position: new_x_position, y_position: new_y_position } =
+                checkNodesCollision(myNode, target_node)
+              updatedNode = {
+                ...node,
+                position: { x: new_x_position, y: new_y_position },
+              }
+            }
+            return updatedNode
           } else {
             return node
           }
@@ -243,8 +273,6 @@ function ReactFlowHandler({ tracks }: Props) {
   const updateShareScreenCoordinates = (data: { coordinates: string }) => {
     const coordinates = data.coordinates
 
-    console.log(data, "UPDATECOORD")
-
     if (!coordinates) return
 
     const arr_coords = coordinates.split(",")
@@ -342,7 +370,6 @@ function ReactFlowHandler({ tracks }: Props) {
   useSocket(
     "updateShareScreenSize",
     (data) => {
-      console.log(data, "SHARESCREENDATA")
       updateShScreenMeasure(data)
     },
     [updateShScreenMeasure]
@@ -382,85 +409,75 @@ function ReactFlowHandler({ tracks }: Props) {
     if (user.id !== targetUser.id) playSoundEffect("elseUserJoin")
   })
 
-  const onNodeDragStop: NodeMouseHandler = useCallback(
-    (event, stopedNode) => {
-      let last_nodes = [...nodes]
-      //check if the node belongs to share screen
-      const isShareScreenNode = stopedNode.type === "shareScreenCard"
-      //check if the node belongs to user node
-      const isUserNode = stopedNode.type === "userNode"
-      //check is node draggable
-      const isDraggable = stopedNode?.data?.draggable
+  const onNodeDragStop = (e: MouseEvent, stopedNode: Node) => {
+    const last_nodes = [...nodes]
+    //check if the node belongs to share screen
+    const isShareScreenNode = stopedNode.type === "shareScreenCard"
+    //check if the node belongs to user node
+    const isUserNode = stopedNode.type === "userNode"
+    //check is node draggable
+    const isDraggable = stopedNode?.data?.draggable
 
-      const hasCollision =
-        nodesCollision && nodesCollision?.intersections?.length > 0
+    const hasCollision =
+      nodesCollision && nodesCollision?.intersections?.length > 0
 
-      let droppedNode: Node = stopedNode
+    let droppedNode: Node = stopedNode
 
-      if (hasCollision) {
-        droppedNode = last_nodes.find(
-          (node) => node.id === droppedNode.id
-        ) as Node
-        setTimeout(() => {
-          setNodesCollision(null)
-        }, 500)
-      }
+    if (hasCollision) {
+      droppedNode = last_nodes.find(
+        (node) => node.id === droppedNode.id
+      ) as Node
+      setTimeout(() => {
+        setNodesCollision(null)
+      }, 500)
+    }
 
-      if (isDraggable) {
-        if (isUserNode) {
-          if (!socket) return
-          const newCoords = `${droppedNode.position.x},${droppedNode.position.y}`
-          const username: string = droppedNode.data?.username as string
-          const sendingObject = {
-            room_id: room?.id,
-            coordinates: newCoords,
-            username,
-          }
-          socket.emit("updateCoordinates", sendingObject)
-          const livekitIdentity = username
-          updateUserCoords(livekitIdentity, droppedNode.position)
+    if (isDraggable) {
+      if (isUserNode) {
+        if (!socket) return
+        const newCoords = `${droppedNode.position.x},${droppedNode.position.y}`
+        const username: string = droppedNode.data?.username as string
+        const sendingObject = {
+          room_id: room?.id,
+          coordinates: newCoords,
+          username,
         }
-        if (isShareScreenNode) {
-          if (!socket) return
-          const newCoords = `${stopedNode.position.x},${stopedNode.position.y}`
-          const sendingObject = {
-            room_id: room?.id,
-            coordinates: newCoords,
-          }
-          socket.emit("updateShareScreenCoordinates", sendingObject)
+        socket.emit("updateCoordinates", sendingObject)
+        const livekitIdentity = username
+        updateUserCoords(livekitIdentity, droppedNode.position)
+      }
+      if (isShareScreenNode) {
+        if (!socket) return
+        const newCoords = `${stopedNode.position.x},${stopedNode.position.y}`
+        const sendingObject = {
+          room_id: room?.id,
+          coordinates: newCoords,
         }
+        socket.emit("updateShareScreenCoordinates", sendingObject)
       }
-    },
-    [nodesCollision, nodes]
-  )
+    }
+  }
 
-  const onNodeDragHandler = (
-    event: MouseEvent,
-    draggingNode: Node,
-    nodes: Node[]
-  ) => {
-    const intersectingNodes = getIntersectingNodes(draggingNode).filter(
-      (item) => {
-        const isUserNode =
-          item.type !== __VARS.jailNodeType &&
-          item.type !== __VARS.backgroundNodeType
-        return isUserNode
-      }
-    )
-
-    console.log(intersectingNodes, "COLLISIONS")
-
+  const onNodeDragHandler = (event: MouseEvent, draggingNode: Node) => {
+    let current_nodes = [...nodes]
+    let flatted_nodes = current_nodes.filter((node) => {
+      const isUserNode =
+        node.type !== __VARS.jailNodeType &&
+        node.type !== __VARS.backgroundNodeType &&
+        node.id !== draggingNode.id
+      return isUserNode
+    })
+    let collisions: Node[] = []
+    for (let n of flatted_nodes) {
+      const { has_collied } = checkNodesCollision(draggingNode, n)
+      if (has_collied) collisions.push(n)
+    }
     setNodesCollision({
       target_node: draggingNode,
-      intersections: intersectingNodes.map((node) => {
-        const { has_collied } = checkNodesCollision(draggingNode, node)
-        console.log(has_collied, "DISTANCEDRAGGING")
-        return { ...node, data: { ...node.data, has_collied: !!has_collied } }
-      }),
+      intersections: collisions,
     })
   }
 
-  console.log(nodes, "NODES")
   return (
     <>
       <ReactFlow

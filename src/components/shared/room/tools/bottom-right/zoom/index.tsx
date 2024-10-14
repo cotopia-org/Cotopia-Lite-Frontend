@@ -5,7 +5,6 @@ import PreviewZoom from "./preview"
 export default function ZoomButtonTool() {
   const rf = useReactFlow()
   const zoom = rf.getZoom()
-  console.log(zoom, "RF")
 
   return (
     <div className="flex flex-col items-center bg-white rounded-xl [&_.zoom-actions]:hover:flex">

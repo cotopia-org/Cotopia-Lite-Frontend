@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React from "react"
 import ActionsRight from "./actions-right"
 import MicButton from "./actions-right/mic"
 import {
@@ -24,20 +24,14 @@ import { Participant, Track } from "livekit-client"
 import { isTrackReferencePlaceholder } from "@livekit/components-core"
 import SessionWrapper from "./wrapper"
 import { useUserTile } from "."
-import { useProfile, useSocket } from "../protected-wrapper"
+import { useProfile } from "../protected-wrapper"
 import CotopiaAvatar from "@/components/shared-ui/c-avatar"
-import {
-  checkNodesCollision,
-  doCirclesMeet,
-  getUserFullname,
-} from "@/lib/utils"
+import { doCirclesMeet, getUserFullname } from "@/lib/utils"
 import VoiceAreaHearing from "./wrapper/voice-area-hearing"
 import CotopiaTooltip from "@/components/shared-ui/c-tooltip"
 import { __VARS } from "@/app/const/vars"
 import { useRoomContext } from "@/components/shared/room/room-context"
 import ParticipantDetails from "@/components/shared/room/participant-detail"
-import { useReactFlow } from "@xyflow/react"
-import { dispatch } from "use-bus"
 import { _BUS } from "@/app/const/bus"
 
 function ParticipantContextIfNeeded(
@@ -145,8 +139,6 @@ export const ParticipantTile = React.forwardRef<
 
   const { isMuted } = useTrackMutedIndicator(trackRef)
 
-  const { draggable } = useUserTile()
-
   const isSpeaking = trackReference?.participant?.isSpeaking
 
   let clss =
@@ -163,76 +155,10 @@ export const ParticipantTile = React.forwardRef<
   )
   const targetUser = participants?.find((x) => x?.username === livekitIdentity)
 
-  const { getIntersectingNodes, getNodes } = useReactFlow()
-
-  const all_nodes = getNodes()
-
-  const my_participant_as_node = all_nodes.find(
-    (p) => p.id === updatedMyUser?.username
-  )
-  const target_participant_as_node = all_nodes.find(
-    (p) => p.id === targetUser?.username
-  )
-
-  let incoming_collisions: any[] = []
-
-  if (my_participant_as_node) {
-    incoming_collisions = getIntersectingNodes(my_participant_as_node).filter(
-      (item) => {
-        const isUserNode =
-          item.type !== __VARS.jailNodeType &&
-          item.type !== __VARS.backgroundNodeType
-        return isUserNode
-      }
-    )
-  }
-
-  let my_radius = (my_participant_as_node?.measured?.width ?? 94) / 2
-
-  let target_radius = (target_participant_as_node?.measured?.width ?? 94) / 2
-
-  let total_radius = my_radius + target_radius
-
   //I heet the circles? checking
-  const { meet, distance } = doCirclesMeet(updatedMyUser, targetUser)
-
-  console.log(updatedMyUser, targetUser, "TARGETUSER")
+  const { meet } = doCirclesMeet(updatedMyUser, targetUser)
 
   const userFullName = getUserFullname(targetUser)
-
-  const socket = useSocket()
-  useEffect(() => {
-    const updateCoordinates = () => {
-      if (!socket) return
-      let new_x_position = undefined
-      let new_y_position = undefined
-
-      if (my_participant_as_node && target_participant_as_node) {
-        const { x_position, y_position } = checkNodesCollision(
-          my_participant_as_node,
-          target_participant_as_node
-        )
-        new_x_position = x_position
-        new_y_position = y_position
-      }
-
-      if (new_x_position && new_y_position) {
-        let objToSend = {
-          ...updatedMyUser,
-          coordinates: `${new_x_position},${new_y_position}`,
-        }
-        socket.emit("updateCoordinates", objToSend)
-        dispatch({
-          type: _BUS.changeMyUserCoord,
-          data: objToSend,
-        })
-      }
-    }
-
-    if (distance && distance < total_radius) {
-      updateCoordinates()
-    }
-  }, [distance, total_radius])
 
   let trackContent = null
 

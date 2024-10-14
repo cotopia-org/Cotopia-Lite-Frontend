@@ -27,8 +27,6 @@ export default function ScreenShareCard({ track, id }: Props) {
 
   const shareScreenNode = rf?.getNode(id)
 
-  console.log(shareScreenNode, "SHARESCREENNODE")
-
   const up_width = shareScreenNode?.data?.width
   const up_height = shareScreenNode?.data?.height
 
@@ -86,7 +84,6 @@ export default function ScreenShareCard({ track, id }: Props) {
     width: number
     height: number
   }) => {
-    console.log(shareScreenNode, "SHARESCNODE")
     if (!socket || !shareScreenNode?.data?.draggable) return
     let new_width = measure.width
     let new_height = measure.height
@@ -144,7 +141,7 @@ export default function ScreenShareCard({ track, id }: Props) {
 
   let resizerBullet = (
     <div
-      className={`resizer w-full h-full absolute bottom-1 right-1  bg-white shadow-lg rounded-full z-[2] flex items-center justify-center cursor-nwse-resize`}
+      className={`resizer w-full h-full bg-white shadow-lg rounded-full z-[2] flex items-center justify-center cursor-nwse-resize`}
     >
       <SquareArrowOutDownRight size={14} />
     </div>
@@ -159,14 +156,14 @@ export default function ScreenShareCard({ track, id }: Props) {
           onResizeEnd={(_, p) =>
             resizeShScreenHandler({ width: p.width, height: p.height })
           }
-          position="bottom-right"
-          keepAspectRatio
           style={{
-            minWidth: "21px",
-            minHeight: "21px",
             background: "transparent",
             border: "none",
+            width: 21,
+            height: 21,
           }}
+          position="bottom-right"
+          keepAspectRatio
         >
           {resizerBullet}
         </NodeResizeControl>

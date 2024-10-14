@@ -268,7 +268,6 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   let target_x = targetNode?.position?.x
   let target_y = targetNode?.position?.y
 
-  console.log(targetNode, "TARGETNODE")
   const target_position = target_x && target_y
   //get my node position
 
@@ -362,4 +361,28 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   }
 
   return { x_position: final_x, y_position: final_y, distance, has_collied }
+}
+
+export const nodesCenterDistance = (first_node: Node, sec_node: Node) => {
+  const first_w = first_node?.measured?.width
+  const first_h = first_node?.measured?.height
+  const sec_w = sec_node?.measured?.width
+  const sec_h = sec_node?.measured?.height
+
+  if (!first_w || !sec_w || !first_h || !sec_h)
+    return { distance: undefined, has_collied: false }
+  const from_x_center = first_node.position.x + first_w / 2
+  const from_y_center = first_node.position.y + sec_h / 2
+
+  const to_x_center = sec_node.position.x
+  const to_y_center = sec_node.position.y
+  const first_r = first_w / 2
+  const sec_r = sec_w / 2
+
+  let distance = Math.sqrt(
+    Math.pow(from_x_center - to_x_center, 2) +
+      Math.pow(from_y_center - to_y_center, 2)
+  )
+
+  return { distance, has_collied: distance <= first_r + sec_r }
 }
