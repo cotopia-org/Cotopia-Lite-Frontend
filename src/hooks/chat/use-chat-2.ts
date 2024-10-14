@@ -4,6 +4,7 @@ import { _BUS } from "@/app/const/bus";
 import {
   addMessage,
   getChats,
+  seenMessage,
   updateMessage,
 } from "@/store/redux/slices/chat-slice";
 import { useAppDispatch, useAppSelector } from "@/store/redux/store";
@@ -28,7 +29,7 @@ function generateTempChat(chat_id: number, user_id: number, text: string) {
     mentions: [],
     nonce_id,
     reply_to: null,
-    seen: false,
+    seen: true, //Because I'm the owner of message
     text,
     updated_at: nonce_id,
     user: user_id,
@@ -113,10 +114,16 @@ export const useChat2 = (props?: {
       nonce_id: message.nonce_id,
     });
 
+    dispatch(
+      seenMessage({ chat_id: message.chat_id, nonce_id: message.nonce_id })
+    );
+
     if (onSuccess) onSuccess();
   };
 
-  useSocket("messageSeen", (data) => console.log("data", data));
+  useSocket("messageSeen", (data) => {
+    dispatch(seenMessage({ chat_id: data.chat_id, nonce_id: data.nonce_id }));
+  });
 
   const chatKeys = Object.keys(chats);
 

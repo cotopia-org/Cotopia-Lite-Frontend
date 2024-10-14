@@ -79,6 +79,28 @@ const chatSlice = createSlice({
         return x;
       });
     },
+    seenMessage: (
+      state,
+      action: PayloadAction<{ chat_id: number; nonce_id: number }>
+    ) => {
+      const chat_id = action.payload.chat_id;
+      const nonce_id = action.payload.nonce_id;
+
+      state.chats[chat_id].messages = state.chats[chat_id].messages.map((x) => {
+        if (x.nonce_id === nonce_id) {
+          return { ...x, seen: true };
+        }
+
+        return x;
+      });
+    },
+    seenAllMessages: (state, action: PayloadAction<{ chat_id: number }>) => {
+      const chat_id = action.payload.chat_id;
+      state.chats[chat_id].messages.map((x) => {
+        x.seen = true;
+        return x;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -142,6 +164,7 @@ const chatSlice = createSlice({
   },
 });
 
-export const { addMessage, updateMessage } = chatSlice.actions;
+export const { addMessage, updateMessage, seenMessage, seenAllMessages } =
+  chatSlice.actions;
 
 export default chatSlice.reducer;
