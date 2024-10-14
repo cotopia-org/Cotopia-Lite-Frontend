@@ -9,6 +9,7 @@ import { Virtualizer } from "@tanstack/react-virtual";
 import { useAppDispatch } from "@/store/redux/store";
 import { getChatMessages } from "@/store/redux/slices/chat-slice";
 import FullLoading from "@/components/shared/full-loading";
+import { _BUS } from "@/app/const/bus";
 
 type Props = {
   chat: ChatType;
@@ -41,7 +42,7 @@ export default function ChatInnerHolder({ chat, onBack, getUser }: Props) {
     <div className='flex flex-col gap-y-2 w-full h-[calc(100vh-132px)]'>
       <div className='flex flex-row items-center gap-x-2'>
         <BackHolder onClick={onBack} />
-        <ChatDetails title={chat.title} description={`Chat description`} />
+        <ChatDetails title={chat.title} />
       </div>
       <Chat2
         items={chatMessages}

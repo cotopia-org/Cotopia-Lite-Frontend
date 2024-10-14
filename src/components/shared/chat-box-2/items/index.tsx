@@ -1,5 +1,5 @@
 import ChatItem from "./item";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
 import { Chat2ItemType } from "@/types/chat2";
 import FetchingProgress from "./fetching-progress";
@@ -7,6 +7,7 @@ import { UserMinimalType } from "@/types/user";
 import useBus from "use-bus";
 import { _BUS } from "@/app/const/bus";
 import { useProfile } from "@/app/(pages)/(protected)/protected-wrapper";
+import UnSeenHandlers from "./un-seen-handlers";
 
 type Props = {
   items: Chat2ItemType[];
@@ -67,7 +68,9 @@ export default function Items({
 
     if (items.length === 0) return;
 
-    rowVirtualizer.scrollToIndex(items.length, { align: "end" });
+    rowVirtualizer.scrollToIndex(items.length, {
+      align: "end",
+    });
 
     isScrollToTop.current = false;
   }, [items.length, rowVirtualizer]);
@@ -120,42 +123,45 @@ export default function Items({
   }, [items.length, rowVirtualizer]);
 
   return (
-    <div
-      ref={parentRef}
-      className='relative flex-grow overflow-y-auto mb-4 space-y-2'
-      style={{ contain: "strict", height: "100%" }}
-    >
-      {!!isFetching && <FetchingProgress />}
+    <div className='flex-grow relative'>
       <div
-        style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
-          position: "relative",
-        }}
+        ref={parentRef}
+        className='relative flex-grow overflow-y-auto mb-4 space-y-2'
+        style={{ contain: "strict", height: "100%" }}
       >
-        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-          const message = messages[virtualRow.index];
-          return (
-            <div
-              data-index={virtualRow.index}
-              key={message.id}
-              ref={rowVirtualizer.measureElement}
-              style={{
-                position: "absolute",
-                top: `${virtualRow.start}px`,
-                left: 0,
-                width: "100%",
-              }}
-            >
-              <ChatItem
-                item={message}
-                key={message.nonce_id}
-                getUser={getUser}
-                isMine={message?.user === profile?.id}
-              />
-            </div>
-          );
-        })}
+        {!!isFetching && <FetchingProgress />}
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const message = messages[virtualRow.index];
+            return (
+              <div
+                data-index={virtualRow.index}
+                key={message.id}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: "absolute",
+                  top: `${virtualRow.start}px`,
+                  left: 0,
+                  width: "100%",
+                }}
+              >
+                <ChatItem
+                  item={message}
+                  key={message.nonce_id}
+                  getUser={getUser}
+                  isMine={message?.user === profile?.id}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
+      <UnSeenHandlers items={items} />
     </div>
   );
 }
