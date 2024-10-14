@@ -81,6 +81,7 @@ function ReactFlowHandler({ tracks }: Props) {
   const [nodes, setNodes] = useNodesState<Node>([])
 
   const handleNodesChange = (changes: NodeChange[]) => {
+    console.log(changes, "CHANGES")
     setNodes((crtNds) => {
       let latest_changes = [...changes]
       const nodesChanges = latest_changes.map((node) => {
@@ -351,9 +352,9 @@ function ReactFlowHandler({ tracks }: Props) {
     updateUserCoordinate(data.data)
   })
 
-  // useBus(_BUS.changeScreenShareSize, (data) => {
-  //   updateShScreenMeasure(data.data)
-  // })
+  useBus(_BUS.changeScreenShareSize, (data) => {
+    updateShScreenMeasure(data.data)
+  })
 
   useSocket("userLeftFromRoom", (data: LeftJoinType) => {
     const { room_id: gotRoomId, user: targetUser } = data
@@ -447,16 +448,19 @@ function ReactFlowHandler({ tracks }: Props) {
       }
     )
 
+    console.log(intersectingNodes, "COLLISIONS")
+
     setNodesCollision({
       target_node: draggingNode,
       intersections: intersectingNodes.map((node) => {
         const { has_collied } = checkNodesCollision(draggingNode, node)
+        console.log(has_collied, "DISTANCEDRAGGING")
         return { ...node, data: { ...node.data, has_collied: !!has_collied } }
       }),
     })
   }
 
-  console.log(nodes, "INNER NODES")
+  console.log(nodes, "NODES")
   return (
     <>
       <ReactFlow

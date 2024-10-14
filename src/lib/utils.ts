@@ -268,6 +268,7 @@ export const checkNodesCollision = (myNode: Node, targetNode: Node) => {
   let target_x = targetNode?.position?.x
   let target_y = targetNode?.position?.y
 
+  console.log(targetNode, "TARGETNODE")
   const target_position = target_x && target_y
   //get my node position
 
