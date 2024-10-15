@@ -20,13 +20,17 @@ type Props = {
 export default function ChatInnerHolder({ chat, onBack, getUser }: Props) {
   const chatRef = useRef<Virtualizer<HTMLDivElement, Element>>();
 
-  const { chatObjects, send } = useChat2({ chat_id: chat.id });
+  const { chatObjects, send, seen } = useChat2({ chat_id: chat.id });
 
   const chatMessages = chatObjects?.[chat.id]?.messages ?? [];
 
-  const handleSendMessage = useCallback((text: string) => {
-    send({ text, seen: true });
-  }, []);
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      const message = send({ text });
+      seen(message);
+    },
+    [seen, send]
+  );
 
   const dispatch = useAppDispatch();
 

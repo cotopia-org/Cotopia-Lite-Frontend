@@ -18,12 +18,10 @@ function generateTempChat({
   chat_id,
   user_id,
   text,
-  seen,
 }: {
   chat_id: number;
   user_id: number;
   text: string;
-  seen?: boolean;
 }) {
   const nonce_id = moment().unix() * 1000;
 
@@ -39,7 +37,7 @@ function generateTempChat({
     mentions: [],
     nonce_id,
     reply_to: null,
-    seen: seen ?? false,
+    seen: false,
     text,
     updated_at: nonce_id,
     user: user_id,
@@ -95,13 +93,11 @@ export const useChat2 = (props?: {
       mentions,
       links,
       files,
-      seen,
     }: {
       text: string;
       mentions?: any[];
       links?: any[];
       files?: number[];
-      seen?: boolean;
     },
     onSuccess?: () => void
   ) => {
@@ -109,7 +105,6 @@ export const useChat2 = (props?: {
       chat_id: chat_id as number,
       user_id: (user as UserType)?.id,
       text,
-      seen,
     });
 
     dispatch(addMessage(message));
@@ -120,6 +115,8 @@ export const useChat2 = (props?: {
     setTimeout(() => {
       busDispatch(_BUS.scrollEndChatBox);
     }, 1);
+
+    return message;
   };
 
   const add = (message: Chat2ItemType, onSuccess?: () => void) => {
