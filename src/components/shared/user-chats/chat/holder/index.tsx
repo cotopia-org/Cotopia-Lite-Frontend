@@ -25,7 +25,7 @@ export default function ChatInnerHolder({ chat, onBack, getUser }: Props) {
   const chatMessages = chatObjects?.[chat.id]?.messages ?? [];
 
   const handleSendMessage = useCallback((text: string) => {
-    send({ text });
+    send({ text, seen: true });
   }, []);
 
   const dispatch = useAppDispatch();

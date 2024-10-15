@@ -4,7 +4,7 @@ import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { seenAllMessages } from "@/store/redux/slices/chat-slice";
 import { useAppDispatch } from "@/store/redux/store";
 import { Chat2ItemType } from "@/types/chat2";
-import { AtSign } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { dispatch as busDispatch } from "use-bus";
 
 type Props = {
@@ -36,7 +36,7 @@ export default function UnSeenHandlers({ items }: Props) {
         count={unSeenCount}
         className='absolute top-[-28px] left-[50%] translate-x-[-50%]'
       />
-      <AtSign className='text-black/60' />
+      <ChevronDown className='text-black/60' />
     </CotopiaIconButton>
   );
 }

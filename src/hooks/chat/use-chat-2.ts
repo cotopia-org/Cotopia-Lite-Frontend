@@ -14,7 +14,17 @@ import moment from "moment";
 import { RefObject, useEffect } from "react";
 import { dispatch as busDispatch } from "use-bus";
 
-function generateTempChat(chat_id: number, user_id: number, text: string) {
+function generateTempChat({
+  chat_id,
+  user_id,
+  text,
+  seen,
+}: {
+  chat_id: number;
+  user_id: number;
+  text: string;
+  seen?: boolean;
+}) {
   const nonce_id = moment().unix() * 1000;
 
   //@ts-ignore
@@ -29,7 +39,7 @@ function generateTempChat(chat_id: number, user_id: number, text: string) {
     mentions: [],
     nonce_id,
     reply_to: null,
-    seen: true, //Because I'm the owner of message
+    seen: seen ?? false,
     text,
     updated_at: nonce_id,
     user: user_id,
@@ -66,32 +76,47 @@ export const useChat2 = (props?: {
 
   useSocket("updateMessage", (data) => console.log("data", data));
 
+  const seenFn = (message: Chat2ItemType, onSuccess?: () => void) => {
+    socket?.emit("seenMessage", {
+      chat_id: message.chat_id,
+      nonce_id: message.nonce_id,
+    });
+
+    dispatch(
+      seenMessage({ chat_id: message.chat_id, nonce_id: message.nonce_id })
+    );
+
+    if (onSuccess) onSuccess();
+  };
+
   const send = (
     {
       text,
       mentions,
       links,
       files,
+      seen,
     }: {
       text: string;
       mentions?: any[];
       links?: any[];
       files?: number[];
+      seen?: boolean;
     },
     onSuccess?: () => void
   ) => {
-    const message = generateTempChat(
-      chat_id as number,
-      (user as UserType)?.id,
-      text
-    );
+    const message = generateTempChat({
+      chat_id: chat_id as number,
+      user_id: (user as UserType)?.id,
+      text,
+      seen,
+    });
 
     dispatch(addMessage(message));
 
-    if (onSuccess) onSuccess();
-
     socket?.emit("sendMessage", message, (data: any) => {});
 
+    if (onSuccess) onSuccess();
     setTimeout(() => {
       busDispatch(_BUS.scrollEndChatBox);
     }, 1);
@@ -108,19 +133,6 @@ export const useChat2 = (props?: {
     if (onSuccess) onSuccess();
   };
 
-  const seen = (message: Chat2ItemType, onSuccess?: () => void) => {
-    socket?.emit("seenMessage", {
-      chat_id: message.chat_id,
-      nonce_id: message.nonce_id,
-    });
-
-    dispatch(
-      seenMessage({ chat_id: message.chat_id, nonce_id: message.nonce_id })
-    );
-
-    if (onSuccess) onSuccess();
-  };
-
   useSocket("messageSeen", (data) => {
     dispatch(seenMessage({ chat_id: data.chat_id, nonce_id: data.nonce_id }));
   });
@@ -131,7 +143,7 @@ export const useChat2 = (props?: {
     add,
     send,
     update,
-    seen,
+    seen: seenFn,
     chats: chatKeys.map((x) => chats[x].object),
     chatObjects: chats,
     loading,
