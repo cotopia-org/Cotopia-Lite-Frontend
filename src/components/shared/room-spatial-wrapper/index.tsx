@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import ModalDisconnected from "../room/connection-status/modal-disconnected";
 import useNetworkStatus from "@/hooks/use-net";
 import useSetting from "@/hooks/use-setting";
+import useQueryParams from "@/hooks/use-query-params";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -25,6 +26,15 @@ export default function RoomSpatialWrapper({
   const settings = useSetting();
 
   const [isReConnecting, setIsReconnecting] = useState(false);
+
+  const { query } = useQueryParams();
+
+  const [isSwitching, setIsSwitching] = useState(false);
+  useEffect(() => {
+    if (query?.isSwitching) {
+      setIsSwitching(true);
+    }
+  }, [query?.isSwitching]);
 
   const { isOnline } = useNetworkStatus();
 
@@ -119,6 +129,7 @@ export default function RoomSpatialWrapper({
           room_id={room_id}
           workspace_id={workspace_id}
           isReConnecting={isReConnecting}
+          isSwitching={isSwitching}
         />
       </RoomWrapper>
     </div>

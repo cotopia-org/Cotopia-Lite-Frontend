@@ -1,66 +1,71 @@
-import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import {
+  useProfile,
+  useSocket,
+} from "@/app/(pages)/(protected)/protected-wrapper";
 import CotopiaButton from "@/components/shared-ui/c-button";
 import ParticipantsWithPopover from "@/components/shared/participants/with-popover";
-import { WorkspaceRoomShortType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomShortType } from "@/types/room";
 import { Cast } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DeleteRoom from "./delete-room";
 import { useEffect, useState } from "react";
-import { UserMinimalType } from "@/types/user";
-import { uniqueById } from "@/lib/utils";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
+import { uniqueById, urlWithQueryParams } from "@/lib/utils";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
+import useSetting from "@/hooks/use-setting";
+import { playSoundEffect } from "@/lib/sound-effects";
+import { dispatch } from "use-bus";
+import { _BUS } from "@/app/const/bus";
 
 type Props = {
   room: WorkspaceRoomShortType;
   workspace_id: number;
   selected_room_id?: number;
-};
-
-type LeftJoinType = {
-  room_id: number;
-  user: UserMinimalType;
+  participants: WorkspaceUserType[];
 };
 
 export default function WorkspaceRoom({
   workspace_id,
   room,
   selected_room_id,
+  participants,
 }: Props) {
-  const [participants, setParticipants] = useState<UserMinimalType[]>([]);
-  useEffect(() => {
-    if (room?.participants !== undefined) setParticipants(room.participants);
-  }, [room?.participants]);
+  const { user } = useProfile();
 
-  useSocket(
-    "userLeftFromRoom",
-    (data: LeftJoinType) => {
-      const { room_id: gotRoomId } = data;
+  const { sounds } = useSetting();
 
-      if (room.id === undefined) return;
-
-      if (gotRoomId !== +room.id) return;
-
-      setParticipants((prev) => prev.filter((x) => x.id !== data.user.id));
-    },
-    [room]
-  );
-
-  useSocket("userJoinedToRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId } = data;
-
-    if (room.id === undefined) return;
-
-    if (gotRoomId !== +room.id) return;
-
-    setParticipants((prev) => [...prev, data.user]);
-  });
-
-  const socket = useSocket();
   const router = useRouter();
 
+  const socket = useSocket();
+
   const joinRoomHandler = async () => {
+    if (!socket) return;
+
     if (selected_room_id !== room.id) {
-      socket?.emit("leaveRoom");
-      router.push(`/workspaces/${workspace_id}/rooms/${room.id}`);
+      socket.emit("joinedRoom", room.id, () => {
+        axiosInstance
+          .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room.id}/join`)
+          .then((res) => {
+            const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+
+            if (sounds.userJoinLeft) playSoundEffect("joined");
+
+            if (livekitToken) {
+              dispatch({
+                type: _BUS.userLeftRoom,
+                user_id: user.id,
+              });
+              router.push(
+                urlWithQueryParams(
+                  `/workspaces/${workspace_id}/rooms/${room.id}`,
+                  { token: livekitToken, isSwitching: true }
+                )
+              );
+
+              return;
+            }
+          });
+      });
     }
   };
 
