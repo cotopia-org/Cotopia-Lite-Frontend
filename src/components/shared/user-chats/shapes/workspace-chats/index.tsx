@@ -11,7 +11,7 @@ export default function WorkspaceChats({ workspace_id }: Props) {
   const { add, update } = useChat2({ workspace_id });
 
   useSocket("messageReceived", (data) => {
-    add(data);
+    add({ ...data, seen: false });
   });
 
   useSocket("messageUpdated", (data) => {
