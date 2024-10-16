@@ -1,18 +1,17 @@
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
-import { Mic, Video as IconVideo } from "lucide-react"
-import { useRouter } from "next/navigation"
-import React, { useEffect, useRef } from "react"
-import { useRoomContext } from "../room-context"
-import CotopiaButton from "@/components/shared-ui/c-button"
-import Video from "./video"
-import { useRoomHolder } from ".."
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
+import { Mic, Video as IconVideo } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { useRoomContext } from "../room-context";
+import CotopiaButton from "@/components/shared-ui/c-button";
+import Video from "./video";
+import { useRoomHolder } from "..";
 
 interface MediaAccessProps {
-  onChecked: () => void
+  onChecked: () => void;
 }
 
 const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
-  const { room_id, workspace_id } = useRoomContext()
+  const { room_id, workspace_id } = useRoomContext();
 
   const {
     stream,
@@ -22,83 +21,81 @@ const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
     enableAudioAccess,
     disableAudioAccess,
     changeStreamState,
-  } = useRoomHolder()
+  } = useRoomHolder();
 
-  const permissions = stream.permissions
-  const hasVideoAccess = permissions.video
-  const hasAudioAccess = permissions.audio
-  const videoStream = stream.videoStream
-  const audioStream = stream.audioStream
+  const permissions = stream.permissions;
+  const hasVideoAccess = permissions.video;
+  const hasAudioAccess = permissions.audio;
+  const videoStream = stream.videoStream;
+  const audioStream = stream.audioStream;
 
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const firstAudRef = useRef<boolean>(true)
-  const firstVidRef = useRef<boolean>(true)
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const firstAudRef = useRef<boolean>(true);
+  const firstVidRef = useRef<boolean>(true);
 
   useEffect(() => {
     if (videoRef.current && videoStream) {
-      videoRef.current.srcObject = videoStream
+      videoRef.current.srcObject = videoStream;
     }
-  }, [videoStream])
+  }, [videoStream]);
 
   useEffect(() => {
     const audioStreaming = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      changeStreamState(stream, "audio")
-      firstAudRef.current = false
-    }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      changeStreamState(stream, "audio");
+      firstAudRef.current = false;
+    };
 
     if (!!firstAudRef.current && hasAudioAccess) {
-      audioStreaming()
+      audioStreaming();
     }
-  }, [hasAudioAccess, firstAudRef])
+  }, [hasAudioAccess, firstAudRef]);
 
   useEffect(() => {
     const videoStreaming = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-      changeStreamState(stream, "video")
-      firstAudRef.current = false
-    }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      changeStreamState(stream, "video");
+      firstAudRef.current = false;
+    };
     if (!!firstVidRef.current && hasVideoAccess) {
-      videoStreaming()
-      firstVidRef.current = false
+      videoStreaming();
+      firstVidRef.current = false;
     }
-  }, [hasVideoAccess, firstVidRef])
+  }, [hasVideoAccess, firstVidRef]);
 
   const handleToggleVideo = () => {
     if (videoStream) {
-      disableVideoAccess()
+      disableVideoAccess();
     } else {
-      enableVideoAccess()
+      enableVideoAccess();
     }
-  }
+  };
 
   const handleToggleAudio = () => {
     if (audioStream) {
-      disableAudioAccess()
+      disableAudioAccess();
     } else {
-      enableAudioAccess()
+      enableAudioAccess();
     }
-  }
+  };
 
-  const router = useRouter()
   const handleJoin = async () => {
-    router.push(`/workspaces/${workspace_id}/rooms/${room_id}`)
-    if (onChecked) onChecked()
-  }
+    if (onChecked) onChecked();
+  };
 
-  let videoButtonClss = "text-black border bg-white"
+  let videoButtonClss = "text-black border bg-white";
 
   if (hasVideoAccess && videoStream)
-    videoButtonClss = "!bg-destructive !text-white"
+    videoButtonClss = "!bg-destructive !text-white";
 
-  let audioButtonClss = "text-black border bg-white"
+  let audioButtonClss = "text-black border bg-white";
 
   if (hasAudioAccess && audioStream)
-    audioButtonClss = "!bg-destructive !text-white"
+    audioButtonClss = "!bg-destructive !text-white";
 
   return (
-    <div className="flex flex-col gap-y-4 items-center w-[400px] max-w-full mx-auto my-8">
-      <h2 className=" text-xl font-bold">Media Access</h2>
+    <div className='flex flex-col gap-y-4 items-center w-[400px] max-w-full mx-auto my-8'>
+      <h2 className=' text-xl font-bold'>Media Access</h2>
       <Video
         hasVideoAccess={!!hasVideoAccess}
         hasVideoStream={videoStream !== null}
@@ -112,7 +109,7 @@ const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
         }
       />
 
-      <div className="flex flex-row items-center gap-x-2">
+      <div className='flex flex-row items-center gap-x-2'>
         <CotopiaIconButton
           disabled={stream_loading}
           variant={"default"}
@@ -134,13 +131,13 @@ const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
         <CotopiaButton
           disabled={stream_loading}
           onClick={handleJoin}
-          className="bg-blue-500 min-w-[100px]"
+          className='bg-blue-500 min-w-[100px]'
         >
           Join Now
         </CotopiaButton>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CheckPermissions2
+export default CheckPermissions2;

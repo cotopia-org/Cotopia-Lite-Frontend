@@ -99,23 +99,6 @@ export default function RoomContext({
   const router = useRouter();
 
   const handleJoinRoom = async () => {
-    // axiosInstance
-    //   .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
-    //   .then((res) => {
-    //     const livekitToken = res.data.data.token; //Getting livekit token from joinObject
-
-    //     if (socket) socket.emit("joinedRoom", room_id);
-
-    //     playSoundEffect("joined");
-
-    //     if (livekitToken) {
-    //       router.push(
-    //         `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
-    //       );
-    //       return;
-    //     }
-    //   });
-
     // Join user to the room by socket request
     if (socket)
       socket.emit("joinedRoom", room_id, () => {
@@ -124,9 +107,8 @@ export default function RoomContext({
           .then((res) => {
             const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
-            if (settings.sounds.userJoinLeft) playSoundEffect("joined");
-
             if (livekitToken) {
+              if (settings.sounds.userJoinLeft) playSoundEffect("joined");
               router.push(
                 `/workspaces/${workspace_id}/rooms/${room_id}?token=${livekitToken}`
               );

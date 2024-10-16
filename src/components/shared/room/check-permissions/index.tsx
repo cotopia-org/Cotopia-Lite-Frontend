@@ -2,7 +2,6 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 import { useEffect, useState } from "react";
 import Video from "./video";
 import { useRoomContext } from "../room-context";
-import { useRouter } from "next/navigation";
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
 type Props = {
@@ -38,9 +37,7 @@ export default function CheckPermissions({ onChecked }: Props) {
     getPermissions();
   }, []);
 
-  const router = useRouter();
   const handleJoin = async () => {
-    router.push(`/workspaces/${workspace_id}/rooms/${room_id}`);
     if (onChecked) onChecked();
   };
 
@@ -49,7 +46,11 @@ export default function CheckPermissions({ onChecked }: Props) {
       <div className='w-full'>
         <Video />
       </div>
-      <CotopiaButton onClick={handleJoin} className='bg-blue-500 min-w-[100px]'>
+      <CotopiaButton
+        disabled={!socket?.connected}
+        onClick={handleJoin}
+        className='bg-blue-500 min-w-[100px]'
+      >
         Join Now
       </CotopiaButton>
     </div>
