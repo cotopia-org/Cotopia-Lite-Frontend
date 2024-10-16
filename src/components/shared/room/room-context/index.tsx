@@ -171,40 +171,6 @@ export default function RoomContext({
     if (onRoomUpdated) onRoomUpdated({ ...room, participants });
   };
 
-  useSocket(
-    "userLeftFromRoom",
-    (data: LeftJoinType) => {
-      if (room === undefined) return;
-
-      if (room_id !== data.room_id) return;
-
-      const participants = room?.participants ?? [];
-
-      const newParticipants = participants.filter((x) => x.id !== data.user.id);
-
-      room.participants = newParticipants;
-
-      if (onRoomUpdated) onRoomUpdated(room);
-    },
-    [room]
-  );
-
-  useSocket(
-    "userJoinedToRoom",
-    (data: LeftJoinType) => {
-      if (room === undefined) return;
-
-      if (room_id !== data.room_id) return;
-
-      const participants = room?.participants ?? [];
-
-      room.participants = [...participants, data.user];
-
-      if (onRoomUpdated) onRoomUpdated(room);
-    },
-    [room]
-  );
-
   const [sidebar, setSidebar] = useState<ReactNode>(<></>);
   const openSidebar = (sidebar: ReactNode) => setSidebar(sidebar);
   const closeSidebar = () => setSidebar(undefined);
@@ -221,11 +187,49 @@ export default function RoomContext({
   const schedulesItems: ScheduleType[] =
     schedulesData !== undefined ? schedulesData?.data : [];
 
-  const { data: workspaceUsersData } = useApi(
+  const { data: workspaceUsersData, mutate: mutateWorkspaceUsers } = useApi(
     `/workspaces/${workspace_id}/users`
   );
   const workpaceUsers =
     workspaceUsersData !== undefined ? workspaceUsersData?.data : [];
+
+  useSocket(
+    "userLeftFromRoom",
+    (data: LeftJoinType) => {
+      mutateWorkspaceUsers();
+
+      if (room === undefined) return;
+
+      if (room_id !== data.room_id) return;
+
+      const participants = room?.participants ?? [];
+
+      const newParticipants = participants.filter((x) => x.id !== data.user.id);
+
+      room.participants = newParticipants;
+
+      if (onRoomUpdated) onRoomUpdated(room);
+    },
+    [room, mutateWorkspaceUsers]
+  );
+
+  useSocket(
+    "userJoinedToRoom",
+    (data: LeftJoinType) => {
+      mutateWorkspaceUsers();
+
+      if (room === undefined) return;
+
+      if (room_id !== data.room_id) return;
+
+      const participants = room?.participants ?? [];
+
+      room.participants = [...participants, data.user];
+
+      if (onRoomUpdated) onRoomUpdated(room);
+    },
+    [room, mutateWorkspaceUsers]
+  );
 
   const { data: workpaceJobs } = useApi(`/workspaces/${workspace_id}/jobs`);
   const workpaceJobItems: JobType[] =
