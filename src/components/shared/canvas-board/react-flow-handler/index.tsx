@@ -229,29 +229,37 @@ function ReactFlowHandler({ tracks }: Props) {
     updateUserCoordinate(data.data);
   });
 
-  useSocket("userLeftFromRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+  useSocket(
+    "userLeftFromRoom",
+    (data: LeftJoinType) => {
+      const { room_id: gotRoomId, user: targetUser } = data;
 
-    if (room_id === undefined) return;
+      if (room_id === undefined) return;
 
-    if (gotRoomId !== +room_id) return;
+      if (gotRoomId !== +room_id) return;
 
-    setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
+      setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
-  });
+      if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
+    },
+    [setNodes]
+  );
 
-  useSocket("userJoinedToRoom", (data: LeftJoinType) => {
-    const { room_id: gotRoomId, user: targetUser } = data;
+  useSocket(
+    "userJoinedToRoom",
+    (data: LeftJoinType) => {
+      const { room_id: gotRoomId, user: targetUser } = data;
 
-    if (room_id === undefined) return;
+      if (room_id === undefined) return;
 
-    if (gotRoomId !== +room_id) return;
+      if (gotRoomId !== +room_id) return;
 
-    setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
+      setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
 
-    if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
-  });
+      if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
+    },
+    [setNodes]
+  );
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
