@@ -3,7 +3,8 @@ import { ConnectionState, RoomEvent } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
 import useQueryParams from "@/hooks/use-query-params";
-import ModalDisconnected from "./modal-disconnected";
+import DisconnectedInvisible from "./disconnected-invisible";
+import { useRoomContext as roomBackendContext } from "../room-context";
 
 function LiveKitConnectionStatus() {
   const { query } = useQueryParams();
@@ -13,6 +14,7 @@ function LiveKitConnectionStatus() {
     useState<string>("Disconnected");
 
   const room = useRoomContext();
+  const { joinRoom } = roomBackendContext();
 
   useEffect(() => {
     const onConnect = () => {
@@ -64,10 +66,12 @@ function LiveKitConnectionStatus() {
     if (room.state === ConnectionState.Connected) return;
 
     room.connect(__VARS.serverUrl, livekit_token);
+
+    joinRoom();
   };
 
   if (connectionStatus == RoomEvent.Disconnected)
-    return <ModalDisconnected onReTry={onReconnect} />;
+    return <DisconnectedInvisible onReTry={onReconnect} />;
 
   return null;
 }

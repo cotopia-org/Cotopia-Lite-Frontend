@@ -12,6 +12,7 @@ import ModalDisconnected from "../room/connection-status/modal-disconnected";
 import useNetworkStatus from "@/hooks/use-net";
 import useSetting from "@/hooks/use-setting";
 import useQueryParams from "@/hooks/use-query-params";
+import { useRoomContext } from "../room/room-context";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -23,6 +24,8 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
+  const { joinRoom } = useRoomContext();
+
   const settings = useSetting();
 
   const [isReConnecting, setIsReconnecting] = useState(false);
@@ -51,9 +54,9 @@ export default function RoomSpatialWrapper({
 
     if (!room_id) return;
 
-    socket.emit("joinedInRoom");
-
     setIsReconnecting(true);
+
+    joinRoom();
   };
 
   const fetchRoom = () => {

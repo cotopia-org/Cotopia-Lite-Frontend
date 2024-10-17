@@ -1,8 +1,5 @@
-import React, { useEffect } from "react";
-
 import { useParticipants } from "@livekit/components-react";
 import { useRoomContext } from "../../room-context";
-import { useRoomContext as livekitRoomContext } from "@livekit/components-react";
 import { UserMinimalType } from "@/types/user";
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
