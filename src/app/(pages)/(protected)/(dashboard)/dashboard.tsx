@@ -11,7 +11,6 @@ import {
 import { DashboardWrapper } from "./dashboard-wrapper";
 import { useSocket } from "../protected-wrapper";
 import FullLoading from "@/components/shared/full-loading";
-import { LeaderboardType } from "@/types/leaderboard";
 
 type Props = {
   user?: UserType;
@@ -32,10 +31,6 @@ export default function Dashboard({ user, children, accessToken }: Props) {
 
   useEffect(() => {
     setSocketConnected(!!socket?.connected);
-
-    return () => {
-      socket?.emit("leaveRoom");
-    };
   }, [socket]);
 
   if (!socketConnected) return <FullLoading />;
