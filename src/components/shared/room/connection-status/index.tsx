@@ -5,8 +5,11 @@ import { __VARS } from "@/app/const/vars";
 import useQueryParams from "@/hooks/use-query-params";
 import DisconnectedInvisible from "./disconnected-invisible";
 import { useRoomContext as roomBackendContext } from "../room-context";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
 function LiveKitConnectionStatus() {
+  const socket = useSocket();
+
   const { query } = useQueryParams();
   const livekit_token = query?.token;
 

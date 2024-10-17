@@ -29,15 +29,6 @@ export default function Disconnected({ onReTry }: DisconnectLayoutProps) {
         title='You disconnected'
         desc='Check your connection status!'
         icon={<Unlink />}
-        // afterDesc={
-        //   <CotopiaButton
-        //     onClick={onReloadHandler}
-        //     className='w-[100px]'
-        //     startIcon={<RotateCcw size={16} />}
-        //   >
-        //     Reconnect
-        //   </CotopiaButton>
-        // }
       />
     </div>
   );

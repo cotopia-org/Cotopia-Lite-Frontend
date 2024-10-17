@@ -99,6 +99,8 @@ export default function RoomContext({
   const router = useRouter();
 
   const handleJoinRoom = async () => {
+    console.log("SOCKET_LOG", socket);
+
     // Join user to the room by socket request
     if (socket)
       socket.emit("joinedRoom", room_id, () => {
