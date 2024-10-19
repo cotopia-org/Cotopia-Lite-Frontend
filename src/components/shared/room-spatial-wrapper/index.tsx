@@ -23,14 +23,6 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
-  const handleJoinRoom = () => {
-    socket?.emit("joinedRoom", room_id, () => {
-      axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-        `/rooms/${room_id}/join`
-      );
-    });
-  };
-
   const settings = useSetting();
 
   const [isReConnecting, setIsReconnecting] = useState(false);
@@ -53,6 +45,14 @@ export default function RoomSpatialWrapper({
   const [socketConnected, setSocketConnected] = useState(true);
 
   const socket = useSocket();
+
+  const handleJoinRoom = () => {
+    socket?.emit("joinedRoom", room_id, () => {
+      axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+        `/rooms/${room_id}/join`
+      );
+    });
+  };
 
   const handleConnectToSocket = () => {
     if (socket?.connected === false) return;
@@ -99,6 +99,7 @@ export default function RoomSpatialWrapper({
 
     const onConnect = () => {
       setSocketConnected(true);
+      handleJoinRoom();
     };
 
     const onDisconnect = () => {
@@ -119,12 +120,6 @@ export default function RoomSpatialWrapper({
       playSoundEffect("userGotClosed");
     }
   }, [socketConnected, settings.sounds.userJoinLeft]);
-
-  useEffect(() => {
-    if (socketConnected === false) return;
-
-    handleJoinRoom();
-  }, [socketConnected]);
 
   return (
     <div className='max-h-screen'>
