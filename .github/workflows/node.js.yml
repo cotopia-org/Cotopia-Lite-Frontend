@@ -33,7 +33,7 @@ jobs:
     # - run: jest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:  [ build ]
     steps:
       - name: Checkout code
