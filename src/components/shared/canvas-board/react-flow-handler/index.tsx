@@ -245,7 +245,7 @@ function ReactFlowHandler({ tracks }: Props) {
 
       if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
     },
-    [setNodes]
+    []
   );
 
   useSocket(
@@ -268,7 +268,7 @@ function ReactFlowHandler({ tracks }: Props) {
 
       if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
     },
-    [setNodes]
+    []
   );
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
