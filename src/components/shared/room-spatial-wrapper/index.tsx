@@ -7,7 +7,7 @@ import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
 import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useNetworkStatus from "@/hooks/use-net";
 import useSetting from "@/hooks/use-setting";
 import useQueryParams from "@/hooks/use-query-params";
@@ -100,12 +100,12 @@ export default function RoomSpatialWrapper({
     if (!socket) return;
 
     const onConnect = () => {
-      console.log("connect to the socket io");
+      console.log("connect to socket io");
       setSocketConnected(true);
-      handleJoinRoom();
     };
 
     const onDisconnect = () => {
+      console.log("disconnect from socket io");
       setSocketConnected(false);
     };
 
@@ -116,13 +116,19 @@ export default function RoomSpatialWrapper({
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
     };
-  }, [socket, handleJoinRoom]);
+  }, [socket]);
 
   useEffect(() => {
     if (!socketConnected && settings.sounds.userJoinLeft) {
       playSoundEffect("userGotClosed");
     }
   }, [socketConnected, settings.sounds.userJoinLeft]);
+
+  useEffect(() => {
+    if (socket?.connected) {
+      handleJoinRoom();
+    }
+  }, [socket?.connected]);
 
   return (
     <div className='max-h-screen'>
