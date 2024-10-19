@@ -12,4 +12,5 @@ export type JobType = {
   updated_at: string;
   workspace_id: number;
   members: UserMinimalType[];
+  total_hours: string;
 };

@@ -30,7 +30,8 @@ export default function WorkingCard({ user }: Props) {
     <div className='flex flex-row gap-x-2 items-center'>
       <ParticipantsWithPopover className='!pb-0' participants={[user]} />
       <span className='text-sm capitalize'>
-        {userJobs.length > 0 && userJobs.map((x) => x.title).join(", ")}
+        {userJobs.length > 0 &&
+          userJobs.map((x) => `${x.title} (${x.total_hours})`).join(", ")}
       </span>
     </div>
   );
