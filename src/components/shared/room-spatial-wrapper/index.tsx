@@ -46,16 +46,6 @@ export default function RoomSpatialWrapper({
 
   const socket = useSocket();
 
-  const handleJoinRoom = () => {
-    console.log("socket", socket);
-
-    socket?.emit("joinedRoom", room_id, () => {
-      axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
-        `/rooms/${room_id}/join`
-      );
-    });
-  };
-
   const handleConnectToSocket = () => {
     if (socket?.connected === false) return;
 
@@ -100,7 +90,12 @@ export default function RoomSpatialWrapper({
     const onConnect = () => {
       console.log("connect to socket io");
       setSocketConnected(true);
-      handleJoinRoom();
+
+      socket?.emit("joinedRoom", room_id, () => {
+        axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+          `/rooms/${room_id}/join`
+        );
+      });
     };
 
     const onDisconnect = () => {
@@ -115,7 +110,7 @@ export default function RoomSpatialWrapper({
       socket?.off("connect", onConnect);
       socket?.off("disconnect", onDisconnect);
     };
-  }, [socket, handleJoinRoom]);
+  }, [socket]);
 
   useEffect(() => {
     if (!socketConnected && settings.sounds.userJoinLeft) {
