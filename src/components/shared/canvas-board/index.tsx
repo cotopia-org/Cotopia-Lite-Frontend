@@ -48,7 +48,7 @@ const Canvas: React.FC = () => {
     return () => clearTimeout(t);
   }, [tracks, init]);
 
-  if (init === false) return <FullLoading />;
+  // if (init === false) return <FullLoading />;
 
   return (
     <div id='canvas-board' className='w-screen h-[1080px]'>

@@ -7,7 +7,6 @@ import {
   TrackReferenceOrPlaceholder,
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
-  useTrackRefContext,
 } from "@livekit/components-react";
 import { createContext, useContext, useMemo } from "react";
 import { TrackReferenceType } from "@/types/track-reference";
@@ -80,6 +79,8 @@ export default function UserSession({
 
     return latestTrack;
   }, [maybeTrackRef, trackRef]);
+
+  console.log("xxx");
 
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>

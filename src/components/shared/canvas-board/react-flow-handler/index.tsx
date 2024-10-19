@@ -119,7 +119,7 @@ function ReactFlowHandler({ tracks }: Props) {
         const coords = participant?.coordinates?.split(",");
 
         let xcoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[0] ?? 200;
-        let ycoord = rf?.getNode(rfUserId)?.position.x ?? coords?.[1] ?? 200;
+        let ycoord = rf?.getNode(rfUserId)?.position.y ?? coords?.[1] ?? 200;
 
         if (typeof xcoord === "string") xcoord = +xcoord;
         if (typeof ycoord === "string") ycoord = +ycoord;
@@ -238,7 +238,10 @@ function ReactFlowHandler({ tracks }: Props) {
 
       if (gotRoomId !== +room_id) return;
 
-      setNodes((prev) => prev.filter((x) => x.id !== targetUser.username));
+      setNodes(
+        (prev) =>
+          uniqueById(prev.filter((x) => x.id !== targetUser.username)) as Node[]
+      );
 
       if (user.id !== targetUser.id) playSoundEffect("elseUserleft");
     },
@@ -254,7 +257,14 @@ function ReactFlowHandler({ tracks }: Props) {
 
       if (gotRoomId !== +room_id) return;
 
-      setNodes((prev) => [...prev, ...addParticipants([targetUser])]);
+      setNodes((prev) => {
+        const nNodes = uniqueById([
+          ...prev,
+          ...addParticipants([targetUser]),
+        ]) as Node[];
+
+        return nNodes;
+      });
 
       if (user.id !== targetUser.id) playSoundEffect("elseUserJoin");
     },
@@ -281,6 +291,8 @@ function ReactFlowHandler({ tracks }: Props) {
       updateUserCoords(livekitIdentity, node.position);
     }
   };
+
+  console.log("nodes", nodes);
 
   return (
     <>

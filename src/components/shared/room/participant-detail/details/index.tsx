@@ -1,16 +1,15 @@
-import { UserMinimalType } from "@/types/user";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import UserCover from "./cover";
-import SendingDirect from "./sending-direct";
 import { createContext, useContext } from "react";
 import UserDate from "./user-date";
 
 type Props = {
-  user: UserMinimalType;
+  user: UserMinimalType | WorkspaceUserType;
   roomId?: number;
 };
 
 const UserDetailContext = createContext<{
-  user?: UserMinimalType;
+  user?: UserMinimalType | WorkspaceUserType;
   roomId?: number | undefined;
 }>({
   user: undefined,

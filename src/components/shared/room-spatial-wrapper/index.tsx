@@ -6,13 +6,12 @@ import RoomWrapper from "@/components/shared/room/wrapper";
 import useLoading from "@/hooks/use-loading";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { playSoundEffect } from "@/lib/sound-effects";
-import { WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import { useEffect, useState } from "react";
-import ModalDisconnected from "../room/connection-status/modal-disconnected";
 import useNetworkStatus from "@/hooks/use-net";
 import useSetting from "@/hooks/use-setting";
 import useQueryParams from "@/hooks/use-query-params";
-import { useRoomContext } from "../room/room-context";
+import Disconnected from "../room/connection-status/disconnected";
 
 type Props = {
   token: string; //Currently we are using livekit, so livekit token
@@ -24,7 +23,13 @@ export default function RoomSpatialWrapper({
   workspace_id,
   room_id,
 }: Props) {
-  const { joinRoom } = useRoomContext();
+  const handleJoinRoom = () => {
+    socket?.emit("joinedRoom", room_id, () => {
+      axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
+        `/rooms/${room_id}/join`
+      );
+    });
+  };
 
   const settings = useSetting();
 
@@ -50,13 +55,11 @@ export default function RoomSpatialWrapper({
   const socket = useSocket();
 
   const handleConnectToSocket = () => {
-    if (!socket) return;
+    if (socket?.connected === false) return;
 
     if (!room_id) return;
 
     setIsReconnecting(true);
-
-    joinRoom();
   };
 
   const fetchRoom = () => {
@@ -117,12 +120,16 @@ export default function RoomSpatialWrapper({
     }
   }, [socketConnected, settings.sounds.userJoinLeft]);
 
-  if (socketConnected === false)
-    return <ModalDisconnected onReTry={handleConnectToSocket} />;
+  useEffect(() => {
+    if (socketConnected === false) return;
+
+    handleJoinRoom();
+  }, [socketConnected]);
 
   return (
     <div className='max-h-screen'>
       <RoomWrapper>
+        {!!!socketConnected && <Disconnected onReTry={handleConnectToSocket} />}
         <RoomHolder
           token={token}
           room={room}

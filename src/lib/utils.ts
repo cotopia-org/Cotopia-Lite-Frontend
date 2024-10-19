@@ -1,7 +1,7 @@
 import { __VARS } from "@/app/const/vars";
 import { mergePropsMain } from "@/components/shared/room/sessions/room-audio-renderer/use-media-track-by-source-or-name/merge-props";
 import { ScheduleType } from "@/types/calendar";
-import { UserMinimalType } from "@/types/user";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 import { TrackReferenceOrPlaceholder } from "@livekit/components-react";
 import { type ClassValue, clsx } from "clsx";
 import { Track } from "livekit-client";
@@ -67,8 +67,8 @@ const DEFAULT_X = 0;
 const DEFAULT_Y = 0;
 
 export function doCirclesMeet(
-  circle1?: UserMinimalType,
-  circle2?: UserMinimalType
+  circle1?: UserMinimalType | WorkspaceUserType,
+  circle2?: UserMinimalType | WorkspaceUserType
 ) {
   if (!circle2 || !circle1)
     return {
