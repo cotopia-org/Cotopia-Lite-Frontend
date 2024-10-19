@@ -36,16 +36,30 @@ jobs:
     runs-on: self-hosted
     needs:  [ build ]
     steps:
-      # - name: Install sshpass
-      #   run: |
-      #     install sshpass -y
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > priv.key
+          sudo chmod 600 priv.key
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
+          # SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
+          # SSH_KEY_PATH: ${{ github.workspace }}/../private.key
+
       - name: Deploy
-        uses: D3rHase/ssh-command-action@latest
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          user: ${{ secrets.SERVER_USERNAME }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
-          command: |
-            cd /root/dev/Cotopia-Lite-Frontend
-            echo "Deploy" > deploy.txt
+        run: |
+          ssh -i priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"SERVER_HOST"
+          cd /root/dev/Cotopia-Lite-Frontend
+          echo "Deploy" > deploy.txt
+
+
+      # - name: Deploy
+      #   uses: D3rHase/ssh-command-action@latest
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     user: ${{ secrets.SERVER_USERNAME }}
+      #     private_key: ${{ secrets.PRIVATE_KEY }}
+      #     port: ${{ secrets.SERVER_PORT }}
+      #     command: |
+      #       cd /root/dev/Cotopia-Lite-Frontend
+      #       echo "Deploy" > deploy.txt
