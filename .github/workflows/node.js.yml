@@ -38,9 +38,7 @@ jobs:
     steps:
       - name: Create SSH key
         run: |
-          mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > priv.key
-          sudo chmod 600 priv.key
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           # SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
