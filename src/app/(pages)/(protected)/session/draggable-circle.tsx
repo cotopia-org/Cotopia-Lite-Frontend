@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ActionsRight from "./actions-right";
 import MicButton from "./actions-right/mic";
 import {
@@ -11,6 +11,7 @@ import {
   PinState,
   TrackRefContext,
   TrackReferenceOrPlaceholder,
+  useConnectionQualityIndicator,
   useEnsureTrackRef,
   useFeatureContext,
   useMaybeLayoutContext,
@@ -20,7 +21,7 @@ import {
   useTrackMutedIndicator,
   VideoTrack,
 } from "@livekit/components-react";
-import { Participant, Track } from "livekit-client";
+import { ConnectionQuality, Participant, Track } from "livekit-client";
 import { isTrackReferencePlaceholder } from "@livekit/components-core";
 import SessionWrapper from "./wrapper";
 import { useUserTile } from ".";
@@ -32,6 +33,7 @@ import CotopiaTooltip from "@/components/shared-ui/c-tooltip";
 import { __VARS } from "@/app/const/vars";
 import { useRoomContext } from "@/components/shared/room/room-context";
 import ParticipantDetails from "@/components/shared/room/participant-detail";
+import { UserMinimalType, WorkspaceUserType } from "@/types/user";
 
 function ParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -94,7 +96,7 @@ function TrackRefContextIfNeeded(
 
 export const ParticipantTile = React.forwardRef<
   HTMLDivElement,
-  ParticipantTileProps & { isDragging: boolean }
+  ParticipantTileProps & { isDragging: boolean; username: string }
 >(function ParticipantTile(
   {
     trackRef,
@@ -102,8 +104,9 @@ export const ParticipantTile = React.forwardRef<
     onParticipantClick,
     disableSpeakingIndicator,
     isDragging,
+    username,
     ...htmlProps
-  }: ParticipantTileProps & { isDragging: boolean },
+  }: ParticipantTileProps & { isDragging: boolean; username: string },
   ref
 ) {
   const trackReference = useEnsureTrackRef(trackRef);
@@ -138,8 +141,6 @@ export const ParticipantTile = React.forwardRef<
 
   const { isMuted } = useTrackMutedIndicator(trackRef);
 
-  const { draggable } = useUserTile();
-
   const isSpeaking = trackReference?.participant?.isSpeaking;
 
   let clss =
@@ -147,15 +148,15 @@ export const ParticipantTile = React.forwardRef<
 
   const { user } = useProfile();
 
-  const { workpaceUsers } = useRoomContext();
+  const { room } = useRoomContext();
 
-  const participants = workpaceUsers;
+  const participants = room?.participants ?? [];
 
   const updatedMyUser = participants?.find(
     (x) => x?.username === user?.username
   );
 
-  const targetUser = participants?.find((x) => x?.username === livekitIdentity);
+  const targetUser = participants?.find((x) => x?.username === username);
 
   const userFullName = getUserFullname(targetUser);
 
@@ -208,18 +209,20 @@ export const ParticipantTile = React.forwardRef<
     clss += ` bg-gray-600`;
   }
 
-  // if (!isMuted && trackRef?.source !== Track.Source.ScreenShare && isMyUser)
-  //   showAvatar = false;
+  const { quality } = useConnectionQualityIndicator({
+    participant: trackReference.participant,
+  });
 
-  // if (!videoState) showAvatar = true;
+  let finalTitle = userFullName;
 
-  if (targetUser === undefined) return;
+  if (quality === ConnectionQuality.Lost || quality === ConnectionQuality.Poor)
+    finalTitle = "Poor connection!";
 
   return (
-    <CotopiaTooltip title={userFullName}>
+    <CotopiaTooltip title={finalTitle}>
       <ParticipantDetails
-        roomId={targetUser?.room_id as number}
-        user={targetUser}
+        roomId={room?.id as number}
+        user={targetUser as WorkspaceUserType | UserMinimalType}
       >
         <>
           <VoiceAreaHearing isDragging={isDragging} />
@@ -263,35 +266,24 @@ export const ParticipantTile = React.forwardRef<
   );
 });
 
-const DEFAULT_TILE_POSITION = [0, 0];
-
 type Props = {
   defaultIsDragging: boolean;
+  username: string;
 };
 
-export default function DraggableCircle({ defaultIsDragging }: Props) {
+export default function DraggableCircle({
+  defaultIsDragging,
+  username,
+}: Props) {
   const { track } = useUserTile();
 
   return (
     <SessionWrapper>
-      <ParticipantTile trackRef={track as any} isDragging={defaultIsDragging} />
+      <ParticipantTile
+        trackRef={track as any}
+        username={username}
+        isDragging={defaultIsDragging}
+      />
     </SessionWrapper>
   );
-
-  // return (
-  //   <DraggableRoom
-  //     onDragEnd={(position) => {
-  //       handleUpdateCoordinates(position);
-  //       setIsDragging(false);
-  //     }}
-  //     onDragging={handleUpdateLocalCoords}
-  //     onStartDragging={handleStartDragging}
-  //     disabled={!isMyUser}
-  //     hasTransition={!isMyUser}
-  //     x={coordsUser?.[0]}
-  //     y={coordsUser?.[1]}
-  //   >
-
-  //   </DraggableRoom>
-  // );
 }

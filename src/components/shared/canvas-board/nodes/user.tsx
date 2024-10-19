@@ -25,8 +25,8 @@ const UserNode = (props: any) => {
   );
   const participants = useParticipants();
 
-  const allRoomParticipantUsername = useMemo(() => {
-    return participants?.map((x) => x.identity) ?? [];
+  const participant = useMemo(() => {
+    return participants.find((x) => x.identity === data.username);
   }, [participants]);
 
   const track = useMemo(() => {
@@ -37,14 +37,6 @@ const UserNode = (props: any) => {
     return tracks.find((x) => x.participant.identity === data.username);
   }, [tracks, data.username]);
 
-  const participant = useMemo(() => {
-    if (participants.length === 0) return undefined;
-
-    return participants.find((x) => x.identity === data.username);
-  }, [participants, data.username]);
-
-  if (!allRoomParticipantUsername.includes(data?.username)) return;
-
   return (
     <>
       <UserSession
@@ -52,6 +44,7 @@ const UserNode = (props: any) => {
         track={track}
         draggable={data?.draggable ?? false}
         isDragging={dragging}
+        username={data?.username ?? ""}
       />
     </>
   );

@@ -5,13 +5,15 @@ import {
   ParticipantTileProps,
   TrackRefContext,
   TrackReferenceOrPlaceholder,
+  useConnectionQualityIndicator,
   useMaybeParticipantContext,
   useMaybeTrackRefContext,
 } from "@livekit/components-react";
 import { createContext, useContext, useMemo } from "react";
 import { TrackReferenceType } from "@/types/track-reference";
-import { Participant, Track } from "livekit-client";
+import { ConnectionQuality, Participant } from "livekit-client";
 import DraggableCircle from "./draggable-circle";
+import WithConnectionQuality from "./with-connection-quality";
 
 function SpacialParticipantContextIfNeeded(
   props: React.PropsWithChildren<{
@@ -59,12 +61,14 @@ type Props = {
   track?: TrackReferenceOrPlaceholder;
   draggable?: boolean;
   isDragging?: boolean;
+  username: string;
 };
 export default function UserSession({
   participant,
   track,
   draggable = false,
   isDragging = false,
+  username,
 }: Props) {
   const trackRef = track;
 
@@ -80,7 +84,7 @@ export default function UserSession({
     return latestTrack;
   }, [maybeTrackRef, trackRef]);
 
-  console.log("xxx");
+  const { quality } = useConnectionQualityIndicator({ participant });
 
   return (
     <TrackRefContextIfNeeded trackRef={trackReference}>
@@ -88,7 +92,12 @@ export default function UserSession({
         participant={participant ?? trackReference?.participant}
       >
         <SessionContext.Provider value={{ track: trackReference, draggable }}>
-          <DraggableCircle defaultIsDragging={isDragging} />
+          <WithConnectionQuality quality={quality}>
+            <DraggableCircle
+              defaultIsDragging={isDragging}
+              username={username}
+            />
+          </WithConnectionQuality>
         </SessionContext.Provider>
       </SpacialParticipantContextIfNeeded>
     </TrackRefContextIfNeeded>

@@ -292,8 +292,6 @@ function ReactFlowHandler({ tracks }: Props) {
     }
   };
 
-  console.log("nodes", nodes);
-
   return (
     <>
       <ReactFlow
