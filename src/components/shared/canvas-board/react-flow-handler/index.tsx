@@ -18,7 +18,7 @@ import {
 } from "@xyflow/react";
 import { useRoomContext } from "../../room/room-context";
 import UserNode from "../nodes/user";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BackgroundNode from "../nodes/background";
 import { __VARS } from "@/app/const/vars";
 import { Track } from "livekit-client";
@@ -64,7 +64,9 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const { room, updateUserCoords, room_id } = useRoomContext();
 
-  const socketParticipants = room?.participants ?? [];
+  const socketParticipants = useMemo(() => {
+    return room?.participants ?? [];
+  }, [room?.participants]);
 
   const socket = useSocket();
 
@@ -163,7 +165,7 @@ function ReactFlowHandler({ tracks }: Props) {
     setNodes(nodesWithBackground(addParticipants(socketParticipants)));
 
     initState.current = false;
-  }, [socketParticipants, tracks]);
+  }, [socketParticipants]);
 
   useEffect(() => {
     setNodes((prev) => [
