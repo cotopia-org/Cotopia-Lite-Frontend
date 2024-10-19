@@ -89,13 +89,16 @@ export default function RoomSpatialWrapper({
   useEffect(() => {
     const onConnect = () => {
       console.log("connect to socket io");
+
       setSocketConnected(true);
 
-      socket?.emit("joinedRoom", room_id, () => {
+      socket?.emit("joinedRoom", room_id);
+
+      setTimeout(() => {
         axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
           `/rooms/${room_id}/join`
         );
-      });
+      }, 500);
     };
 
     const onDisconnect = () => {
