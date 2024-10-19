@@ -36,11 +36,14 @@ jobs:
     runs-on: self-hosted
     needs:  [ build ]
     steps:
+      # - name: Install sshpass
+      #   run: |
+      #     install sshpass -y
       - name: Deploy
         uses: D3rHase/ssh-command-action@latest
         with:
           host: ${{ secrets.SERVER_HOST }}
-          user: ${{ secrets.USERNAME }}
+          user: ${{ secrets.SERVER_USERNAME }}
           private_key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           command: |
