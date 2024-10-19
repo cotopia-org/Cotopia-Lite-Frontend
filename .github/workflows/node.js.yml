@@ -38,9 +38,7 @@ jobs:
     steps:
       - name: Create SSH key
         run: |
-          mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > ./priv.key
-          sudo chmod 600 priv.key
           ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"SERVER_HOST"
           cd /root/dev/Cotopia-Lite-Frontend
           echo "Deploy" > deploy.txt
