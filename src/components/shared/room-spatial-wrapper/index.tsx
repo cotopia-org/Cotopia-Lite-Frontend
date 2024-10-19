@@ -47,13 +47,13 @@ export default function RoomSpatialWrapper({
   const socket = useSocket();
 
   const handleJoinRoom = () => {
-    socket?.emit(
-      "joinedRoom",
-      room_id,
+    console.log("socket", socket);
+
+    socket?.emit("joinedRoom", room_id, () => {
       axiosInstance.get<FetchDataType<WorkspaceRoomJoinType>>(
         `/rooms/${room_id}/join`
-      )
-    );
+      );
+    });
   };
 
   const handleConnectToSocket = () => {
