@@ -1,4 +1,11 @@
-import RoomSpatialWrapper from "@/components/shared/room-spatial-wrapper";
+import dynamic from "next/dynamic";
+
+const RoomSpatialWrapper = dynamic(
+  () => import("@/components/shared/room-spatial-wrapper"),
+  {
+    ssr: false,
+  }
+);
 
 type Props = {
   searchParams: {
