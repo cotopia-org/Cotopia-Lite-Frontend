@@ -34,7 +34,6 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    stage: deploy
     depends-on: build
     steps:
       - name: Checkout code
