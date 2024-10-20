@@ -1,9 +1,9 @@
 "use client";
 
+import { _BUS } from "@/app/const/bus";
 import { __VARS } from "@/app/const/vars";
 import axiosInstance from "@/lib/axios";
-import socket from "@/lib/socket";
-import ReduxWrapper from "@/store/redux/Wrapper";
+import { useAppSelector } from "@/store/redux/store";
 import { UserType } from "@/types/user";
 import {
   createContext,
@@ -12,11 +12,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 type Props = {
   children: ReactNode;
-  token: string;
   user: UserType;
 };
 
@@ -51,7 +51,9 @@ export const useSocket = (
   return socketState;
 };
 
-export default function ProtectedWrapper({ children, token, user }: Props) {
+export default function ProtectedWrapper({ children, user }: Props) {
+  const { token } = useAppSelector((store) => store.authSlice);
+
   //Be sure axios instance token has been set
   const [tokenSet, setTokenSet] = useState(false);
   useEffect(() => {
@@ -60,29 +62,37 @@ export default function ProtectedWrapper({ children, token, user }: Props) {
   }, [token]);
 
   const [socketState, setSocketState] = useState<Socket>();
+
   useEffect(() => {
-    socket.connect(__VARS.socketUrl, token);
+    // Create a socket connection
+    const socket = io(__VARS.socketUrl, {
+      query: {
+        userToken: token,
+      },
+    });
 
-    const instance = socket.getInstance();
+    socket.on("connect", () => {
+      toast.success("Socket connected");
+      setSocketState(socket);
+    });
 
-    if (instance)
-      instance?.on("connect", () => {
-        setSocketState(instance);
-      });
+    socket.on("disconnect", () => {
+      toast.error("Socket disconnected");
+    });
 
+    // Clean up the socket connection on unmount
     return () => {
+      toast.error("Socket disconnected");
       socket.disconnect();
     };
-  }, [token]);
+  }, []);
 
   //Show nothing if token is not set
   if (!tokenSet) return;
 
   return (
-    <ReduxWrapper>
-      <ProfileContext.Provider value={{ user, socketState, token }}>
-        {children}
-      </ProfileContext.Provider>
-    </ReduxWrapper>
+    <ProfileContext.Provider value={{ user, socketState, token }}>
+      {children}
+    </ProfileContext.Provider>
   );
 }

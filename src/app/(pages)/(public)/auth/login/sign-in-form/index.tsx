@@ -6,6 +6,8 @@ import CotopiaInput from "@/components/shared-ui/c-input";
 import CotopiaPasswordInput from "@/components/shared-ui/c-password-input";
 import { buttonVariants } from "@/components/ui/button";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
+import { storeSessionAction } from "@/store/redux/slices/auth-slice";
+import { useAppDispatch } from "@/store/redux/store";
 import { AuthenticateType } from "@/types/authenticate";
 import { useFormik } from "formik";
 import { MoveRight } from "lucide-react";
@@ -18,6 +20,8 @@ type Props = {
   onLoggedIn?: (res: AuthenticateType) => void;
 };
 export default function SignInForm({ onLoggedIn }: Props) {
+  const dispatch = useAppDispatch();
+
   const { values, touched, errors, isSubmitting, getFieldProps, handleSubmit } =
     useFormik({
       initialValues: {
@@ -41,6 +45,12 @@ export default function SignInForm({ onLoggedIn }: Props) {
           );
           actions.setSubmitting(false);
           toast.success("You logged in successfully.");
+
+          const { token, ...user } = res.data.data;
+
+          //Store data in redux
+          dispatch(storeSessionAction({ token, user }));
+
           if (onLoggedIn) onLoggedIn(res.data.data);
         } catch (e) {
           actions.setSubmitting(false);

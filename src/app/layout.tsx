@@ -2,6 +2,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import "@xyflow/react/dist/style.css";
 import { Viewport } from "next";
+import ReduxWrapper from "@/store/redux/Wrapper";
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <Toaster />
-        {children}
-        <div id='portal'></div>
+        <ReduxWrapper>
+          <Toaster />
+          {children}
+          <div id='portal'></div>
+        </ReduxWrapper>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import {
 } from "@/app/(pages)/(protected)/protected-wrapper";
 import { _BUS } from "@/app/const/bus";
 import { useApi } from "@/hooks/swr";
+import useLoading from "@/hooks/use-loading";
 import useQueryParams from "@/hooks/use-query-params";
 import useSetting from "@/hooks/use-setting";
 import axiosInstance, { FetchDataType } from "@/lib/axios";
@@ -19,6 +20,7 @@ import React, {
   createContext,
   ReactNode,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -28,14 +30,13 @@ type LeftJoinType = { room_id: number; user: UserMinimalType };
 type Props = {
   children: ReactNode;
   room_id: number;
-  room?: WorkspaceRoomType;
   onRoomUpdated?: (item: WorkspaceRoomType) => void;
   workspace_id?: string;
 };
 
 const RoomCtx = createContext<{
-  room?: WorkspaceRoomType;
   room_id: number;
+  room?: WorkspaceRoomType;
   workspace_id?: string;
   livekit_token?: string;
   openSidebar: (node: ReactNode) => void;
@@ -85,10 +86,33 @@ export const useRoomContext = () => useContext(RoomCtx);
 export default function RoomContext({
   children,
   room_id,
-  room,
   onRoomUpdated,
   workspace_id,
 }: Props) {
+  const [room, setRoom] = useState<WorkspaceRoomType>();
+  const { startLoading, stopLoading, isLoading } = useLoading();
+
+  const fetchRoom = (roomId: string | number) => {
+    startLoading();
+    axiosInstance
+      .get<FetchDataType<WorkspaceRoomType>>(`/rooms/${roomId}`)
+      .then(async (res) => {
+        setRoom(res?.data?.data);
+        stopLoading();
+      })
+      .catch((err) => {
+        stopLoading();
+      });
+  };
+
+  useEffect(() => {
+    fetchRoom(room_id);
+  }, [room_id]);
+
+  useSocket("roomUpdated", (data) => {
+    setRoom(data);
+  });
+
   const settings = useSetting();
 
   const { query } = useQueryParams();

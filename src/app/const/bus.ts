@@ -10,4 +10,6 @@ export const _BUS = {
   scrollToTargetMessage: "SCROLL_TO_TARGET_MESSAGE",
   changeMyUserCoord: "CHANGE_MY_USER_COORD",
   userLeftRoom: "USER_LEFT_ROOM",
+  socketConnected: "SOCKET_CONNECTED",
+  socketDisConnected: "SOCKET_DISCONNECTED",
 };

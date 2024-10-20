@@ -1,7 +1,6 @@
 import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
 import { Mic, Video as IconVideo } from "lucide-react";
 import React, { useEffect, useRef } from "react";
-import { useRoomContext } from "../room-context";
 import CotopiaButton from "@/components/shared-ui/c-button";
 import Video from "./video";
 import { useRoomHolder } from "..";
@@ -11,8 +10,6 @@ interface MediaAccessProps {
 }
 
 const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
-  const { room_id, workspace_id } = useRoomContext();
-
   const {
     stream,
     stream_loading,

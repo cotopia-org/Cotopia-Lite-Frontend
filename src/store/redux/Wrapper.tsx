@@ -1,12 +1,10 @@
-"use client"
+"use client";
 
-import { Provider } from "react-redux"
-import { persistor, reduxStore } from "./store"
-import { PersistGate } from "redux-persist/integration/react"
-import FullLoading from "@/components/shared/full-loading"
-import { ReactNode } from "react"
-
-interface Props {}
+import { Provider } from "react-redux";
+import { persistor, reduxStore } from "./store";
+import { PersistGate } from "redux-persist/integration/react";
+import FullLoading from "@/components/shared/full-loading";
+import { ReactNode } from "react";
 
 const ReduxWrapper = ({ children }: { children: ReactNode }) => {
   return (
@@ -15,7 +13,7 @@ const ReduxWrapper = ({ children }: { children: ReactNode }) => {
         {children}
       </PersistGate>
     </Provider>
-  )
-}
+  );
+};
 
-export default ReduxWrapper
+export default ReduxWrapper;

@@ -4,9 +4,10 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
 import RoomContext from "./room-context";
 import RoomInner from "./room-inner";
-import { WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
@@ -16,7 +17,15 @@ import LiveKitConnectionStatus from "./connection-status";
 import CheckPermissions2 from "./check-permissions-2";
 import ChatWrapper from "../chat-wrapper";
 import { ReactFlowProvider } from "@xyflow/react";
-import axiosInstance from "@/lib/axios";
+import axiosInstance, { FetchDataType } from "@/lib/axios";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
+import Disconnected from "./connection-status/disconnected";
+import { toast } from "sonner";
+import useLoading from "@/hooks/use-loading";
+import useBus from "use-bus";
+import { _BUS } from "@/app/const/bus";
+import { io, Socket } from "socket.io-client";
+import { useAppSelector } from "@/store/redux/store";
 
 type MediaPermission = {
   audio: boolean;
@@ -60,8 +69,6 @@ type Props = {
   token: string;
   workspace_id: string;
   room_id: number;
-  room?: WorkspaceRoomType;
-  onRoomUpdated?: (item: WorkspaceRoomType) => void;
   isReConnecting?: boolean;
   isSwitching?: boolean;
 };
@@ -101,8 +108,6 @@ export default function RoomHolder({
   token,
   workspace_id,
   room_id,
-  room,
-  onRoomUpdated,
   isReConnecting,
   isSwitching,
 }: Props) {
@@ -294,10 +299,39 @@ export default function RoomHolder({
     </LiveKitRoom>
   );
 
+  const socket = useSocket();
+
+  const handleReTry = () => {
+    console.log("retry to connect!");
+  };
+
+  const handleJoin = useCallback(async () => {
+    console.log("should join!");
+    console.log(socket);
+    socket?.emit("joinedRoom", room_id, async () => {
+      axiosInstance
+        .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
+        .then((res) => {
+          setPermissionChecked(true);
+        })
+        .catch((err) => {
+          toast.error("Couldn't join to the room!");
+        });
+    });
+  }, [socket, room_id]);
+
+  useEffect(() => {
+    const fn = () => {
+      handleJoin();
+    };
+    socket?.on("connect", fn);
+    return () => {
+      socket?.off("connect", fn);
+    };
+  }, [handleJoin]);
+
   if (permissionChecked === false && !isReConnecting && !isSwitching)
-    content = (
-      <CheckPermissions2 onChecked={() => setPermissionChecked(true)} />
-    );
+    content = <CheckPermissions2 onChecked={handleJoin} />;
 
   return (
     <RoomHolderContext.Provider
@@ -317,12 +351,10 @@ export default function RoomHolder({
     >
       <ReactFlowProvider>
         <ChatWrapper>
-          <RoomContext
-            room={room}
-            room_id={room_id}
-            onRoomUpdated={onRoomUpdated}
-            workspace_id={workspace_id}
-          >
+          <RoomContext room_id={room_id} workspace_id={workspace_id}>
+            {socket?.connected === false && (
+              <Disconnected onReTry={handleReTry} />
+            )}
             {content}
           </RoomContext>
         </ChatWrapper>
