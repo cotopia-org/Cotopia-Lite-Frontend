@@ -33,19 +33,22 @@ jobs:
     # - run: jest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:  [ build ]
     steps:
       - name: Create SSH key
         run: |
           echo "$SSH_PRIVATE_KEY" > priv.key
-          ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"SERVER_HOST"
-          cd /root/dev/Cotopia-Lite-Frontend
-          echo "Deploy" > deploy.txt
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           # SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
-          SSH_KEY_PATH: ${{ github.workspace }}/../private.key
+          # SSH_KEY_PATH: ${{ github.workspace }}/../private.key
+
+      - name: Deploy
+        run: |
+          ssh -i priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"SERVER_HOST"
+          cd /root/dev/Cotopia-Lite-Frontend
+          echo "Deploy" > deploy.txt
 
       # - name: Deploy
       #   run: |
