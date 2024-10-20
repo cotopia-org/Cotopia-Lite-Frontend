@@ -52,6 +52,8 @@ jobs:
           echo "Deploy" > deploy.txt
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
+          SERVER_HOST: ${{secrets.SERVER_HOST}}
+          SERVER_USERNAME: ${{secrets.SERVER_USERNAME}}
 
       # - name: Deploy
       #   run: |
