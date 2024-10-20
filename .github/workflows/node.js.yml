@@ -49,10 +49,7 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST"
-          ip a
-          cd /root/dev/Cotopia-Lite-Frontend
-          echo "Deploy" > deploy.txt
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm install'
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           SERVER_HOST: ${{secrets.SERVER_HOST}}
