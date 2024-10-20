@@ -49,9 +49,8 @@ jobs:
 
       - name: Deploy
         run: |
-          cat ./privkey | wc -l
           ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST"
-          whoami
+          ip a
           cd /root/dev/Cotopia-Lite-Frontend
           echo "Deploy" > deploy.txt
         env:
