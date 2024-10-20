@@ -20,7 +20,7 @@ export default function RoomInner() {
     return () => {
       socket?.off("connect", fn);
     };
-  }, []);
+  }, [socket]);
 
   let mainRoomHolderClss = "main-room-holder w-full h-screen overflow-hidden";
   if (sidebar) mainRoomHolderClss += " pr-[376px]";
