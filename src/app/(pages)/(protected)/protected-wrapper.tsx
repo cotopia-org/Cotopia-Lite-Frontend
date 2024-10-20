@@ -54,6 +54,12 @@ export const useSocket = (
 export default function ProtectedWrapper({ children, user }: Props) {
   const { token } = useAppSelector((store) => store.authSlice);
 
+  useEffect(() => {
+    if (token === undefined) {
+      window.location.href = `/api/auth/sign-out`;
+    }
+  }, [token]);
+
   //Be sure axios instance token has been set
   const [tokenSet, setTokenSet] = useState(false);
   useEffect(() => {
