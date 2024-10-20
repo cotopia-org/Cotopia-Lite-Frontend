@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -40,7 +40,7 @@ jobs:
       - name: Create SSH key
         run: |
           echo "$SSH_PRIVATE_KEY" > priv.key
-          sudo chmod 600 priv.key
+          chmod 600 priv.key
           stat priv.key
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
