@@ -124,7 +124,7 @@ export default function RoomContext({
 
   const handleJoinRoom = async () => {
     // Join user to the room by socket request
-    if (socket)
+    if (socket) {
       socket.emit("joinedRoom", room_id, () => {
         axiosInstance
           .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
@@ -140,6 +140,7 @@ export default function RoomContext({
             }
           });
       });
+    }
   };
 
   const [permissionState, setPermissionState] = useState({
