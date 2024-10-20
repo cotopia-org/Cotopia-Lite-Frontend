@@ -130,7 +130,7 @@ function ReactFlowHandler({ tracks }: Props) {
           (a) => a.participant.identity === participant.username
         );
 
-        const isDraggable = user?.username === track?.participant?.identity;
+        const isDraggable = user?.username === participant.username;
 
         let object: Node = {
           id: "" + participant?.username,
@@ -275,8 +275,6 @@ function ReactFlowHandler({ tracks }: Props) {
 
   const onNodeDragStop: NodeMouseHandler = (event, node) => {
     if (node?.data?.draggable) {
-      if (!socket) return;
-
       const newCoords = `${node.position.x},${node.position.y}`;
 
       const username: string = node.data.username as string;
@@ -286,7 +284,7 @@ function ReactFlowHandler({ tracks }: Props) {
         username,
       };
 
-      socket.emit("updateCoordinates", sendingObject);
+      socket?.emit("updateCoordinates", sendingObject);
 
       const livekitIdentity = username;
 

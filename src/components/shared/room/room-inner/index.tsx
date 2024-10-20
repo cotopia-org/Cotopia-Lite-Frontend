@@ -5,9 +5,22 @@ import RoomSettings from "../settings";
 import LiveKitAudioManager from "../components/audio-manager";
 import InitRoom from "./init-room";
 import CanvasBoard from "../../canvas-board";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
 export default function RoomInner() {
+  const socket = useSocket();
+
   const { sidebar, joinRoom } = useRoomContext();
+
+  useEffect(() => {
+    const fn = () => {
+      joinRoom();
+    };
+    socket?.on("connect", fn);
+    return () => {
+      socket?.off("connect", fn);
+    };
+  }, []);
 
   let mainRoomHolderClss = "main-room-holder w-full h-screen overflow-hidden";
   if (sidebar) mainRoomHolderClss += " pr-[376px]";

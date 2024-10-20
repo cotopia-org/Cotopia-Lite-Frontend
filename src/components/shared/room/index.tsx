@@ -319,17 +319,6 @@ export default function RoomHolder({
         });
     });
   }, [socket, room_id]);
-
-  useEffect(() => {
-    const fn = () => {
-      handleJoin();
-    };
-    socket?.on("connect", fn);
-    return () => {
-      socket?.off("connect", fn);
-    };
-  }, [handleJoin]);
-
   if (permissionChecked === false && !isReConnecting && !isSwitching)
     content = <CheckPermissions2 onChecked={handleJoin} />;
 
