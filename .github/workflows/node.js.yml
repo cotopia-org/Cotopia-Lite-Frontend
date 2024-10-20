@@ -36,6 +36,7 @@ jobs:
     runs-on: self-hosted
     needs:  [ build ]
     steps:
+
       - name: Create SSH key
         run: |
           echo "$SSH_PRIVATE_KEY" > priv.key
@@ -49,6 +50,8 @@ jobs:
           ssh -i priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"SERVER_HOST"
           cd /root/dev/Cotopia-Lite-Frontend
           echo "Deploy" > deploy.txt
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
 
       # - name: Deploy
       #   run: |
