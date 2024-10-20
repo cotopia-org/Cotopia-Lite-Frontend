@@ -35,7 +35,6 @@ import BottomMiddleTools from "../../room/tools/bottom-middle";
 import BottomRightTools from "../../room/tools/bottom-right";
 import useBus, { dispatch } from "use-bus";
 import { _BUS } from "@/app/const/bus";
-// import { useCanvas } from "..";
 
 export const RF_BACKGROUND_ID = "bg-node-4214242141";
 export const RF_JAIL_ID = "jail-78412641267";
@@ -228,6 +227,7 @@ function ReactFlowHandler({ tracks }: Props) {
   );
 
   useBus(_BUS.changeMyUserCoord, (data) => {
+    console.log("data", data.data);
     updateUserCoordinate(data.data);
   });
 
@@ -285,6 +285,14 @@ function ReactFlowHandler({ tracks }: Props) {
       };
 
       socket?.emit("updateCoordinates", sendingObject);
+
+      dispatch({
+        type: _BUS.changeMyUserCoord,
+        data: {
+          ...user,
+          coordinates: newCoords,
+        },
+      });
 
       const livekitIdentity = username;
 

@@ -1,7 +1,4 @@
-import {
-  useProfile,
-  useSocket,
-} from "@/app/(pages)/(protected)/protected-wrapper";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import { _BUS } from "@/app/const/bus";
 import { useApi } from "@/hooks/swr";
 import useLoading from "@/hooks/use-loading";
@@ -30,7 +27,6 @@ type LeftJoinType = { room_id: number; user: UserMinimalType };
 type Props = {
   children: ReactNode;
   room_id: number;
-  onRoomUpdated?: (item: WorkspaceRoomType) => void;
   workspace_id?: string;
 };
 
@@ -86,7 +82,6 @@ export const useRoomContext = () => useContext(RoomCtx);
 export default function RoomContext({
   children,
   room_id,
-  onRoomUpdated,
   workspace_id,
 }: Props) {
   const [room, setRoom] = useState<WorkspaceRoomType>();
@@ -160,22 +155,25 @@ export default function RoomContext({
 
     if (room === undefined) return;
 
-    if (onRoomUpdated === undefined) return;
-
     const participants = room?.participants ?? [];
 
     const participant_index = participants.findIndex(
       (x: any) => x.username === username
     );
 
-    if (participant_index === -1) return onRoomUpdated(room);
+    if (participant_index === -1) return setRoom(room);
 
     participants[participant_index] = {
       ...participants[participant_index],
       coordinates: `${position.x},${position.y}`,
     };
 
-    if (onRoomUpdated) onRoomUpdated({ ...room, participants });
+    console.log(
+      "participants[participant_index]",
+      participants[participant_index]
+    );
+
+    setRoom({ ...room, participants });
   };
 
   const [sidebar, setSidebar] = useState<ReactNode>(<></>);
@@ -215,7 +213,7 @@ export default function RoomContext({
 
       room.participants = newParticipants;
 
-      if (onRoomUpdated) onRoomUpdated(room);
+      setRoom(room);
     },
     [room, mutateWorkspaceUsers]
   );
@@ -233,7 +231,7 @@ export default function RoomContext({
 
       room.participants = [...participants, data.user];
 
-      if (onRoomUpdated) onRoomUpdated(room);
+      setRoom(room);
     },
     [room, mutateWorkspaceUsers]
   );
