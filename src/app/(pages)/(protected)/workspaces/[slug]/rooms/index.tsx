@@ -19,9 +19,7 @@ export default function WorkspaceRoomsHolder({ workspace_id }: Props) {
 
   const { data, isLoading, mutate } = useApi<
     FetchDataType<WorkspaceRoomShortType[]>
-  >(`/workspaces/${workspace_id}/rooms`, {
-    isFetch: rooms.length === 0,
-  });
+  >(`/workspaces/${workspace_id}/rooms`);
   const items = !!data ? data?.data : [];
 
   useEffect(() => {

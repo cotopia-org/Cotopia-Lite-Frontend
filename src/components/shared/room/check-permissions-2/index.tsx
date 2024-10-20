@@ -4,12 +4,15 @@ import React, { useEffect, useRef } from "react";
 import CotopiaButton from "@/components/shared-ui/c-button";
 import Video from "./video";
 import { useRoomHolder } from "..";
+import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 
 interface MediaAccessProps {
   onChecked: () => void;
 }
 
 const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
+  const socket = useSocket();
+
   const {
     stream,
     stream_loading,
@@ -126,6 +129,7 @@ const CheckPermissions2: React.FC<MediaAccessProps> = ({ onChecked }) => {
       </div>
       <div>
         <CotopiaButton
+          loading={!!!socket}
           disabled={stream_loading}
           onClick={handleJoin}
           className='bg-blue-500 min-w-[100px]'
