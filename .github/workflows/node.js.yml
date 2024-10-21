@@ -41,7 +41,6 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > priv.key
           chmod 600 priv.key
-          stat priv.key
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           # SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
@@ -49,7 +48,9 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm install && echo "Deploy" > deploy.txt'
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm install'
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm run buld'
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && pm2 restart lite'
         env:
           SSH_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           SERVER_HOST: ${{secrets.SERVER_HOST}}
