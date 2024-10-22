@@ -34,7 +34,7 @@ const JobItem = ({ item, mutate }: Props) => {
       </p>
       <div className='flex w-full items-center justify-between mt-2 '>
         <JobStatus status={item.status} />
-        <TimeOverShower date={item.end_at} />
+        {/* <TimeOverShower date={item.end_at} /> */}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ export type JobStatuType = "in_progress" | "paused" | "completed" | "started";
 export type JobType = {
   created_at: string;
   description: string;
-  end_at: string;
+  estimate: number;
   id: number;
   status: JobStatuType;
   title: string;
