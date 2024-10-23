@@ -40,10 +40,10 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && git pull origin dev'
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm install'
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && npm run build'
-          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" 'cd /root/dev/Cotopia-Lite-Frontend && pm2 restart '${{ env.BRANCH_NAME }}
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" "cd /home/dev/Lite/front/${{ env.BRANCH_NAME }} && git pull origin ${{ env.BRANCH_NAME }}"
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" "cd /home/dev/Lite/front/${{ env.BRANCH_NAME }} && npm install"
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" "cd /home/dev/Lite/front/${{ env.BRANCH_NAME }} && npm run build"
+          ssh -i ./priv.key -o StrictHostKeyChecking=no "$SERVER_USERNAME"@"$SERVER_HOST" "cd /home/dev/Lite/front/${{ env.BRANCH_NAME }} && pm2 restart ${{ env.BRANCH_NAME }}"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
