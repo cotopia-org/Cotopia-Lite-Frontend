@@ -1,37 +1,38 @@
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import useLoading from "@/hooks/use-loading";
-import axiosInstance from "@/lib/axios";
-import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRoomContext } from "../../../room-context";
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
+import useLoading from "@/hooks/use-loading"
+import axiosInstance from "@/lib/axios"
+import { useRouter } from "next/navigation"
+import { useRoomContext } from "../../../room-context"
+import { LogoutIcon } from "@/components/icons"
+import colors from "tailwindcss/colors"
 
 export default function UserLogoutButtonTool() {
-  const { workspace_id } = useRoomContext();
+  const { workspace_id } = useRoomContext()
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { startLoading, stopLoading, isLoading } = useLoading();
+  const { startLoading, stopLoading, isLoading } = useLoading()
 
   const handleBack = () => {
-    startLoading();
+    startLoading()
     axiosInstance
       .get(`/rooms/leave`)
       .then((res) => {
-        router.push(`/workspaces/${workspace_id}`);
-        stopLoading();
+        router.push(`/workspaces/${workspace_id}`)
+        stopLoading()
       })
       .catch((err) => {
-        stopLoading();
-      });
-  };
+        stopLoading()
+      })
+  }
 
   return (
     <CotopiaIconButton
       disabled={isLoading}
       onClick={handleBack}
-      className='text-red-600'
+      className="w-6 h-6"
     >
-      <LogOut />
+      <LogoutIcon size={20} color={colors.red[700]} />
     </CotopiaIconButton>
-  );
+  )
 }

@@ -12,6 +12,9 @@ import { _BUS } from "@/app/const/bus"
 import SelectedUser from "./selected-user"
 import { InviteType } from "@/types/invite"
 import { CodePicker } from "./code-picker"
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
+import colors from "tailwindcss/colors"
+import { ProfileAddIcon } from "@/components/icons"
 
 export default function InviteButtonTool() {
   const [selectedUser, setSelectedUser] = useState<UserMinimalType>()
@@ -81,14 +84,9 @@ export default function InviteButtonTool() {
             </>
           }
           trigger={(open) => (
-            <CotopiaButton
-              onClick={open}
-              loading={isLoading}
-              startIcon={<UserRoundPlus />}
-              className="bg-white hover:bg-white text-black rounded-xl"
-            >
-              Invite
-            </CotopiaButton>
+            <CotopiaIconButton onClick={open} className="w-6 h-6">
+              <ProfileAddIcon size={20} color={colors.black} />
+            </CotopiaIconButton>
           )}
         />
       )}

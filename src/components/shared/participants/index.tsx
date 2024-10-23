@@ -31,7 +31,6 @@ export default function Participants({
             toolTipTitle:
               customTitle !== undefined ? customTitle(x) : undefined,
             className: avatarClss,
-            render,
           }))}
           render={render}
         />

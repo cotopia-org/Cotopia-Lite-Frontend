@@ -1,42 +1,43 @@
-import CotopiaButton from "@/components/shared-ui/c-button";
+import CotopiaButton from "@/components/shared-ui/c-button"
 
-import { Clock } from "lucide-react";
+import { Clock } from "lucide-react"
 
-import { _BUS } from "@/app/const/bus";
-import useLoading from "@/hooks/use-loading";
-import axiosInstance, { FetchDataType } from "@/lib/axios";
-import { useEffect, useState } from "react";
-import { convertMinutesToHHMMSS, urlWithQueryParams } from "@/lib/utils";
-import PopupBox from "@/components/shared/popup-box";
-import TimeTrackingDetails from "./details";
-import TimeTrackingButton from "./button";
-import PopupBoxChild from "@/components/shared/popup-box/child";
+import { _BUS } from "@/app/const/bus"
+import useLoading from "@/hooks/use-loading"
+import axiosInstance from "@/lib/axios"
+import { useEffect, useState } from "react"
+import { urlWithQueryParams } from "@/lib/utils"
+import PopupBox from "@/components/shared/popup-box"
+import TimeTrackingDetails from "./details"
+import TimeTrackingButton from "./button"
+import PopupBoxChild from "@/components/shared/popup-box/child"
 
 export default function TimeTrackingButtonTool() {
-  const [seconds, setSeconds] = useState<undefined | number>();
+  const [seconds, setSeconds] = useState<undefined | number>()
 
-  const { startLoading, stopLoading, isLoading } = useLoading();
+  const { startLoading, stopLoading, isLoading } = useLoading()
   const getActivityTime = () => {
-    startLoading();
+    startLoading()
     axiosInstance
       .get(urlWithQueryParams(`/users/activities`, { period: "today" }))
       .then((res) => {
-        const mins = res.data.data;
-        setSeconds(mins * 60);
-        stopLoading();
+        const mins = res.data.data
+        setSeconds(mins * 60)
+        stopLoading()
       })
       .catch((err) => {
-        stopLoading();
-      });
-  };
+        stopLoading()
+      })
+  }
   useEffect(() => {
-    getActivityTime();
-  }, []);
+    getActivityTime()
+  }, [])
 
   return (
     <PopupBox
-      trigger={(open) => (
+      trigger={(open, isOpen) => (
         <TimeTrackingButton
+          isOpen={isOpen}
           defaultSeconds={seconds ?? 0}
           onClick={open}
           isLoading={isLoading}
@@ -48,13 +49,13 @@ export default function TimeTrackingButtonTool() {
           <PopupBoxChild
             {...style}
             onClose={close}
-            title='Leaderboard'
+            title="Leaderboard"
             width={300}
           >
             <TimeTrackingDetails />
           </PopupBoxChild>
-        );
+        )
       }}
     </PopupBox>
-  );
+  )
 }

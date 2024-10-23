@@ -1,30 +1,38 @@
 import { Loader } from "lucide-react"
 import { Button, ButtonProps } from "../ui/button"
-import { ReactNode } from "react"
+import { MouseEvent, ReactNode } from "react"
 
-type Props = ButtonProps & {
+export type CotopiaButtonProps = ButtonProps & {
   loading?: boolean
   startIcon?: ReactNode
   endIcon?: ReactNode
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void
 }
 
 export default function CotopiaButton({
   loading,
   startIcon,
   endIcon,
+  onClick,
   ...rest
-}: Props) {
+}: CotopiaButtonProps) {
   const isDisabled = rest?.disabled ?? loading ?? false
   let clss = rest?.className ?? ""
   clss += ` gap-x-2 px-2`
 
   return (
-    <Button type="button" {...rest} className={clss} disabled={isDisabled}>
+    <Button
+      onClick={onClick}
+      type="button"
+      {...rest}
+      className={clss}
+      disabled={isDisabled}
+    >
       {loading ? (
         <Loader className="animate-spin" />
       ) : (
         <>
-          <div className="flex flex-row items-center gap-x-1">
+          <div className="button-wrapper flex flex-row items-center gap-x-2">
             {!!startIcon && startIcon}
             {rest?.children}
           </div>

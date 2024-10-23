@@ -14,7 +14,11 @@ const AddJobHandler = ({ onCreated, workspaceId }: Props) => {
   return (
     <FullModalBox
       trigger={(open) => (
-        <CotopiaButton startIcon={<Plus />} onClick={open}>
+        <CotopiaButton
+          className="min-w-[100px]"
+          startIcon={<Plus size={16} />}
+          onClick={open}
+        >
           Add Job
         </CotopiaButton>
       )}

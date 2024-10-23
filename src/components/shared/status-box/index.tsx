@@ -1,3 +1,5 @@
+import { colors } from "@/app/const/vars"
+
 export type StatusBoxVariant =
   | "success"
   | "info"
@@ -15,35 +17,32 @@ export default function StatusBox({
   label,
   alpha = "0.1",
 }: Props) {
-  let bgColor = "rgba(0,0,0,1)"
-  let textColor = `rgba(0,0,0,${alpha})`
+  let bgColor = colors.primary.background
+  let textColor = colors.primary.body
 
   switch (variant) {
+    case "default":
+    case "info":
+      textColor = colors.primary.body
+      bgColor = colors.primary.background
+      break
     case "success":
-      textColor = "rgba(56,142,60,1)"
+      textColor = colors.success.default
       bgColor = `rgba(56,142,60,${alpha})`
       break
-    case "info":
-      textColor = "rgba(2,136,209,1)"
-      bgColor = `rgba(2,136,209,${alpha})`
-      break
     case "warning":
-      textColor = "rgba(243, 156, 18, 1)"
-      bgColor = `rgba(243, 156, 18, ${alpha})`
+      textColor = colors.warning.default
+      bgColor = colors.warning.light
       break
     case "error":
-      textColor = "rgba(230,74,25,1)"
+      textColor = colors.error.default
       bgColor = `rgba(230,74,25,${alpha})`
       break
-    default:
-    case "default":
-      textColor = "rgba(0,0,0,1)"
-      bgColor = `rgba(0,0,0,${alpha})`
   }
 
   return (
     <div
-      className={`w-auto inline-flex py-[4px] px-[10px] rounded-[32px] text-[12px] font-medium`}
+      className={`w-auto inline-flex py-1 px-3 rounded-lg text-sm font-medium`}
       style={{
         backgroundColor: bgColor,
         color: textColor,

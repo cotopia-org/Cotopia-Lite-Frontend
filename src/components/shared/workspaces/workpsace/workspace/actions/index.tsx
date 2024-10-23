@@ -1,14 +1,40 @@
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import { WorkspaceType } from "@/types/workspace";
-import { MoreHorizontal } from "lucide-react";
+import { colors } from "@/app/const/vars"
+import MoreHorizontal from "@/components/icons/more-horiz"
+import CotopiaIconButton from "@/components/shared-ui/c-icon-button"
+import CotopiaPopover from "@/components/shared-ui/c-popover"
+import React from "react"
 
-type Props = {
-  item: WorkspaceType;
-};
-export default function WorkspaceActions({ item }: Props) {
+interface Props {}
+
+const WorkspaceActions = (props: Props) => {
   return (
-    <CotopiaIconButton variant={"ghost"} className='!bg-transparent'>
-      <MoreHorizontal />
+    <CotopiaIconButton
+      onClick={(e) => e.stopPropagation()}
+      type="button"
+      className="!bg-transparent hover:!bg-black/[0.10] w-6 h-6"
+    >
+      <MoreHorizontal size={16} color={colors.grayscale.grayscaleSubtitle} />
     </CotopiaIconButton>
-  );
+  )
+
+  return (
+    <CotopiaPopover
+      trigger={
+        <CotopiaIconButton
+          type="button"
+          className="!bg-transparent hover:!bg-black/[0.10] w-6 h-6"
+        >
+          <MoreHorizontal
+            size={16}
+            color={colors.grayscale.grayscaleSubtitle}
+          />
+        </CotopiaIconButton>
+      }
+      contentClassName="w-auto p-1"
+    >
+      <>workspace options</>
+    </CotopiaPopover>
+  )
 }
+
+export default WorkspaceActions

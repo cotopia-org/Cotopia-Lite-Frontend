@@ -1,19 +1,17 @@
-"use client";
+"use client"
 
-import CotopiaIconButton from "@/components/shared-ui/c-icon-button";
-import { CircleMinus, Minimize } from "lucide-react";
-import { ReactNode } from "react";
-import BoxHolder from "../../box-holder";
+import { ReactNode } from "react"
+import BoxHolder from "../../box-holder"
 
 type Props = {
-  children: ReactNode;
-  onClose: () => void;
-  top: number;
-  left: number;
-  zIndex?: number;
-  width?: number;
-  title: string;
-};
+  children: ReactNode
+  onClose: () => void
+  top: number
+  left: number
+  zIndex?: number
+  width?: number
+  title: string
+}
 export default function PopupBoxChild({
   children,
   onClose,
@@ -25,7 +23,7 @@ export default function PopupBoxChild({
 }: Props) {
   return (
     <div
-      className='bg-background rounded-lg p-4 fixed mt-4'
+      className="bg-background rounded-lg p-4 fixed mt-4"
       style={{
         width,
         top: top,
@@ -37,5 +35,5 @@ export default function PopupBoxChild({
         {children}
       </BoxHolder>
     </div>
-  );
+  )
 }

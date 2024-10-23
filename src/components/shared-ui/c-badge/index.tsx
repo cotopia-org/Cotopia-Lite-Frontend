@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 export type CBadgeProps = {
-  count: number;
-  size?: "small" | "normal" | "large";
-  showAnimate?: boolean;
-  className?: string;
-};
+  count: number
+  size?: "small" | "normal" | "large"
+  showAnimate?: boolean
+  className?: string
+}
 
-let timeout: any = undefined;
+let timeout: any = undefined
 
 export default function CBadge({
   count,
@@ -15,41 +15,41 @@ export default function CBadge({
   size = "small",
   className,
 }: CBadgeProps) {
-  const [hasAnimate, setHasAnimate] = useState(false);
+  const [hasAnimate, setHasAnimate] = useState(false)
 
   useEffect(() => {
     function giveAnimate() {
-      setHasAnimate(true);
+      setHasAnimate(true)
 
       timeout = setTimeout(() => {
-        setHasAnimate(false);
-      }, 1000);
+        setHasAnimate(false)
+      }, 1000)
     }
 
     if (showAnimate) {
-      giveAnimate();
+      giveAnimate()
     }
 
     return () => {
-      clearTimeout(timeout);
-    };
-  }, [count, showAnimate]);
+      clearTimeout(timeout)
+    }
+  }, [count, showAnimate])
 
-  let clss = className ?? "";
+  let clss = className ?? ""
 
   switch (size) {
     case "small":
-      clss += ` w-[16px] h-[16px]`;
-      break;
+      clss += ` w-[16px] h-[16px] text-xs`
+      break
     case "normal":
-      clss += ` w-[24px] h-[24px]`;
-      break;
+      clss += ` w-[24px] h-[24px] text-sm`
+      break
     case "large":
-      clss += ` w-[32px] h-[32px]`;
-      break;
+      clss += ` w-[32px] h-[32px]`
+      break
   }
 
-  if (count <= 0) return;
+  if (count <= 0) return
 
   return (
     <div
@@ -59,5 +59,5 @@ export default function CBadge({
     >
       {count}
     </div>
-  );
+  )
 }

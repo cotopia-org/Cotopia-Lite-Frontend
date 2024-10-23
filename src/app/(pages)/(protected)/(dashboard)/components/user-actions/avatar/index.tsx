@@ -1,26 +1,26 @@
-"use client";
+"use client"
 
-import { useAuth } from "../../../dashboard";
-import CotopiaAvatar from "@/components/shared-ui/c-avatar";
-import { FullModalBox } from "@/components/shared/modal-box";
-import { getUserFullname } from "@/lib/utils";
-import UserSettings from "./settings";
+import { useAuth } from "../../../dashboard"
+import CotopiaAvatar from "@/components/shared-ui/c-avatar"
+import { FullModalBox } from "@/components/shared/modal-box"
+import { getUserFullname } from "@/lib/utils"
+import UserSettings from "./settings"
 
 type Props = {
-  size?: "normal" | "large";
-};
+  size?: "normal" | "large"
+}
 
 export default function UserActionsAvatarButton({ size = "large" }: Props) {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
-  if (!user) return;
+  if (!user) return
 
-  let userFullName = getUserFullname(user);
+  let userFullName = getUserFullname(user)
 
-  let avatarClss = "cursor-pointer";
+  let avatarClss = "cursor-pointer"
 
   if (size === "normal") {
-    avatarClss += ` w-[32px] h-[32px]`;
+    avatarClss += ` w-[32px] h-[32px] border`
   }
 
   return (
@@ -33,9 +33,9 @@ export default function UserActionsAvatarButton({ size = "large" }: Props) {
           onClick={open}
         />
       )}
-      className='w-[640px]'
+      className="w-[640px]"
     >
       {(open, close) => <UserSettings />}
     </FullModalBox>
-  );
+  )
 }

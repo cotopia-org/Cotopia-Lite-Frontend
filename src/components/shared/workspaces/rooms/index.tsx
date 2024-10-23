@@ -1,25 +1,24 @@
-import { WorkspaceRoomShortType } from "@/types/room";
-import WorkspaceRoom from "./room";
-import TitleEl from "../../title-el";
-import { useRoomContext } from "../../room/room-context";
+import { WorkspaceRoomShortType } from "@/types/room"
+import WorkspaceRoom from "./room"
+import { useRoomContext } from "../../room/room-context"
 
 type Props = {
-  rooms: WorkspaceRoomShortType[];
-  workspace_id: number;
-  selected_room_id?: number;
-};
+  rooms: WorkspaceRoomShortType[]
+  workspace_id: number
+  selected_room_id?: number
+}
 
 export default function WorkspaceRooms({
   workspace_id,
   rooms,
   selected_room_id,
 }: Props) {
-  const { workpaceUsers } = useRoomContext();
+  const { workpaceUsers } = useRoomContext()
 
-  if (rooms.length === 0) return null;
+  if (rooms.length === 0) return null
 
   return (
-    <TitleEl title='Rooms'>
+    <div className="flex flex-col justify-start gap-y-1 w-full">
       {rooms.map((room) => {
         return (
           <WorkspaceRoom
@@ -31,8 +30,8 @@ export default function WorkspaceRooms({
               (x) => x.room_id === room.id && x.status === "online"
             )}
           />
-        );
+        )
       })}
-    </TitleEl>
-  );
+    </div>
+  )
 }

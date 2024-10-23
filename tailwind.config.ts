@@ -24,10 +24,13 @@ const config = {
         ring: "var(--ring)",
         background: "var(--background)",
         foreground: "var(--foreground)",
-        primaryBackground: "var(--primary-background)",
         primary: {
           DEFAULT: "var(--primary)",
+          background: "var(--primary-background)",
           foreground: "var(--primary-foreground)",
+          label: "var(--primary-label)",
+          light: "var(--primary-light)",
+          body: "var(--primary-body)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
@@ -53,11 +56,31 @@ const config = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
+        grayscale: {
+          DEFAULT: "var(--grayscale)",
+          light: "var(--grayscale-light)",
+          subtitle: "var(--grayscale-subtitle)",
+          caption: "var(--grayscale-caption)",
+          paragraph: "var(--grayscale-paragraph)",
+          border: "var(--grayscale-border)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+        },
+        success: {
+          DEFAULT: "var(--success)",
+        },
+        error: {
+          DEFAULT: "var(--error)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "app-bar": "0 2px 4px rgba(0, 0, 0, 0.16)",
       },
       keyframes: {
         "accordion-down": {

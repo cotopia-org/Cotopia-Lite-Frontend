@@ -1,22 +1,25 @@
-import CotopiaButton from "@/components/shared-ui/c-button";
-import ModalBox from "@/components/shared/modal-box";
-import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
-import AddRoomForm from "./form";
-import { WorkspaceRoomShortType } from "@/types/room";
+import CotopiaButton from "@/components/shared-ui/c-button"
+import ModalBox from "@/components/shared/modal-box"
+import { DialogDescription, DialogTitle } from "@/components/ui/dialog"
+import { Plus } from "lucide-react"
+import AddRoomForm from "./form"
+import { WorkspaceRoomShortType } from "@/types/room"
+import { colors } from "@/app/const/vars"
 
 type Props = {
-  workspace_id: string;
-  onAdd: (room: WorkspaceRoomShortType) => void;
-};
+  workspace_id: string
+  onAdd: (room: WorkspaceRoomShortType) => void
+}
 export default function AddRoom({ workspace_id, onAdd }: Props) {
   return (
     <ModalBox
       trigger={(open) => (
         <CotopiaButton
-          className='text-gray-600'
+          className="text-grayscale-subtitle hover:text-grayscale-subtitle"
           variant={"ghost"}
-          startIcon={<Plus size={16} />}
+          startIcon={
+            <Plus size={16} color={colors.grayscale.grayscaleSubtitle} />
+          }
           onClick={open}
         >
           Add Room
@@ -34,8 +37,8 @@ export default function AddRoom({ workspace_id, onAdd }: Props) {
               onCreated={onAdd}
             />
           </>
-        );
+        )
       }}
     </ModalBox>
-  );
+  )
 }

@@ -1,22 +1,22 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ReactNode } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ReactNode } from "react"
 
 type Tab = {
-  value: string;
-  title?: ReactNode;
-  icon?: ReactNode;
-  content: ReactNode;
-};
+  value: string
+  title?: ReactNode
+  icon?: ReactNode
+  content: ReactNode
+}
 
 type Props = {
-  title?: ReactNode;
-  items: Tab[];
-  className?: string;
-  titleClassName?: string;
-  defaultValue?: string;
-  dividerBetweenContentAndTabs?: boolean;
-  onChangeTab?: (tab: string) => void;
-};
+  title?: ReactNode
+  items: Tab[]
+  className?: string
+  titleClassName?: string
+  defaultValue?: string
+  dividerBetweenContentAndTabs?: boolean
+  onChangeTab?: (tab: string) => void
+}
 
 export default function CTabs({
   defaultValue,
@@ -27,14 +27,14 @@ export default function CTabs({
   dividerBetweenContentAndTabs = false,
   onChangeTab,
 }: Props) {
-  let clss = "w-full flex flex-col";
+  let clss = "w-full flex flex-col"
 
-  if (dividerBetweenContentAndTabs) clss += ` gap-y-4`;
-  if (className) clss += ` ${className}`;
+  if (dividerBetweenContentAndTabs) clss += ` gap-y-4`
+  if (className) clss += ` ${className}`
 
   const handleChangeTab = (value: string) => {
-    if (onChangeTab) onChangeTab(value);
-  };
+    if (onChangeTab) onChangeTab(value)
+  }
 
   return (
     <Tabs
@@ -42,10 +42,14 @@ export default function CTabs({
       className={clss}
       onValueChange={handleChangeTab}
     >
-      <div className='tab-holder flex flex-row items-center justify-between'>
-        <TabsList className='flex flex-row justify-start bg-black/5'>
+      <div className="tab-holder flex flex-row items-center justify-between">
+        <TabsList className="tabs-list flex flex-row gap-x-2 justify-start bg-transparent">
           {items.map((x) => (
-            <TabsTrigger value={x.value} key={x.value}>
+            <TabsTrigger
+              value={x.value}
+              key={x.value}
+              className="min-w-[48px] min-h-[48px] rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white [&_svg_path]:data-[state=active]:stroke-white"
+            >
               {x.icon ? x.icon : x.title}
             </TabsTrigger>
           ))}
@@ -58,10 +62,10 @@ export default function CTabs({
       </div>
       {!!dividerBetweenContentAndTabs && <hr />}
       {items.map((x) => (
-        <TabsContent value={x.value} key={x.value} className='tab-content'>
+        <TabsContent value={x.value} key={x.value} className="tab-content">
           {x.content}
         </TabsContent>
       ))}
     </Tabs>
-  );
+  )
 }
