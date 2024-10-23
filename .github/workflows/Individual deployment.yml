@@ -1,4 +1,5 @@
 name: Individual branch deployment
+
 on:
   workflow_dispatch:
   push:
