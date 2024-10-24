@@ -116,6 +116,7 @@ export default function SignInForm({ onLoggedIn }: Props) {
           I don't remember my password
           <MoveRight className='ml-2' size={12} />
         </Link>
+        <span>Rasti's Repo</span>
       </div>
     </div>
   );
