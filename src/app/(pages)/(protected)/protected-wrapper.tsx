@@ -15,6 +15,7 @@ import {
 } from "react";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
+import { dispatch } from "use-bus";
 
 type Props = {
   children: ReactNode;
@@ -87,6 +88,7 @@ export default function ProtectedWrapper({ children, user }: Props) {
       playSoundEffect("leftMyself");
       toast.error("Socket disconnected");
       setSocketState(undefined);
+      dispatch(_BUS.rejoinRoom);
     });
 
     // Clean up the socket connection on unmount

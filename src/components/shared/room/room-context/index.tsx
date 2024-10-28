@@ -21,6 +21,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import useBus from "use-bus";
 
 type LeftJoinType = { room_id: number; user: UserMinimalType };
 
@@ -133,6 +134,8 @@ export default function RoomContext({
       });
   };
 
+  useBus(_BUS.rejoinRoom, () => handleJoinRoom());
+
   const [permissionState, setPermissionState] = useState({
     audio: true,
     video: true,
@@ -162,11 +165,6 @@ export default function RoomContext({
       ...participants[participant_index],
       coordinates: `${position.x},${position.y}`,
     };
-
-    console.log(
-      "participants[participant_index]",
-      participants[participant_index]
-    );
 
     setRoom({ ...room, participants });
   };

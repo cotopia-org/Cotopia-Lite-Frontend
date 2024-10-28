@@ -12,4 +12,5 @@ export const _BUS = {
   userLeftRoom: "USER_LEFT_ROOM",
   socketConnected: "SOCKET_CONNECTED",
   socketDisConnected: "SOCKET_DISCONNECTED",
+  rejoinRoom: "REJOIN_ROOM",
 };
