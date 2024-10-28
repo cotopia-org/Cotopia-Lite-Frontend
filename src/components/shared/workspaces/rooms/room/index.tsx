@@ -35,35 +35,31 @@ export default function WorkspaceRoom({
   const { startLoading, stopLoading, isLoading } = useLoading();
 
   const joinRoomHandler = async () => {
-    if (!socket) return;
-
     if (selected_room_id !== room.id) {
       startLoading();
-      socket.emit("joinedRoom", room.id, () => {
-        axiosInstance
-          .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room.id}/join`)
-          .then((res) => {
-            const livekitToken = res.data.data.token; //Getting livekit token from joinObject
+      axiosInstance
+        .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room.id}/join`)
+        .then((res) => {
+          const livekitToken = res.data.data.token; //Getting livekit token from joinObject
 
-            stopLoading();
+          stopLoading();
 
-            if (sounds.userJoinLeft) playSoundEffect("joined");
+          if (sounds.userJoinLeft) playSoundEffect("joined");
 
-            if (livekitToken) {
-              router.push(
-                urlWithQueryParams(
-                  `/workspaces/${workspace_id}/rooms/${room.id}`,
-                  { token: livekitToken, isSwitching: true }
-                )
-              );
+          if (livekitToken) {
+            router.push(
+              urlWithQueryParams(
+                `/workspaces/${workspace_id}/rooms/${room.id}`,
+                { token: livekitToken, isSwitching: true }
+              )
+            );
 
-              return;
-            }
-          })
-          .catch((err) => {
-            stopLoading();
-          });
-      });
+            return;
+          }
+        })
+        .catch((err) => {
+          stopLoading();
+        });
     }
   };
 

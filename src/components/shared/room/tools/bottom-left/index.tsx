@@ -1,6 +1,7 @@
 import VerticalDivider from "@/components/shared/vertical-divider";
 import ReportBugButtonTool from "./bug";
 import PingShower from "./ping";
+import SocketConnectionState from "./socket-connection-state";
 // import QuestionButtonTool from "./question";
 
 export default function BottomLeftTools() {
@@ -11,6 +12,7 @@ export default function BottomLeftTools() {
       <ReportBugButtonTool />
       <VerticalDivider />
       <PingShower />
+      <SocketConnectionState />
     </div>
   );
 }

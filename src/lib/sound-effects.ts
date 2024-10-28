@@ -16,6 +16,9 @@ export const sounds = {
   left: new Howl({
     src: ["/assets/sounds-effects/left.mp3"],
   }),
+  leftMyself: new Howl({
+    src: ["/assets/sounds-effects/left-myself.wav"],
+  }),
   joined: new Howl({
     src: ["/assets/sounds-effects/joined.mp3"],
   }),

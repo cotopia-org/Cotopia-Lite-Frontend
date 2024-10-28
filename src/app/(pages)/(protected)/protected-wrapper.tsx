@@ -3,6 +3,7 @@
 import { _BUS } from "@/app/const/bus";
 import { __VARS } from "@/app/const/vars";
 import axiosInstance from "@/lib/axios";
+import { playSoundEffect } from "@/lib/sound-effects";
 import { useAppSelector } from "@/store/redux/store";
 import { UserType } from "@/types/user";
 import {
@@ -83,7 +84,9 @@ export default function ProtectedWrapper({ children, user }: Props) {
     });
 
     socket.on("disconnect", () => {
+      playSoundEffect("leftMyself");
       toast.error("Socket disconnected");
+      setSocketState(undefined);
     });
 
     // Clean up the socket connection on unmount

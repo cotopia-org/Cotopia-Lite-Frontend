@@ -45,10 +45,7 @@ const PingShower: React.FC = () => {
 
   return (
     <CotopiaTooltip title={`Ping (${ping})`}>
-      <div className={clss}>
-        {/* <RadioTower /> */}
-        {icon}
-      </div>
+      <div className={clss}>{icon}</div>
     </CotopiaTooltip>
   );
 };

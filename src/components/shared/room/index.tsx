@@ -306,19 +306,15 @@ export default function RoomHolder({
   };
 
   const handleJoin = useCallback(async () => {
-    console.log("should join!");
-    console.log(socket);
-    socket?.emit("joinedRoom", room_id, async () => {
-      axiosInstance
-        .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
-        .then((res) => {
-          setPermissionChecked(true);
-        })
-        .catch((err) => {
-          toast.error("Couldn't join to the room!");
-        });
-    });
-  }, [socket, room_id]);
+    axiosInstance
+      .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
+      .then((res) => {
+        setPermissionChecked(true);
+      })
+      .catch((err) => {
+        toast.error("Couldn't join to the room!");
+      });
+  }, [room_id]);
   if (permissionChecked === false && !isReConnecting && !isSwitching)
     content = <CheckPermissions2 onChecked={handleJoin} />;
 
