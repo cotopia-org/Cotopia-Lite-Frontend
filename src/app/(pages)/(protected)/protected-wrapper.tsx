@@ -82,13 +82,13 @@ export default function ProtectedWrapper({ children, user }: Props) {
     socket.on("connect", () => {
       toast.success("Socket connected");
       setSocketState(socket);
+      dispatch(_BUS.rejoinRoom);
     });
 
     socket.on("disconnect", () => {
       playSoundEffect("leftMyself");
       toast.error("Socket disconnected");
       setSocketState(undefined);
-      dispatch(_BUS.rejoinRoom);
     });
 
     // Clean up the socket connection on unmount
