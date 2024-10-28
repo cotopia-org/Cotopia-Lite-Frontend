@@ -19,7 +19,7 @@ const ITEMS: DashboardMenuItemType[] = [
   {
     title: "Dashboard",
     icon: <Clock />,
-    href: `/dashboard`,
+    href: `/`,
   },
   {
     title: "My Workspaces",
