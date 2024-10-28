@@ -134,8 +134,6 @@ export default function RoomContext({
       });
   };
 
-  useBus(_BUS.rejoinRoom, () => handleJoinRoom());
-
   const [permissionState, setPermissionState] = useState({
     audio: true,
     video: true,

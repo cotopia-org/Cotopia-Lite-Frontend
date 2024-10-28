@@ -315,8 +315,21 @@ export default function RoomHolder({
         toast.error("Couldn't join to the room!");
       });
   }, [room_id]);
-  if (permissionChecked === false && !isReConnecting && !isSwitching)
-    content = <CheckPermissions2 onChecked={handleJoin} />;
+
+  const handlePassed =
+    permissionChecked === false && !isReConnecting && !isSwitching;
+
+  useBus(
+    _BUS.rejoinRoom,
+    () => {
+      if (permissionChecked === true || isSwitching || isReConnecting) {
+        handleJoin();
+      }
+    },
+    [handlePassed, handleJoin]
+  );
+
+  if (handlePassed) content = <CheckPermissions2 onChecked={handleJoin} />;
 
   return (
     <RoomHolderContext.Provider
