@@ -79,22 +79,28 @@ export default function ProtectedWrapper({ children, user }: Props) {
       },
     });
 
-    socket.on("connect", () => {
+    const onConnect = () => {
       toast.success("Socket connected");
       setSocketState(socket);
       dispatch(_BUS.rejoinRoom);
-    });
+    };
 
-    socket.on("disconnect", () => {
+    const onDisconnect = () => {
       playSoundEffect("leftMyself");
       toast.error("Socket disconnected");
       setSocketState(undefined);
-    });
+    };
+
+    socket.on("connect", onConnect);
+
+    socket.on("disconnect", onDisconnect);
 
     // Clean up the socket connection on unmount
     return () => {
       toast.error("Socket disconnected");
       socket.disconnect();
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
     };
   }, []);
 
