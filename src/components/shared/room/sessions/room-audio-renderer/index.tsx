@@ -35,7 +35,7 @@ export interface RoomAudioRendererProps {
  */
 
 export function RoomAudioRenderer() {
-  const { user } = useProfile();
+  const { user, socketState } = useProfile();
 
   const { room } = useRoomContext();
   const allParticipants = room?.participants ?? [];
@@ -58,6 +58,8 @@ export function RoomAudioRenderer() {
     (ref) =>
       !isLocal(ref.participant) && ref.publication.kind === Track.Kind.Audio
   );
+
+  if (socketState?.connected === undefined) return;
 
   return (
     <div style={{ display: "none" }}>

@@ -1,7 +1,6 @@
 import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
-import React, { useEffect } from "react";
-import { useRoomContext } from "../../room-context";
+import { useEffect } from "react";
 import { useRoomHolder } from "../..";
 
 export default function AudioInit() {

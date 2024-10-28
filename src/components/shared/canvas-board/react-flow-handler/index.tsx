@@ -227,7 +227,6 @@ function ReactFlowHandler({ tracks }: Props) {
   );
 
   useBus(_BUS.changeMyUserCoord, (data) => {
-    console.log("data", data.data);
     updateUserCoordinate(data.data);
   });
 
@@ -249,6 +248,12 @@ function ReactFlowHandler({ tracks }: Props) {
     },
     []
   );
+
+  useBus(_BUS.userLeftRoom, (data) => {
+    setNodes(
+      (prev) => uniqueById(prev.filter((x) => x.id !== user.username)) as Node[]
+    );
+  });
 
   useSocket(
     "userJoinedToRoom",

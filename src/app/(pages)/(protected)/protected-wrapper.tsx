@@ -89,6 +89,7 @@ export default function ProtectedWrapper({ children, user }: Props) {
       playSoundEffect("leftMyself");
       toast.error("Socket disconnected");
       setSocketState(undefined);
+      dispatch(_BUS.userLeftRoom);
     };
 
     socket.on("connect", onConnect);
