@@ -109,6 +109,14 @@ export default function RoomContext({
     setRoom(data);
   });
 
+  //Update room object when background changed
+  useSocket("roomBackgroundChanged", (data: WorkspaceRoomType) => {
+    setRoom((prev) => ({
+      ...((prev ?? {}) as WorkspaceRoomType),
+      background: data.background,
+    }));
+  });
+
   const settings = useSetting();
 
   const { query } = useQueryParams();
