@@ -10,6 +10,8 @@ export const _BUS = {
   scrollToTargetMessage: "SCROLL_TO_TARGET_MESSAGE",
   changeMyUserCoord: "CHANGE_MY_USER_COORD",
   userLeftRoom: "USER_LEFT_ROOM",
+  stopWorkTimer: "STOP_WORK_TIMER",
+  startWorkTimer: "START_WORK_TIMER",
   socketConnected: "SOCKET_CONNECTED",
   socketDisConnected: "SOCKET_DISCONNECTED",
   rejoinRoom: "REJOIN_ROOM",

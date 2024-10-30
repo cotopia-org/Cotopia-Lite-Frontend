@@ -16,4 +16,5 @@ export const __VARS = {
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
   teleportMargin: 40,
+  userTimeTrackerId: "user-timer-tracker",
 };

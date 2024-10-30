@@ -2,6 +2,7 @@ import CotopiaButton from "@/components/shared-ui/c-button";
 
 import { Clock } from "lucide-react";
 import Timer from "../timer";
+import { __VARS } from "@/app/const/vars";
 
 type Props = {
   isLoading: boolean;
@@ -22,7 +23,7 @@ export default function TimeTrackingButton({
       onClick={onClick}
     >
       <div className='absolute top-2 right-2 w-2 h-2 bg-red-600 rounded-full animate-pulse'></div>
-      <Timer initialSeconds={defaultSeconds}>
+      <Timer initialSeconds={defaultSeconds} id={__VARS.userTimeTrackerId}>
         {(time) => <span className='min-w-[60px]'>{time}</span>}
       </Timer>
     </CotopiaButton>

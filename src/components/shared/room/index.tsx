@@ -11,6 +11,7 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
 } from "react";
 import LiveKitConnectionStatus from "./connection-status";
@@ -305,16 +306,30 @@ export default function RoomHolder({
     console.log("retry to connect!");
   };
 
+  const isJoined = useRef(false);
+
   const handleJoin = useCallback(async () => {
     axiosInstance
       .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
       .then((res) => {
         setPermissionChecked(true);
+        isJoined.current = true;
       })
       .catch((err) => {
         toast.error("Couldn't join to the room!");
       });
   }, [room_id]);
+
+  const handleJoinWithInterval = () => {
+    let interval = setInterval(() => {
+      if (isJoined.current === true) {
+        clearInterval(interval);
+        return;
+      }
+
+      handleJoin();
+    }, 3000);
+  };
 
   const handlePassed =
     permissionChecked === false && !isReConnecting && !isSwitching;
@@ -323,11 +338,15 @@ export default function RoomHolder({
     _BUS.rejoinRoom,
     () => {
       if (permissionChecked === true || isSwitching || isReConnecting) {
-        handleJoin();
+        handleJoinWithInterval();
       }
     },
-    [handlePassed, handleJoin]
+    [handlePassed]
   );
+
+  useBus(_BUS.userLeftRoom, () => {
+    isJoined.current = false;
+  });
 
   if (handlePassed) content = <CheckPermissions2 onChecked={handleJoin} />;
 

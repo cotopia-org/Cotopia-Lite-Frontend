@@ -83,6 +83,10 @@ export default function ProtectedWrapper({ children, user }: Props) {
       toast.success("Socket connected");
       setSocketState(socket);
       dispatch(_BUS.rejoinRoom);
+      dispatch({
+        type: _BUS.startWorkTimer,
+        id: __VARS.userTimeTrackerId,
+      });
     };
 
     const onDisconnect = () => {
@@ -90,6 +94,10 @@ export default function ProtectedWrapper({ children, user }: Props) {
       toast.error("Socket disconnected");
       setSocketState(undefined);
       dispatch(_BUS.userLeftRoom);
+      dispatch({
+        type: _BUS.stopWorkTimer,
+        id: __VARS.userTimeTrackerId,
+      });
     };
 
     socket.on("connect", onConnect);
