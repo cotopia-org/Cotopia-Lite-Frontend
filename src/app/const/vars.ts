@@ -3,7 +3,7 @@ export const __VARS = {
   serverUrl: process.env.NEXT_PUBLIC_LK_SERVER_URL,
   socketUrl: process.env.NEXT_PUBLIC_SOOCKET_URL ?? "",
   tokenCookieKey: process.env.NEXT_PUBLIC_TOKEN_COOKIE_KEY ?? "token",
-  dashboardPage: "/dashboard",
+  dashboardPage: "/workspaces/all",
   loginPage: `/auth/login`,
   registerPage: `/auth/register`,
   forgetPasswordPage: `/auth/forget-password`,
@@ -16,4 +16,4 @@ export const __VARS = {
   pagesLimitDiff: 6,
   defaultPositionOfUserY: 400,
   teleportMargin: 40,
-}
+};

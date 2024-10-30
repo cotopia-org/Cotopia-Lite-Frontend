@@ -68,10 +68,7 @@ export function RoomAudioRenderer() {
           (x) => x.username === trackRef?.participant?.identity
         );
 
-        const { meet, volumePercentage } = doCirclesMeet(
-          updatedMyUser,
-          trackOwner
-        );
+        const { meet } = doCirclesMeet(updatedMyUser, trackOwner);
 
         let volume = 1;
         let isMuted = !meet;
