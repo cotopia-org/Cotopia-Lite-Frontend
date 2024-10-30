@@ -4,14 +4,13 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { __VARS } from "@/app/const/vars";
 import RoomContext from "./room-context";
 import RoomInner from "./room-inner";
-import { WorkspaceRoomJoinType, WorkspaceRoomType } from "@/types/room";
+import { WorkspaceRoomJoinType } from "@/types/room";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useReducer,
-  useRef,
   useState,
 } from "react";
 import LiveKitConnectionStatus from "./connection-status";
@@ -22,11 +21,8 @@ import axiosInstance, { FetchDataType } from "@/lib/axios";
 import { useSocket } from "@/app/(pages)/(protected)/protected-wrapper";
 import Disconnected from "./connection-status/disconnected";
 import { toast } from "sonner";
-import useLoading from "@/hooks/use-loading";
 import useBus from "use-bus";
 import { _BUS } from "@/app/const/bus";
-import { io, Socket } from "socket.io-client";
-import { useAppSelector } from "@/store/redux/store";
 
 type MediaPermission = {
   audio: boolean;
@@ -306,30 +302,16 @@ export default function RoomHolder({
     console.log("retry to connect!");
   };
 
-  const isJoined = useRef(false);
-
   const handleJoin = useCallback(async () => {
     axiosInstance
       .get<FetchDataType<WorkspaceRoomJoinType>>(`/rooms/${room_id}/join`)
       .then((res) => {
         setPermissionChecked(true);
-        isJoined.current = true;
       })
       .catch((err) => {
         toast.error("Couldn't join to the room!");
       });
   }, [room_id]);
-
-  const handleJoinWithInterval = () => {
-    let interval = setInterval(() => {
-      if (isJoined.current === true) {
-        clearInterval(interval);
-        return;
-      }
-
-      handleJoin();
-    }, 3000);
-  };
 
   const handlePassed =
     permissionChecked === false && !isReConnecting && !isSwitching;
@@ -338,15 +320,11 @@ export default function RoomHolder({
     _BUS.rejoinRoom,
     () => {
       if (permissionChecked === true || isSwitching || isReConnecting) {
-        handleJoinWithInterval();
+        handleJoin();
       }
     },
     [handlePassed]
   );
-
-  useBus(_BUS.userLeftRoom, () => {
-    isJoined.current = false;
-  });
 
   if (handlePassed) content = <CheckPermissions2 onChecked={handleJoin} />;
 
