@@ -2,10 +2,21 @@ import CotopiaButton from "@/components/shared-ui/c-button"
 import PopupBox from "@/components/shared/popup-box"
 import PopupBoxChild from "@/components/shared/popup-box/child"
 import { Wallet } from "lucide-react"
-import Link from "next/link"
-import React from "react"
 
 export default function PayrollButton() {
+
+  function handleSendData() {
+    const data = localStorage.getItem("persist:cotopia-lite");
+    const parsedData = data && JSON.parse(data);
+    const authSlice = parsedData?.authSlice;
+    const targetWindow = window.open("http://localhost:3000"); 
+    if (targetWindow && authSlice) {
+      targetWindow.postMessage(authSlice, "http://localhost:3000");
+    } else {
+      console.error("Failed to open window or authSlice is undefined.");
+    }
+  }
+
   return (
     <PopupBox
       trigger={(open) => (
@@ -27,9 +38,9 @@ export default function PayrollButton() {
           top={triggerPosition.top}
           left={triggerPosition.left}
         >
-          <Link href="http://localhost:3000">
-            <CotopiaButton>More</CotopiaButton>
-          </Link>
+          <CotopiaButton onClick={handleSendData} className="bg-black text-black rounded-xl">
+            More
+          </CotopiaButton>
         </PopupBoxChild>
       )}
     </PopupBox>
